@@ -1,5 +1,6 @@
 "use client"
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import Map from "react-map-gl";
 
 type ItemDeReservorio = Record<string, unknown>;
 
@@ -84,6 +85,20 @@ export default function Home() {
             </article>
           ))}
       </section>
+
+      <div>
+        <h2 style={{ marginTop: "32px", marginBottom: "16px", fontSize: "20px" }}>Map</h2>
+        <Map
+          initialViewState={{
+            latitude: 37.7749,
+            longitude: -122.4194,
+            zoom: 10,
+          }}
+          style={{ width: "100%", height: 400, borderRadius: 12 }}
+          mapStyle="mapbox://styles/mapbox/streets-v11"
+          mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
+        />
+      </div>
     </main>
   );
 }
