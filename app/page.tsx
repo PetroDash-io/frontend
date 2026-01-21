@@ -11,7 +11,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const url = "https://petrodashbackend.onrender.com/ultimo";
+    const url = "https://petrodashbackend.onrender.com/pozos/ultimo";
 
     const fetchData = async () => {
       try {
