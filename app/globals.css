@@ -24,3 +24,23 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.pozo-popup-wrapper .mapboxgl-popup-content {
+  padding: 0 !important;      /* 🔑 elimina padding interno */
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.pozo-popup {
+  background: #fff;
+  color: #000;
+  padding: 4px 6px;           /* 👈 tamaño real del popup */
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;        /* evita que se agrande */
+}
+
+.pozo-popup-wrapper .mapboxgl-popup-tip {
+  border-top-color: #000 !important;
+}
