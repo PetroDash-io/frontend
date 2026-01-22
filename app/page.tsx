@@ -23,7 +23,6 @@ export default function Home() {
 
   useEffect(() => {
     const url = `https://petrodashbackend.onrender.com/pozos?limit=${limit}`;
-
     const fetchData = async () => {
       try {
         const response = await fetch(url, {
