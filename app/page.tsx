@@ -20,10 +20,6 @@ export default function Home() {
   const [selectedPozoId, setSelectedPozoId] = useState<string | null>(null);
   const [pozoDetail, setPozoDetail] = useState<PozoDetail | null>(null);
   const [loadingPozo, setLoadingPozo] = useState(false);
-
-  /* ===========================
-     Fetch pozos
-  =========================== */
   useEffect(() => {
     const url = `https://petrodashbackend.onrender.com/pozos?limit=${limit}`;
 
@@ -58,10 +54,6 @@ export default function Home() {
 
     fetchData();
   }, [limit]);
-
-  /* ===========================
-     Fetch pozo individual
-  =========================== */
   useEffect(() => {
     if (!selectedPozoId) return;
 
@@ -95,9 +87,6 @@ export default function Home() {
 
   return (
     <>
-      {/* ===========================
-          Header
-      =========================== */}
       <header
         style={{
           height: 64,
@@ -128,10 +117,6 @@ export default function Home() {
           PetroDash
         </h1>
       </header>
-
-      {/* ===========================
-          Layout principal
-      =========================== */}
       <main
         style={{
           display: "grid",
@@ -143,7 +128,6 @@ export default function Home() {
           backgroundColor: colors.bg,
         }}
       >
-        {/* Control de cantidad */}
         <div style={{ gridColumn: "1 / -1" }}>
           <label style={{ fontSize: 14, color: colors.text }}>
             Cantidad de pozos:&nbsp;
@@ -166,10 +150,6 @@ export default function Home() {
             />
           </label>
         </div>
-
-        {/* ===========================
-            Mapa
-        =========================== */}
         <div style={{ position: "relative" }}>
           {/* Barra de estados flotante */}
           <div
@@ -275,10 +255,6 @@ export default function Home() {
             )}
           </Map>
         </div>
-
-        {/* ===========================
-            Panel derecho
-        =========================== */}
         <div
           style={{
             border: `1px solid ${colors.panelBorder}`,
