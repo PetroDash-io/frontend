@@ -193,7 +193,7 @@ export default function Home() {
               process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
             }
           >
-            {reservorio.map((item: PozoDetail) => {
+            {reservorio.map((item: ItemDeReservorio) => {
               if (!item.geojson) return null;
 
               let lon: number, lat: number;

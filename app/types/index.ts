@@ -1,4 +1,9 @@
-export type ItemDeReservorio = Record<string, unknown>;
+export interface ItemDeReservorio {
+  idpozo: string;
+  tipoestado?: string;
+  geojson?: string;
+  [key: string]: unknown;
+}
 
 export interface ActivePozo {
   id: string;
