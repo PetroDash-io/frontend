@@ -18,6 +18,7 @@ export default function Home() {
 
   const [limit, setLimit] = useState(100);
   const [selectedPozoId, setSelectedPozoId] = useState<string | null>(null);
+  const [focusedPozoId, setFocusedPozoId] = useState<string | null>(null);
   const [pozoDetail, setPozoDetail] = useState<PozoDetail | null>(null);
   const [loadingPozo, setLoadingPozo] = useState(false);
   useEffect(() => {
@@ -213,11 +214,23 @@ export default function Home() {
                   anchor="center"
                 >
                   <div
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`${item.tipoestado || "Well"} ${item.idpozo}`}
                     onMouseEnter={() =>
                       setActivePozo({ id: item.idpozo, lon, lat })
                     }
                     onMouseLeave={() => setActivePozo(null)}
                     onClick={() => setSelectedPozoId(item.idpozo)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setSelectedPozoId(item.idpozo);
+                      }
+                    }}
+                    onFocus={() => setFocusedPozoId(item.idpozo)}
+                    onBlur={() => setFocusedPozoId(null)}
                     style={{
                       width: selectedPozoId === item.idpozo ? 10 : 8,
                       height: selectedPozoId === item.idpozo ? 10 : 8,
@@ -228,6 +241,11 @@ export default function Home() {
                       borderRadius: "50%",
                       border: "1px solid rgba(0,0,0,0.3)",
                       cursor: "pointer",
+                      outline: "none",
+                      boxShadow:
+                        focusedPozoId === item.idpozo
+                          ? `0 0 0 2px ${colors.accent}`
+                          : "none",
                     }}
                   />
                 </Marker>
