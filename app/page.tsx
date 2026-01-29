@@ -4,15 +4,19 @@ import React, { useEffect, useState } from "react";
 import Map, { Marker, Popup } from "react-map-gl/mapbox";
 import "mapbox-gl/dist/mapbox-gl.css";
 
+
 import { MAX_POZOS, colors, LEGEND_ITEMS } from "./utils/constants";
 import { getPozoColor } from "./utils/helpers";
 import { LegendItem } from "./components/LegendItem";
 import type { ItemDeReservorio, ActivePozo, PozoDetail } from "./types";
+import { TablaPozos } from "./components/TablaPozos";
 
 export default function Home() {
   const [reservorio, setReservorio] = useState<ItemDeReservorio[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [tab, setTab] = useState<"pozo" | "tabla">("pozo"); // pozo o tabla
 
   const [activePozo, setActivePozo] = useState<ActivePozo | null>(null);
 
@@ -117,10 +121,16 @@ export default function Home() {
           PetroDash
         </h1>
       </header>
+
+      <div style={{ display: "flex", gap: 12 }}>
+        <button onClick={() => setTab("pozo")}>Mapa</button>
+        <button onClick={() => setTab("tabla")}>Tabla</button>
+     </div>
+
       <main
         style={{
           display: "grid",
-          gridTemplateColumns: "2fr 1fr",
+          gridTemplateColumns: tab === "pozo" ? "2fr 1fr" : "1fr",
           gap: 24,
           padding: 24,
           maxWidth: 1400,
@@ -128,6 +138,7 @@ export default function Home() {
           backgroundColor: colors.bg,
         }}
       >
+
         <div style={{ gridColumn: "1 / -1" }}>
           <label style={{ fontSize: 14, color: colors.text }}>
             Cantidad de pozos:&nbsp;
@@ -150,7 +161,10 @@ export default function Home() {
             />
           </label>
         </div>
-        <div style={{ position: "relative" }}>
+      {tab === "pozo" && (
+      <>
+
+        <div style={{ position: "relative" }}> 
           {/* Barra de estados flotante */}
           <div
             style={{
@@ -178,7 +192,7 @@ export default function Home() {
             ))}
           </div>
 
-          <Map
+          <Map 
             initialViewState={{
               longitude: -68.059167,
               latitude: -38.951944,
@@ -255,7 +269,8 @@ export default function Home() {
             )}
           </Map>
         </div>
-        <div
+
+        <div // Panel de detalles del pozo
           style={{
             border: `1px solid ${colors.panelBorder}`,
             borderRadius: 14,
@@ -322,6 +337,15 @@ export default function Home() {
             </>
           )}
         </div>
+      </> 
+      )}
+
+      {tab ===  "tabla" && (
+        <TablaPozos
+          data={reservorio}
+          onSelectedPozo={(idpozo) => setSelectedPozoId(idpozo)}
+        />  
+      )} 
       </main>
     </>
   );
