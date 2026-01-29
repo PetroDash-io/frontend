@@ -9,6 +9,11 @@ export const colors = {
   accent: "#D6A23A",
   primary: "#4B2A1A",
   secondary: "#3F6B4F",
+  pozoActivo: "#22C55E",
+  pozoParado: "#FACC15",
+  pozoInactivo: "#EF4444",
+  pozoNoInformado: "#9CA3AF",
+  pozoUnknown: "#6B7280",
 };
 
 export const ESTADOS_POZO = {
@@ -38,8 +43,8 @@ export const ESTADOS_POZO = {
 };
 
 export const LEGEND_ITEMS = [
-  { color: "#22C55E", label: "Activo" },
-  { color: "#FACC15", label: "Parado" },
-  { color: "#EF4444", label: "Inactivo" },
-  { color: "#9CA3AF", label: "No informado" },
+  { color: colors.pozoActivo, label: "Activo" },
+  { color: colors.pozoParado, label: "Parado" },
+  { color: colors.pozoInactivo, label: "Inactivo" },
+  { color: colors.pozoNoInformado, label: "No informado" },
 ];
