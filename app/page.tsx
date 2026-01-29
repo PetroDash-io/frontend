@@ -215,7 +215,7 @@ export default function Home() {
                   <div
                     role="button"
                     tabIndex={0}
-                    aria-label={`Well marker ${item.idpozo}`}
+                    aria-label={`${item.tipoestado || "Well"} ${item.idpozo}`}
                     onMouseEnter={() =>
                       setActivePozo({ id: item.idpozo, lon, lat })
                     }
@@ -224,6 +224,7 @@ export default function Home() {
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
                         e.preventDefault();
+                        e.stopPropagation();
                         setSelectedPozoId(item.idpozo);
                       }
                     }}
@@ -237,6 +238,13 @@ export default function Home() {
                       borderRadius: "50%",
                       border: "1px solid rgba(0,0,0,0.3)",
                       cursor: "pointer",
+                      outline: "none",
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.boxShadow = `0 0 0 2px ${colors.accent}`;
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.boxShadow = "none";
                     }}
                   />
                 </Marker>
