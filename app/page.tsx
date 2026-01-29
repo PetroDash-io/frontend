@@ -74,7 +74,8 @@ export default function Home() {
         }
 
         const json = await response.json();
-        setPozoDetail(json.data[0]);
+        const data = json?.data;
+        setPozoDetail(Array.isArray(data) && data.length > 0 ? data[0] : null);
       } catch {
         setPozoDetail(null);
       } finally {
