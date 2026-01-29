@@ -1,4 +1,4 @@
-import { ESTADOS_POZO } from "./constants";
+import { ESTADOS_POZO, colors } from "./constants";
 
 export const normalize = (value?: string) =>
   value
@@ -31,19 +31,18 @@ const NORMALIZED_ESTADOS_POZO = {
 };
 
 export const getPozoColor = (tipoestado?: string) => {
-  if (!tipoestado) return "#9CA3AF";
+  if (!tipoestado) return colors.pozoNoInformado;
 
   const estado = normalize(tipoestado);
-  if (!estado) return "#9CA3AF";
-  if (!estado) return "#9CA3AF";
+  if (!estado) return colors.pozoNoInformado;
 
-  if (NORMALIZED_ESTADOS_POZO.ACTIVO.has(estado)) return "#22C55E";
+  if (NORMALIZED_ESTADOS_POZO.ACTIVO.has(estado)) return colors.pozoActivo;
 
-  if (NORMALIZED_ESTADOS_POZO.PARADO.has(estado)) return "#FACC15";
+  if (NORMALIZED_ESTADOS_POZO.PARADO.has(estado)) return colors.pozoParado;
 
-  if (NORMALIZED_ESTADOS_POZO.INACTIVO.has(estado)) return "#EF4444";
+  if (NORMALIZED_ESTADOS_POZO.INACTIVO.has(estado)) return colors.pozoInactivo;
 
-  if (NORMALIZED_ESTADOS_POZO.NO_INFORMADO.has(estado)) return "#9CA3AF";
+  if (NORMALIZED_ESTADOS_POZO.NO_INFORMADO.has(estado)) return colors.pozoNoInformado;
 
-  return "#6B7280";
+  return colors.pozoUnknown;
 };
