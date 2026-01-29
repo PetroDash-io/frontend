@@ -18,6 +18,7 @@ export default function Home() {
 
   const [limit, setLimit] = useState(100);
   const [selectedPozoId, setSelectedPozoId] = useState<string | null>(null);
+  const [focusedPozoId, setFocusedPozoId] = useState<string | null>(null);
   const [pozoDetail, setPozoDetail] = useState<PozoDetail | null>(null);
   const [loadingPozo, setLoadingPozo] = useState(false);
   useEffect(() => {
@@ -228,6 +229,8 @@ export default function Home() {
                         setSelectedPozoId(item.idpozo);
                       }
                     }}
+                    onFocus={() => setFocusedPozoId(item.idpozo)}
+                    onBlur={() => setFocusedPozoId(null)}
                     style={{
                       width: selectedPozoId === item.idpozo ? 10 : 8,
                       height: selectedPozoId === item.idpozo ? 10 : 8,
@@ -239,12 +242,10 @@ export default function Home() {
                       border: "1px solid rgba(0,0,0,0.3)",
                       cursor: "pointer",
                       outline: "none",
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.boxShadow = `0 0 0 2px ${colors.accent}`;
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.boxShadow = "none";
+                      boxShadow:
+                        focusedPozoId === item.idpozo
+                          ? `0 0 0 2px ${colors.accent}`
+                          : "none",
                     }}
                   />
                 </Marker>
