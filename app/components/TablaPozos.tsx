@@ -36,6 +36,11 @@ export function TablaPozos({ data, onSelectedPozo }: TablaPozosProps) {
                 "Área",
                 "Yacimiento",
                 "Estado",
+                "Tipo de Recurso",
+                "Tipo de pozo",
+                "Profundidad",
+                "Formación",
+                "Clasificación",
               ].map((h) => (
                 <th
                   key={h}
@@ -76,6 +81,12 @@ export function TablaPozos({ data, onSelectedPozo }: TablaPozosProps) {
                 <td style={cell}>{pozo.area}</td>
                 <td style={cell}>{pozo.yacimiento}</td>
                 <td style={cell}>{pozo.tipoestado}</td>
+                <td style={cell}>{pozo.tipo_recurso}</td>
+                <td style={cell}>{pozo.tipopozo}</td>
+                <td style={cell}>{pozo.profundidad}</td>
+                <td style={cell}>{pozo.formacion}</td>
+                <td style={cell}>{pozo.clasificacion}</td>
+                
               </tr>
             ))}
           </tbody>
@@ -87,4 +98,5 @@ export function TablaPozos({ data, onSelectedPozo }: TablaPozosProps) {
   const cell: React.CSSProperties = {
     padding: "8px",
     whiteSpace: "nowrap",
+    color: "#222",
   };
