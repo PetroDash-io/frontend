@@ -213,11 +213,20 @@ export default function Home() {
                   anchor="center"
                 >
                   <div
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Well marker ${item.idpozo}`}
                     onMouseEnter={() =>
                       setActivePozo({ id: item.idpozo, lon, lat })
                     }
                     onMouseLeave={() => setActivePozo(null)}
                     onClick={() => setSelectedPozoId(item.idpozo)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setSelectedPozoId(item.idpozo);
+                      }
+                    }}
                     style={{
                       width: selectedPozoId === item.idpozo ? 10 : 8,
                       height: selectedPozoId === item.idpozo ? 10 : 8,
