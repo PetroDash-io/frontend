@@ -138,7 +138,9 @@ export default function Home() {
               value={limit}
               onChange={(e) => {
                 const value = Number(e.target.value);
-                if (value <= MAX_POZOS) setLimit(value);
+                if (!Number.isNaN(value) && value >= 1 && value <= MAX_POZOS) {
+                  setLimit(value);
+                }
               }}
               style={{
                 width: 120,
