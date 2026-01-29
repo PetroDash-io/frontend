@@ -95,7 +95,7 @@ export default function Home() {
           alignItems: "center",
           gap: 16,
           padding: "0 28px",
-          background: "linear-gradient(90deg, #3F6B4F, #4B2A1A)",
+          background: `linear-gradient(90deg, ${colors.secondary}, ${colors.primary})`,
         }}
       >
         <img
