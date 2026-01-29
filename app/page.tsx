@@ -111,7 +111,7 @@ export default function Home() {
           style={{
             fontSize: 22,
             fontWeight: 600,
-            color: "#F3EEE6",
+            color: colors.textLight,
             letterSpacing: "0.5px",
           }}
         >
