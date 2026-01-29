@@ -35,6 +35,7 @@ export const getPozoColor = (tipoestado?: string) => {
 
   const estado = normalize(tipoestado);
   if (!estado) return "#9CA3AF";
+  if (!estado) return "#9CA3AF";
 
   if (NORMALIZED_ESTADOS_POZO.ACTIVO.has(estado)) return "#22C55E";
 
