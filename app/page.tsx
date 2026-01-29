@@ -18,6 +18,7 @@ export default function Home() {
 
   const [limit, setLimit] = useState(100);
   const [selectedPozoId, setSelectedPozoId] = useState<string | null>(null);
+  const [focusedPozoId, setFocusedPozoId] = useState<string | null>(null);
   const [pozoDetail, setPozoDetail] = useState<PozoDetail | null>(null);
   const [loadingPozo, setLoadingPozo] = useState(false);
   useEffect(() => {
@@ -74,7 +75,8 @@ export default function Home() {
         }
 
         const json = await response.json();
-        setPozoDetail(json.data[0]);
+        const data = json?.data;
+        setPozoDetail(Array.isArray(data) && data.length > 0 ? data[0] : null);
       } catch {
         setPozoDetail(null);
       } finally {
@@ -94,7 +96,7 @@ export default function Home() {
           alignItems: "center",
           gap: 16,
           padding: "0 28px",
-          background: "linear-gradient(90deg, #3F6B4F, #4B2A1A)",
+          background: `linear-gradient(90deg, ${colors.secondary}, ${colors.primary})`,
         }}
       >
         <img
@@ -110,7 +112,7 @@ export default function Home() {
           style={{
             fontSize: 22,
             fontWeight: 600,
-            color: "#F3EEE6",
+            color: colors.textLight,
             letterSpacing: "0.5px",
           }}
         >
@@ -192,7 +194,7 @@ export default function Home() {
               process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
             }
           >
-            {reservorio.map((item: PozoDetail) => {
+            {reservorio.map((item: ItemDeReservorio) => {
               if (!item.geojson) return null;
 
               let lon: number, lat: number;
@@ -212,11 +214,23 @@ export default function Home() {
                   anchor="center"
                 >
                   <div
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`${item.tipoestado || "Well"} ${item.idpozo}`}
                     onMouseEnter={() =>
                       setActivePozo({ id: item.idpozo, lon, lat })
                     }
                     onMouseLeave={() => setActivePozo(null)}
                     onClick={() => setSelectedPozoId(item.idpozo)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setSelectedPozoId(item.idpozo);
+                      }
+                    }}
+                    onFocus={() => setFocusedPozoId(item.idpozo)}
+                    onBlur={() => setFocusedPozoId(null)}
                     style={{
                       width: selectedPozoId === item.idpozo ? 10 : 8,
                       height: selectedPozoId === item.idpozo ? 10 : 8,
@@ -227,6 +241,11 @@ export default function Home() {
                       borderRadius: "50%",
                       border: "1px solid rgba(0,0,0,0.3)",
                       cursor: "pointer",
+                      outline: "none",
+                      boxShadow:
+                        focusedPozoId === item.idpozo
+                          ? `0 0 0 2px ${colors.accent}`
+                          : "none",
                     }}
                   />
                 </Marker>
