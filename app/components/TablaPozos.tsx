@@ -1,14 +1,13 @@
-import type { ItemDeReservorio } from "../types";
+import type { PozoDetail } from "../types";
 import { colors } from "../utils/constants";
 
 
 interface TablaPozosProps {
-  data: ItemDeReservorio[];
+  data: PozoDetail[];
   onSelectedPozo?: (id: string) => void;
 }
 
 export function TablaPozos({ data, onSelectedPozo }: TablaPozosProps) {
-    console.log("DATA EN TABLA:", data);
     return (
       <div
         style={{
@@ -59,7 +58,7 @@ export function TablaPozos({ data, onSelectedPozo }: TablaPozosProps) {
           </thead>
   
           <tbody>
-            {data.map((pozo: any) => (
+            {data.map((pozo) => (
               <tr
                 key={pozo.idpozo}
                 onClick={() => onSelectedPozo?.(pozo.idpozo)}

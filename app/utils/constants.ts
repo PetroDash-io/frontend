@@ -43,3 +43,5 @@ export const LEGEND_ITEMS = [
   { color: "#EF4444", label: "Inactivo" },
   { color: "#9CA3AF", label: "No informado" },
 ];
+
+
