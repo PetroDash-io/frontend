@@ -1,5 +1,3 @@
-export type ItemDeReservorio = Record<string, unknown>;
-
 export interface ActivePozo {
   id: string;
   lon: number;
@@ -7,17 +5,17 @@ export interface ActivePozo {
 }
 
 export interface PozoDetail {
-  idpozo: string;
-  cuenca: string;
-  provincia: string;
+  well_id: string;
+  watershed: string;
+  province: string;
   area: string;
-  empresa: string;
-  yacimiento: string;
-  formacion: string;
-  clasificacion: string;
-  tipo_recurso: string;
-  tipopozo: string;
-  tipoestado: string;
-  profundidad: number;
+  company: string;
+  field: string;
+  formation: string;
+  classification: string;
+  resource_type: string;
+  type: string;
+  status: string;
+  depth: number;
   geojson?: string;
 }
