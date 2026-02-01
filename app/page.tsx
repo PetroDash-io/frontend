@@ -57,7 +57,7 @@ export default function Home() {
   });
 
   useEffect(() => {
-    const url = `http://0.0.0.0:8080/pozos?limit=${limit}`;
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/pozos?limit=${limit}`;
     const fetchData = async () => {
       try {
         const response = await fetch(url, {
@@ -96,7 +96,7 @@ export default function Home() {
       setLoadingPozo(true);
       try {
         const response = await fetch(
-          `http://0.0.0.0:8080/pozos/${selectedPozoId}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/pozos/${selectedPozoId}`,
           {
             headers: {
               "X-API-Key": process.env.NEXT_PUBLIC_API_KEY || "",
