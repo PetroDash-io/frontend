@@ -48,3 +48,5 @@ export const LEGEND_ITEMS = [
   { color: colors.pozoInactivo, label: "Inactivo" },
   { color: colors.pozoNoInformado, label: "No informado" },
 ];
+
+

@@ -4,15 +4,39 @@ import React, { useEffect, useState } from "react";
 import Map, { Marker, Popup } from "react-map-gl/mapbox";
 import "mapbox-gl/dist/mapbox-gl.css";
 
+
 import { MAX_POZOS, colors, LEGEND_ITEMS } from "./utils/constants";
 import { getPozoColor } from "./utils/helpers";
 import { LegendItem } from "./components/LegendItem";
-import type { ItemDeReservorio, ActivePozo, PozoDetail } from "./types";
+import type { ActivePozo, PozoDetail } from "./types";
+import { TablaPozos } from "./components/TablaPozos";
 
 export default function Home() {
-  const [reservorio, setReservorio] = useState<ItemDeReservorio[]>([]);
+  const [reservorio, setReservorio] = useState<PozoDetail[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [filters, setFilters] = useState(
+    {
+      provincia: "ALL",
+      tipoestado: "ALL",
+      empresa: "ALL"
+    }
+  );
+
+  const reservorioFiltrado = reservorio.filter((pozo) => {
+    if (filters.provincia !== "ALL" && pozo.provincia !== filters.provincia)
+      return false;
+  
+    if (filters.tipoestado !== "ALL" && pozo.tipoestado !== filters.tipoestado)
+      return false;
+  
+    if (filters.empresa !== "ALL" && pozo.empresa !== filters.empresa)
+      return false;
+  
+    return true;
+  });
+  
+  const [tab, setTab] = useState<"pozo" | "tabla">("pozo"); // pozo o tabla
 
   const [activePozo, setActivePozo] = useState<ActivePozo | null>(null);
 
@@ -21,6 +45,18 @@ export default function Home() {
   const [focusedPozoId, setFocusedPozoId] = useState<string | null>(null);
   const [pozoDetail, setPozoDetail] = useState<PozoDetail | null>(null);
   const [loadingPozo, setLoadingPozo] = useState(false);
+  const tabButtonStyle = (active: boolean) => ({
+    padding: "8px 16px",
+    borderRadius: 8,
+    border: "1px solid #3F6B4F",
+    backgroundColor: active ? "#3F6B4F" : "transparent",
+    color: active ? "#F3EEE6" : "#3F6B4F",
+    fontSize: 14,
+    fontWeight: 500,
+    cursor: "pointer",
+    transition: "all 0.2s ease",
+  });
+  
   useEffect(() => {
     const url = `https://petrodashbackend.onrender.com/pozos?limit=${limit}`;
 
@@ -39,7 +75,7 @@ export default function Home() {
         const json = await response.json();
         const { data } = json;
 
-        const normalized: ItemDeReservorio[] = Array.isArray(data)
+        const normalized: PozoDetail[] = Array.isArray(data)
           ? data
           : data
           ? [data]
@@ -119,10 +155,70 @@ export default function Home() {
           PetroDash
         </h1>
       </header>
+
+      <div style={{ display: "flex", gap: 12, padding: "12px 24px" }}>
+        <button
+          style={tabButtonStyle(tab === "pozo")}
+          onClick={() => setTab("pozo")}
+        >
+          Mapa
+        </button>
+
+        <button
+          style={tabButtonStyle(tab === "tabla")}
+          onClick={() => setTab("tabla")}
+        >
+          Tabla
+        </button>
+      </div>
+
+      <div style={{ display: "flex", gap: 12, padding: "12px 24px"}}>
+        <select
+          value={filters.provincia}
+          onChange={(e) =>
+            setFilters({ ...filters, provincia: e.target.value })
+          }
+          className="select-filter"
+        >
+          <option value="ALL">Todas las provincias</option>
+          {[...new Set(reservorio.map(p => p.provincia))].map(p => (
+            <option key={p} value={p}>{p}</option>
+          ))}
+        </select>
+
+        <select
+          value={filters.tipoestado}
+          onChange={(e) =>
+            setFilters({ ...filters, tipoestado: e.target.value })
+          }
+          className="select-filter"
+        >
+          <option value="ALL">Todos los estados</option>
+          {[...new Set(reservorio.map(p => p.tipoestado))].map(e => (
+            <option key={e} value={e}>{e}</option>
+          ))}
+        </select>
+
+        <select
+          value={filters.empresa}
+          onChange={(e) =>
+            setFilters({ ...filters, empresa: e.target.value })
+          }
+          className="select-filter"
+         
+        >
+          <option value="ALL">Todas las empresas</option>
+          {[...new Set(reservorio.map(p => p.empresa))].map(emp => (
+            <option key={emp} value={emp}>{emp}</option>
+          ))}
+        </select>
+      </div>
+
+
       <main
         style={{
           display: "grid",
-          gridTemplateColumns: "2fr 1fr",
+          gridTemplateColumns: tab === "pozo" ? "2fr 1fr" : "1fr",
           gap: 24,
           padding: 24,
           maxWidth: 1400,
@@ -130,6 +226,7 @@ export default function Home() {
           backgroundColor: colors.bg,
         }}
       >
+
         <div style={{ gridColumn: "1 / -1" }}>
           <label style={{ fontSize: 14, color: colors.text }}>
             Cantidad de pozos:&nbsp;
@@ -154,7 +251,10 @@ export default function Home() {
             />
           </label>
         </div>
-        <div style={{ position: "relative" }}>
+      {tab === "pozo" && (
+      <>
+
+        <div style={{ position: "relative" }}> 
           {/* Barra de estados flotante */}
           <div
             style={{
@@ -182,7 +282,7 @@ export default function Home() {
             ))}
           </div>
 
-          <Map
+          <Map 
             initialViewState={{
               longitude: -68.059167,
               latitude: -38.951944,
@@ -194,7 +294,7 @@ export default function Home() {
               process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
             }
           >
-            {reservorio.map((item: ItemDeReservorio) => {
+            {reservorioFiltrado.map((item: PozoDetail) => {
               if (!item.geojson) return null;
 
               let lon: number, lat: number;
@@ -276,7 +376,8 @@ export default function Home() {
             )}
           </Map>
         </div>
-        <div
+
+        <div // Panel de detalles del pozo
           style={{
             border: `1px solid ${colors.panelBorder}`,
             borderRadius: 14,
@@ -343,6 +444,15 @@ export default function Home() {
             </>
           )}
         </div>
+      </> 
+      )}
+
+      {tab ===  "tabla" && (
+        <TablaPozos
+          data={reservorioFiltrado}
+          onSelectedPozo={(idpozo) => setSelectedPozoId(idpozo)}
+        />  
+      )} 
       </main>
     </>
   );
