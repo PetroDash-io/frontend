@@ -19,3 +19,9 @@ export interface PozoDetail {
   depth: number;
   geojson?: string;
 }
+
+export interface ActivePozo {
+  id: string;
+  lon: number;
+  lat: number;
+}
