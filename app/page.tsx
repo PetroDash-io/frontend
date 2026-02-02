@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import Map, { Marker, Popup } from "react-map-gl/mapbox";
+import React, {useEffect, useState} from "react";
+import Map, {Marker, Popup} from "react-map-gl/mapbox";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 
@@ -9,7 +9,7 @@ import { MAX_POZOS, colors, LEGEND_ITEMS } from "./utils/constants";
 import { getPozoColor } from "./utils/helpers";
 import { LegendItem } from "./components/LegendItem";
 import type { ActivePozo, PozoDetail } from "./types";
-import { TablaPozos } from "./components/TablaPozos";
+import { WellsTable } from "./components/WellsTable";
 
 export default function Home() {
   const [reservorio, setReservorio] = useState<PozoDetail[]>([]);
@@ -17,25 +17,25 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState(
     {
-      provincia: "ALL",
-      tipoestado: "ALL",
-      empresa: "ALL"
+      province: "ALL",
+      status: "ALL",
+      company: "ALL"
     }
   );
 
   const reservorioFiltrado = reservorio.filter((pozo) => {
-    if (filters.provincia !== "ALL" && pozo.provincia !== filters.provincia)
+    if (filters.province !== "ALL" && pozo.province !== filters.province)
       return false;
-  
-    if (filters.tipoestado !== "ALL" && pozo.tipoestado !== filters.tipoestado)
+
+    if (filters.status !== "ALL" && pozo.status !== filters.status)
       return false;
-  
-    if (filters.empresa !== "ALL" && pozo.empresa !== filters.empresa)
+
+    if (filters.company !== "ALL" && pozo.company !== filters.company)
       return false;
-  
+
     return true;
   });
-  
+
   const [tab, setTab] = useState<"pozo" | "tabla">("pozo"); // pozo o tabla
 
   const [activePozo, setActivePozo] = useState<ActivePozo | null>(null);
@@ -56,10 +56,9 @@ export default function Home() {
     cursor: "pointer",
     transition: "all 0.2s ease",
   });
-  
-  useEffect(() => {
-    const url = `https://petrodashbackend.onrender.com/pozos?limit=${limit}`;
 
+  useEffect(() => {
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/pozos?limit=${limit}`;
     const fetchData = async () => {
       try {
         const response = await fetch(url, {
@@ -98,7 +97,7 @@ export default function Home() {
       setLoadingPozo(true);
       try {
         const response = await fetch(
-          `https://petrodashbackend.onrender.com/pozos/${selectedPozoId}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/pozos/${selectedPozoId}`,
           {
             headers: {
               "X-API-Key": process.env.NEXT_PUBLIC_API_KEY || "",
@@ -174,41 +173,41 @@ export default function Home() {
 
       <div style={{ display: "flex", gap: 12, padding: "12px 24px"}}>
         <select
-          value={filters.provincia}
+          value={filters.province}
           onChange={(e) =>
-            setFilters({ ...filters, provincia: e.target.value })
+            setFilters({ ...filters, province: e.target.value })
           }
           className="select-filter"
         >
-          <option value="ALL">Todas las provincias</option>
-          {[...new Set(reservorio.map(p => p.provincia))].map(p => (
+          <option value="ALL">Todas las provinces</option>
+          {[...new Set(reservorio.map(well => well.province))].map(p => (
             <option key={p} value={p}>{p}</option>
           ))}
         </select>
 
         <select
-          value={filters.tipoestado}
+          value={filters.status}
           onChange={(e) =>
-            setFilters({ ...filters, tipoestado: e.target.value })
+            setFilters({ ...filters, status: e.target.value })
           }
           className="select-filter"
         >
           <option value="ALL">Todos los estados</option>
-          {[...new Set(reservorio.map(p => p.tipoestado))].map(e => (
+          {[...new Set(reservorio.map(well => well.status))].map(e => (
             <option key={e} value={e}>{e}</option>
           ))}
         </select>
 
         <select
-          value={filters.empresa}
+          value={filters.company}
           onChange={(e) =>
-            setFilters({ ...filters, empresa: e.target.value })
+            setFilters({ ...filters, company: e.target.value })
           }
           className="select-filter"
-         
+
         >
           <option value="ALL">Todas las empresas</option>
-          {[...new Set(reservorio.map(p => p.empresa))].map(emp => (
+          {[...new Set(reservorio.map(well => well.company))].map(emp => (
             <option key={emp} value={emp}>{emp}</option>
           ))}
         </select>
@@ -254,7 +253,7 @@ export default function Home() {
       {tab === "pozo" && (
       <>
 
-        <div style={{ position: "relative" }}> 
+        <div style={{ position: "relative" }}>
           {/* Barra de estados flotante */}
           <div
             style={{
@@ -282,7 +281,7 @@ export default function Home() {
             ))}
           </div>
 
-          <Map 
+          <Map
             initialViewState={{
               longitude: -68.059167,
               latitude: -38.951944,
@@ -308,7 +307,7 @@ export default function Home() {
 
               return (
                 <Marker
-                  key={item.idpozo}
+                  key={item.well_id}
                   longitude={lon}
                   latitude={lat}
                   anchor="center"
@@ -316,34 +315,34 @@ export default function Home() {
                   <div
                     role="button"
                     tabIndex={0}
-                    aria-label={`${item.tipoestado || "Well"} ${item.idpozo}`}
+                    aria-label={`${item.status || "Well"} ${item.well_id}`}
                     onMouseEnter={() =>
-                      setActivePozo({ id: item.idpozo, lon, lat })
+                      setActivePozo({ id: item.well_id, lon, lat })
                     }
                     onMouseLeave={() => setActivePozo(null)}
-                    onClick={() => setSelectedPozoId(item.idpozo)}
+                    onClick={() => setSelectedPozoId(item.well_id)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
                         e.preventDefault();
                         e.stopPropagation();
-                        setSelectedPozoId(item.idpozo);
+                        setSelectedPozoId(item.well_id);
                       }
                     }}
-                    onFocus={() => setFocusedPozoId(item.idpozo)}
+                    onFocus={() => setFocusedPozoId(item.well_id)}
                     onBlur={() => setFocusedPozoId(null)}
                     style={{
-                      width: selectedPozoId === item.idpozo ? 10 : 8,
-                      height: selectedPozoId === item.idpozo ? 10 : 8,
+                      width: selectedPozoId === item.well_id ? 10 : 8,
+                      height: selectedPozoId === item.well_id ? 10 : 8,
                       backgroundColor:
-                        selectedPozoId === item.idpozo
+                        selectedPozoId === item.well_id
                           ? colors.accent
-                          : getPozoColor(item.tipoestado),
+                          : getPozoColor(item.status),
                       borderRadius: "50%",
                       border: "1px solid rgba(0,0,0,0.3)",
                       cursor: "pointer",
                       outline: "none",
                       boxShadow:
-                        focusedPozoId === item.idpozo
+                        focusedPozoId === item.well_id
                           ? `0 0 0 2px ${colors.accent}`
                           : "none",
                     }}
@@ -403,7 +402,7 @@ export default function Home() {
                   color: colors.accent,
                 }}
               >
-                Pozo {pozoDetail.idpozo}
+                Pozo {pozoDetail.well_id}
               </h3>
 
               <dl
@@ -416,17 +415,17 @@ export default function Home() {
                 }}
               >
                 {[
-                  ["Cuenca", pozoDetail.cuenca],
-                  ["Provincia", pozoDetail.provincia],
+                  ["Cuenca", pozoDetail.watershed],
+                  ["Provincia", pozoDetail.province],
                   ["Área", pozoDetail.area],
-                  ["Empresa", pozoDetail.empresa],
-                  ["Yacimiento", pozoDetail.yacimiento],
-                  ["Formación", pozoDetail.formacion],
-                  ["Clasificación", pozoDetail.clasificacion],
-                  ["Tipo recurso", pozoDetail.tipo_recurso],
-                  ["Tipo pozo", pozoDetail.tipopozo],
-                  ["Estado", pozoDetail.tipoestado],
-                  ["Profundidad", `${pozoDetail.profundidad} metros`],
+                  ["Empresa", pozoDetail.company],
+                  ["Yacimiento", pozoDetail.field],
+                  ["Formación", pozoDetail.formation],
+                  ["Clasificación", pozoDetail.classification],
+                  ["Tipo recurso", pozoDetail.resource_type],
+                  ["Tipo pozo", pozoDetail.type],
+                  ["Estado", pozoDetail.status],
+                  ["Profundidad", `${pozoDetail.depth} metros`],
                 ].map(([label, value]) => (
                   <React.Fragment key={label}>
                     <dt
@@ -444,17 +443,16 @@ export default function Home() {
             </>
           )}
         </div>
-      </> 
+      </>
       )}
 
       {tab ===  "tabla" && (
-        <TablaPozos
+        <WellsTable
           data={reservorioFiltrado}
           onSelectedPozo={(idpozo) => setSelectedPozoId(idpozo)}
-        />  
-      )} 
+        />
+      )}
       </main>
     </>
   );
-  
 }

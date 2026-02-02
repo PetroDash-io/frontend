@@ -1,20 +1,24 @@
-export interface PozoDetail {
-  idpozo: string;
-  cuenca: string;
-  provincia: string;
-  area: string;
-  empresa: string;
-  yacimiento: string;
-  formacion: string;
-  clasificacion: string;
-  tipo_recurso: string;
-  tipopozo: string;
-  tipoestado: string;
-  profundidad: number;
-  geojson?: string;
+export interface ActivePozo {
+  id: string;
+  lon: number;
+  lat: number;
 }
 
-export type ItemDeReservorio = PozoDetail;
+export interface PozoDetail {
+  well_id: string;
+  watershed: string;
+  province: string;
+  area: string;
+  company: string;
+  field: string;
+  formation: string;
+  classification: string;
+  resource_type: string;
+  type: string;
+  status: string;
+  depth: number;
+  geojson?: string;
+}
 
 export interface ActivePozo {
   id: string;

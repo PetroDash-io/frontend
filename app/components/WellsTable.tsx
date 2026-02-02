@@ -2,12 +2,12 @@ import type { PozoDetail } from "../types";
 import { colors } from "../utils/constants";
 
 
-interface TablaPozosProps {
+interface WellsTableProps {
   data: PozoDetail[];
   onSelectedPozo?: (id: string) => void;
 }
 
-export function TablaPozos({ data, onSelectedPozo }: TablaPozosProps) {
+export function WellsTable({ data, onSelectedPozo }: WellsTableProps) {
     return (
       <div
         style={{
@@ -60,8 +60,8 @@ export function TablaPozos({ data, onSelectedPozo }: TablaPozosProps) {
           <tbody>
             {data.map((pozo) => (
               <tr
-                key={pozo.idpozo}
-                onClick={() => onSelectedPozo?.(pozo.idpozo)}
+                key={pozo.well_id}
+                onClick={() => onSelectedPozo?.(pozo.well_id)}
                 style={{
                   cursor: "pointer",
                   borderBottom: "1px solid #eee",
@@ -73,18 +73,18 @@ export function TablaPozos({ data, onSelectedPozo }: TablaPozosProps) {
                   (e.currentTarget.style.background = "transparent")
                 }
               >
-                <td style={cell}>{pozo.idpozo}</td>
-                <td style={cell}>{pozo.empresa}</td>
-                <td style={cell}>{pozo.provincia}</td>
-                <td style={cell}>{pozo.cuenca}</td>
+                <td style={cell}>{pozo.well_id}</td>
+                <td style={cell}>{pozo.company}</td>
+                <td style={cell}>{pozo.province}</td>
+                <td style={cell}>{pozo.watershed}</td>
                 <td style={cell}>{pozo.area}</td>
-                <td style={cell}>{pozo.yacimiento}</td>
-                <td style={cell}>{pozo.tipoestado}</td>
-                <td style={cell}>{pozo.tipo_recurso}</td>
-                <td style={cell}>{pozo.tipopozo}</td>
-                <td style={cell}>{pozo.profundidad}</td>
-                <td style={cell}>{pozo.formacion}</td>
-                <td style={cell}>{pozo.clasificacion}</td>
+                <td style={cell}>{pozo.field}</td>
+                <td style={cell}>{pozo.status}</td>
+                <td style={cell}>{pozo.resource_type}</td>
+                <td style={cell}>{pozo.type}</td>
+                <td style={cell}>{pozo.depth}</td>
+                <td style={cell}>{pozo.formation}</td>
+                <td style={cell}>{pozo.classification}</td>
                 
               </tr>
             ))}
