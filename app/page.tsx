@@ -5,11 +5,22 @@ import Map, { Marker, Popup } from "react-map-gl/mapbox";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 import { MAX_POZOS, colors, LEGEND_ITEMS } from "./utils/constants";
-import { getPozoColor } from "./utils/helpers";
+import {getPozoColor, toNumber} from "./utils/helpers";
 import { LegendItem } from "./components/LegendItem";
-import type { ActivePozo, PozoDetail } from "./types";
+import {ActivePozo, PozoDetail, ProductionMonthly} from "./types";
 import { WellsTable } from "./components/WellsTable";
+import {ProductionMonthlyResponse} from "@/app/api_client/ProductionMonthlyResponse";
 
+import {
+    ResponsiveContainer,
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    Legend,
+} from "recharts";
 
 export default function Home() {
     const [reservorio, setReservorio] = useState<PozoDetail[]>([]);
@@ -27,6 +38,11 @@ export default function Home() {
     const [selectedPozoId, setSelectedPozoId] = useState<string | null>(null);
     const [pozoDetail, setPozoDetail] = useState<PozoDetail | null>(null);
     const [loadingPozo, setLoadingPozo] = useState(false);
+
+    const [showCurve, setShowCurve] = useState(false);
+    const [curveLoading, setCurveLoading] = useState(false);
+    const [curveError, setCurveError] = useState<string | null>(null);
+    const [curveData, setCurveData] = useState<ProductionMonthly[] | null>(null);
 
     const reservorioFiltrado = useMemo(() => {
         return reservorio.filter((pozo) => {
@@ -113,6 +129,77 @@ export default function Home() {
 
         fetchPozo();
     }, [selectedPozoId]);
+
+    useEffect(() => {
+        setShowCurve(false);
+        setCurveLoading(false);
+        setCurveError(null);
+        setCurveData(null);
+    }, [selectedPozoId]);
+
+    async function fetchProductionForSelectedWell(wellId: string) {
+        setCurveLoading(true);
+        setCurveError(null);
+
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pozos/${wellId}/produccion-mensual`, {
+                headers: {
+                    "X-API-Key": process.env.NEXT_PUBLIC_API_KEY || "",
+                },
+            });
+
+            if (!response.ok) {
+                // si el backend devuelve 404 con detail, lo mostramos
+                let errorMessage = `Error al cargar producción mensual (status ${response.status})`;
+                try {
+                    const jsonResponse = await response.json();
+                    if (jsonResponse?.detail) errorMessage = jsonResponse.detail;
+                } catch {}
+                throw new Error(errorMessage);
+            }
+
+            const json: ProductionMonthlyResponse = await response.json();
+            const rows = Array.isArray(json.data) ? json.data : [];
+
+            // Orden defensivo por fecha (aunque ya venga ordenado)
+            rows.sort((a, b) => a.reported_period_date.localeCompare(b.reported_period_date));
+
+            setCurveData(rows);
+        } catch (error) {
+            setCurveData(null);
+            setCurveError(error instanceof Error ? error.message : "Error inesperado");
+        } finally {
+            setCurveLoading(false);
+        }
+    }
+
+    function onToggleCurve() {
+        if (!selectedPozoId) return;
+
+        if (!showCurve) {
+            setShowCurve(true);
+            if (!curveData && !curveLoading) {
+                fetchProductionForSelectedWell(selectedPozoId);
+            }
+            return;
+        }
+
+        setShowCurve(false);
+    }
+
+    const chartData = useMemo(() => {
+        if (!curveData || curveData.length === 0) return null;
+
+        return curveData
+            .slice()
+            .sort((a, b) => a.reported_period_date.localeCompare(b.reported_period_date))
+            .map((record) => ({
+                date: record.reported_period_date.slice(0, 7), // "YYYY-MM"
+                oil: toNumber(record.oil_production) ?? 0,
+                gas: toNumber(record.gas_production) ?? 0,
+                water: toNumber(record.water_production) ?? 0,
+            }));
+    }, [curveData]);
 
     return (
         <>
@@ -272,6 +359,32 @@ export default function Home() {
                                             </React.Fragment>
                                         ))}
                                     </dl>
+
+                                    <div style={styles.showCurveButtonContainer}>
+                                        <button
+                                            style={styles.showCurveButton(showCurve)}
+                                            disabled={!selectedPozoId || curveLoading}
+                                            onClick={onToggleCurve}
+                                            title={!selectedPozoId ? "Seleccioná un pozo" : "Ver curva de vida"}
+                                        >
+                                            {showCurve ? "Ocultar curva de vida" : "Ver curva de vida"}
+                                        </button>
+
+                                        {showCurve && (
+                                            <button
+                                                style={styles.showCurveSecondaryButton}
+                                                disabled={!selectedPozoId || curveLoading}
+                                                onClick={() => selectedPozoId && fetchProductionForSelectedWell(selectedPozoId)}
+                                                title="Volver a pedir a la API">
+                                                Refrescar
+                                            </button>
+                                        )}
+                                    </div>
+
+                                    {showCurve && curveLoading && <p style={styles.curveHint}>Cargando producción mensual...</p>}
+                                    {showCurve && curveError && (
+                                        <p style={{ ...styles.curveHint, color: "#fecaca" }}>{curveError}</p>
+                                    )}
                                 </>
                             )}
                         </div>
@@ -279,7 +392,7 @@ export default function Home() {
                 )}
 
                 {tab === "tabla" && (
-                    <WellsTable data={reservorioFiltrado} onSelectedPozo={(idpozo) => setSelectedPozoId(idpozo)} />
+                    <WellsTable data={reservorioFiltrado} onSelectedPozo={(well_id) => setSelectedPozoId(well_id)} />
                 )}
 
                 {error && (
@@ -293,8 +406,33 @@ export default function Home() {
                         <p>Cargando pozos...</p>
                     </div>
                 )}
+
+                {showCurve && selectedPozoId && chartData && (
+                    <CurveChart data={chartData} />
+                )}
             </main>
         </>
+    );
+}
+
+function CurveChart({ data }: { data: { date: string; oil: number | null; gas: number | null; water: number | null }[] }) {
+    return (
+        <div style={styles.curveChartWrapper}>
+            <div style={{ height: 320 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="date" minTickGap={18} />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Line type="monotone" dataKey="oil" name="Petróleo" dot={false} connectNulls={false}/>
+                        <Line type="monotone" dataKey="gas" name="Gas" dot={false} connectNulls={false}/>
+                        <Line type="monotone" dataKey="water" name="Agua" dot={false} connectNulls={false}/>
+                    </LineChart>
+                </ResponsiveContainer>
+            </div>
+        </div>
     );
 }
 
@@ -330,9 +468,7 @@ const styles = {
         padding: 24,
         maxWidth: "100%",
         margin: "0 auto",
-        backgroundColor: colors.bg,
-        borderWidth: 2,
-        borderColor: "green"
+        backgroundColor: colors.bg
     }),
     limitFilterContainer: {
         display: "flex",
@@ -427,7 +563,48 @@ const styles = {
     },
     loadingContainer: {
         display: "flex"
-    }
+    },
+    showCurveButtonContainer: {
+        display: "flex",
+        gap: 10,
+        alignItems: "center",
+        marginTop: 6,
+    },
+    showCurveButton: (active: boolean) => ({
+        padding: "8px 10px",
+        borderRadius: 10,
+        border: `1px solid ${colors.accent}`,
+        backgroundColor: active ? colors.accent : "transparent",
+        color: active ? "#0b0b0b" : colors.accent,
+        fontSize: 13,
+        fontWeight: 600,
+        cursor: "pointer",
+        transition: "all 0.2s ease",
+    }),
+    showCurveSecondaryButton: {
+        padding: "8px 10px",
+        borderRadius: 10,
+        border: `1px solid rgba(243,238,230,0.35)`,
+        backgroundColor: "rgba(243,238,230,0.08)",
+        color: "rgba(243,238,230,0.9)",
+        fontSize: 13,
+        fontWeight: 600,
+        cursor: "pointer",
+    },
+    curveHint: {
+        margin: 0,
+        fontSize: 13,
+        opacity: 0.9,
+    },
+    curveChartWrapper: {
+        display: "flex",
+        flexDirection: "column",
+        gap: 10,
+        borderRadius: 14,
+        border: `1px solid ${colors.panelBorder}`,
+        color: colors.textLight,
+        marginTop: 50,
+    },
 } as const;
 
 function tabButtonStyle(active: boolean): React.CSSProperties {
