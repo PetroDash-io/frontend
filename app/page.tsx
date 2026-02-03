@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
-import Map, { Marker, Popup } from "react-map-gl/mapbox";
+import React, {useEffect, useMemo, useState} from "react";
+import Map, {Marker, Popup} from "react-map-gl/mapbox";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 import { MAX_POZOS, colors, LEGEND_ITEMS } from "./utils/constants";
@@ -36,7 +36,8 @@ export default function Home() {
     const [activePozo, setActivePozo] = useState<ActivePozo | null>(null);
     const [limit, setLimit] = useState(100);
     const [selectedPozoId, setSelectedPozoId] = useState<string | null>(null);
-    const [pozoDetail, setPozoDetail] = useState<PozoDetail | null>(null);
+    const [focusedPozoId, setFocusedPozoId] = useState<string | null>(null);
+  const [pozoDetail, setPozoDetail] = useState<PozoDetail | null>(null);
     const [loadingPozo, setLoadingPozo] = useState(false);
 
     const [showCurve, setShowCurve] = useState(false);
@@ -68,7 +69,6 @@ export default function Home() {
 
     useEffect(() => {
         const url = `${process.env.NEXT_PUBLIC_API_URL}/pozos?limit=${limit}`;
-
         const fetchData = async () => {
             setLoading(true);
             setError(null);
@@ -119,7 +119,8 @@ export default function Home() {
                 }
 
                 const json = await response.json();
-                setPozoDetail(json.data[0]);
+                const data = json?.data;
+        setPozoDetail(Array.isArray(data) && data.length > 0 ? data[0] : null);
             } catch {
                 setPozoDetail(null);
             } finally {
@@ -267,7 +268,9 @@ export default function Home() {
                             value={limit}
                             onChange={(e) => {
                                 const value = Number(e.target.value);
-                                if (value <= MAX_POZOS) setLimit(value);
+                                if (!Number.isNaN(value) && value >= 1 && value <= MAX_POZOS) {
+                  setLimit(value);
+                }
                             }}
                             style={styles.limitInput}
                         />
