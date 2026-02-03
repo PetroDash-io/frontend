@@ -76,7 +76,7 @@ export default function Home() {
             try {
                 const response = await fetch(url, {
                     headers: {
-                        "x-api-key": process.env.NEXT_PUBLIC_API_KEY || "",
+                        "X-API-Key": process.env.NEXT_PUBLIC_API_KEY || "",
                     },
                 });
 
@@ -109,7 +109,7 @@ export default function Home() {
                     `${process.env.NEXT_PUBLIC_API_URL}/pozos/${selectedPozoId}`,
                     {
                         headers: {
-                            "x-api-key": process.env.NEXT_PUBLIC_API_KEY || "",
+                            "X-API-Key": process.env.NEXT_PUBLIC_API_KEY || "",
                         },
                     }
                 );
@@ -145,7 +145,7 @@ export default function Home() {
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pozos/${wellId}/produccion-mensual`, {
                 headers: {
-                    "x-api-key": process.env.NEXT_PUBLIC_API_KEY || "",
+                    "X-API-Key": process.env.NEXT_PUBLIC_API_KEY || "",
                 },
             });
 
