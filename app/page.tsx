@@ -37,7 +37,7 @@ export default function Home() {
     const [limit, setLimit] = useState(100);
     const [selectedPozoId, setSelectedPozoId] = useState<string | null>(null);
     const [focusedPozoId, setFocusedPozoId] = useState<string | null>(null);
-  const [pozoDetail, setPozoDetail] = useState<PozoDetail | null>(null);
+    const [pozoDetail, setPozoDetail] = useState<PozoDetail | null>(null);
     const [loadingPozo, setLoadingPozo] = useState(false);
 
     const [showCurve, setShowCurve] = useState(false);
@@ -269,8 +269,8 @@ export default function Home() {
                             onChange={(e) => {
                                 const value = Number(e.target.value);
                                 if (!Number.isNaN(value) && value >= 1 && value <= MAX_POZOS) {
-                  setLimit(value);
-                }
+                                    setLimit(value);
+                                }
                             }}
                             style={styles.limitInput}
                         />
@@ -310,11 +310,22 @@ export default function Home() {
                                     return (
                                         <Marker key={item.well_id} longitude={lon} latitude={lat} anchor="center">
                                             <div
+                                                role="button"
+                                                tabIndex={0}
+                                                aria-label={`${item.status || "Well"} ${item.well_id}`}
                                                 onMouseEnter={() => setActivePozo({ id: item.well_id, lon, lat })}
                                                 onMouseLeave={() => setActivePozo(null)}
                                                 onClick={() => setSelectedPozoId(item.well_id)}
-                                                style={styles.markerDot({ selected: isSelected, status: item.status })}
-                                            />
+                                                onFocus={() => setFocusedPozoId(item.well_id)}
+                                                onBlur={() => setFocusedPozoId(null)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === "Enter" || e.key === " ") {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        setSelectedPozoId(item.well_id);
+                                                    }
+                                                }}
+                                                style={styles.markerDot({selected: isSelected, status: item.status, focused: focusedPozoId == item.well_id})}/>
                                         </Marker>
                                     );
                                 })}
@@ -368,8 +379,7 @@ export default function Home() {
                                             style={styles.showCurveButton(showCurve)}
                                             disabled={!selectedPozoId || curveLoading}
                                             onClick={onToggleCurve}
-                                            title={!selectedPozoId ? "Seleccioná un pozo" : "Ver curva de vida"}
-                                        >
+                                            title={!selectedPozoId ? "Seleccioná un pozo" : "Ver curva de vida"}>
                                             {showCurve ? "Ocultar curva de vida" : "Ver curva de vida"}
                                         </button>
 
@@ -447,23 +457,23 @@ const styles = {
         gap: 16,
         padding: "0 28px",
         background: "linear-gradient(90deg, #3F6B4F, #4B2A1A)",
-    },
+    } as React.CSSProperties,
     logo: {
         height: "100%",
         transform: "scale(1.3)",
         transformOrigin: "left center",
-    },
+    } as React.CSSProperties,
     title: {
         fontSize: 22,
         fontWeight: 600,
         color: "#F3EEE6",
         letterSpacing: "0.5px",
-    },
+    } as React.CSSProperties,
     topControlsRow: {
         display: "flex",
         gap: 12,
         padding: "12px 24px",
-    },
+    } as React.CSSProperties,
     main: (tab: "pozo" | "tabla") => ({
         display: "flex",
         flexDirection: "column",
@@ -472,20 +482,20 @@ const styles = {
         maxWidth: "100%",
         margin: "0 auto",
         backgroundColor: colors.bg
-    }),
+    }) as React.CSSProperties,
     limitFilterContainer: {
         display: "flex",
         flexDirection: "row"
-    },
+    } as React.CSSProperties,
     wellDetailsContainer: {
         display: "flex",
         flexDirection: "row",
         height: 560
-    },
+    } as React.CSSProperties,
     mapContainer: {
         flex: 3,
         marginRight: 24
-    },
+    } as React.CSSProperties,
     infoContainer: {
         flex: 1,
         borderRadius: 14,
@@ -494,18 +504,18 @@ const styles = {
         padding: 18,
         backgroundColor: colors.panel,
         color: colors.textLight
-    },
+    } as React.CSSProperties,
     limitLabel: {
         fontSize: 14,
         color: colors.text,
-    },
+    } as React.CSSProperties,
     limitInput: {
         width: 120,
         padding: "6px 8px",
         borderRadius: 8,
         border: `1px solid ${colors.secondary}`,
         backgroundColor: "#fff",
-    },
+    } as React.CSSProperties,
     legendBar: {
         position: "relative",
         top: 50,
@@ -522,19 +532,21 @@ const styles = {
         fontSize: 13,
         color: colors.text,
         boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-    },
+    } as React.CSSProperties,
     map: {
         width: "100%",
         borderRadius: 14,
-    },
-    markerDot: (opts: {selected: boolean; status: string}) => ({
+    } as React.CSSProperties,
+    markerDot: (opts: {selected: boolean; status: string, focused: boolean}) => ({
         width: opts.selected ? 10 : 8,
         height: opts.selected ? 10 : 8,
         backgroundColor: opts.selected ? colors.accent : getPozoColor(opts.status),
         borderRadius: "50%",
         border: "1px solid rgba(0,0,0,0.3)",
         cursor: "pointer",
-    }),
+        outline: "none",
+        boxShadow: opts.focused ? `0 0 0 2px ${colors.accent}` : "none",
+    }) as React.CSSProperties,
     popupBox: {
         backgroundColor: colors.panel,
         color: colors.textLight,
@@ -542,37 +554,37 @@ const styles = {
         borderRadius: 8,
         fontSize: 13,
         border: `1px solid ${colors.accent}`,
-    },
+    } as React.CSSProperties,
     sidePanelHint: {
         opacity: 0.8,
-    },
+    } as React.CSSProperties,
     sidePanelTitle: {
         marginBottom: 16,
         color: colors.accent,
-    },
+    } as React.CSSProperties,
     detailGrid: {
         display: "grid",
         gridTemplateColumns: "130px 1fr",
         rowGap: 10,
         columnGap: 12,
         fontSize: 14,
-    },
+    } as React.CSSProperties,
     detailLabel: {
         color: colors.accent,
         fontWeight: 500,
-    },
+    } as React.CSSProperties,
     errorMessageContainer: {
         display: "flex"
-    },
+    } as React.CSSProperties,
     loadingContainer: {
         display: "flex"
-    },
+    } as React.CSSProperties,
     showCurveButtonContainer: {
         display: "flex",
         gap: 10,
         alignItems: "center",
         marginTop: 6,
-    },
+    } as React.CSSProperties,
     showCurveButton: (active: boolean) => ({
         padding: "8px 10px",
         borderRadius: 10,
@@ -583,7 +595,7 @@ const styles = {
         fontWeight: 600,
         cursor: "pointer",
         transition: "all 0.2s ease",
-    }),
+    }) as React.CSSProperties,
     showCurveSecondaryButton: {
         padding: "8px 10px",
         borderRadius: 10,
@@ -593,12 +605,12 @@ const styles = {
         fontSize: 13,
         fontWeight: 600,
         cursor: "pointer",
-    },
+    } as React.CSSProperties,
     curveHint: {
         margin: 0,
         fontSize: 13,
         opacity: 0.9,
-    },
+    } as React.CSSProperties,
     curveChartWrapper: {
         display: "flex",
         flexDirection: "column",
@@ -607,7 +619,7 @@ const styles = {
         border: `1px solid ${colors.panelBorder}`,
         color: colors.textLight,
         marginTop: 50,
-    },
+    } as React.CSSProperties,
 } as const;
 
 function tabButtonStyle(active: boolean): React.CSSProperties {
