@@ -1,5 +1,5 @@
-import type { PozoDetail } from "../types";
-import { colors } from "../utils/constants";
+import type { PozoDetail } from "@/app/types";
+import { colors } from "@/utils/constants";
 
 
 interface WellsTableProps {
