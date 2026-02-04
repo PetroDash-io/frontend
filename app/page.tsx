@@ -1,26 +1,16 @@
 "use client";
 
 import React, {useEffect, useMemo, useState} from "react";
-import Map, {Marker, Popup} from "react-map-gl/mapbox";
 import "mapbox-gl/dist/mapbox-gl.css";
 
-import { MAX_POZOS, colors, LEGEND_ITEMS } from "./utils/constants";
-import {getPozoColor, toNumber} from "./utils/helpers";
-import { LegendItem } from "./components/LegendItem";
-import {ActivePozo, PozoDetail, ProductionMonthly} from "./types";
-import { WellsTable } from "./components/WellsTable";
-import {ProductionMonthlyResponse} from "@/app/api_client/ProductionMonthlyResponse";
+import { MAX_POZOS, colors } from "@/utils/constants";
+import { toNumber} from "@/utils/helpers";
+import {PozoDetail, ProductionMonthly} from "@/app/types";
+import { WellsTable } from "@/components/WellsTable";
+import { CurveChart } from "@/components/CurveChart";
 
-import {
-    ResponsiveContainer,
-    LineChart,
-    Line,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    Legend,
-} from "recharts";
+import { MyMap } from "@/components/MyMap";
+import { MyInfoContainer } from "@/components/MyInfoContainer";
 
 export default function Home() {
     const [reservorio, setReservorio] = useState<PozoDetail[]>([]);
@@ -33,16 +23,10 @@ export default function Home() {
     });
 
     const [tab, setTab] = useState<"pozo" | "tabla">("pozo");
-    const [activePozo, setActivePozo] = useState<ActivePozo | null>(null);
     const [limit, setLimit] = useState(100);
     const [selectedPozoId, setSelectedPozoId] = useState<string | null>(null);
-    const [focusedPozoId, setFocusedPozoId] = useState<string | null>(null);
-    const [pozoDetail, setPozoDetail] = useState<PozoDetail | null>(null);
-    const [loadingPozo, setLoadingPozo] = useState(false);
 
     const [showCurve, setShowCurve] = useState(false);
-    const [curveLoading, setCurveLoading] = useState(false);
-    const [curveError, setCurveError] = useState<string | null>(null);
     const [curveData, setCurveData] = useState<ProductionMonthly[] | null>(null);
 
     const reservorioFiltrado = useMemo(() => {
@@ -98,95 +82,6 @@ export default function Home() {
 
         fetchData();
     }, [limit]);
-
-    useEffect(() => {
-        if (!selectedPozoId) return;
-
-        const fetchPozo = async () => {
-            setLoadingPozo(true);
-            try {
-                const response = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/pozos/${selectedPozoId}`,
-                    {
-                        headers: {
-                            "X-API-Key": process.env.NEXT_PUBLIC_API_KEY || "",
-                        },
-                    }
-                );
-
-                if (!response.ok) {
-                    throw new Error("Error al cargar el pozo");
-                }
-
-                const json = await response.json();
-                const data = json?.data;
-        setPozoDetail(Array.isArray(data) && data.length > 0 ? data[0] : null);
-            } catch {
-                setPozoDetail(null);
-            } finally {
-                setLoadingPozo(false);
-            }
-        };
-
-        fetchPozo();
-    }, [selectedPozoId]);
-
-    useEffect(() => {
-        setShowCurve(false);
-        setCurveLoading(false);
-        setCurveError(null);
-        setCurveData(null);
-    }, [selectedPozoId]);
-
-    async function fetchProductionForSelectedWell(wellId: string) {
-        setCurveLoading(true);
-        setCurveError(null);
-
-        try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pozos/${wellId}/produccion-mensual`, {
-                headers: {
-                    "X-API-Key": process.env.NEXT_PUBLIC_API_KEY || "",
-                },
-            });
-
-            if (!response.ok) {
-                // si el backend devuelve 404 con detail, lo mostramos
-                let errorMessage = `Error al cargar producción mensual (status ${response.status})`;
-                try {
-                    const jsonResponse = await response.json();
-                    if (jsonResponse?.detail) errorMessage = jsonResponse.detail;
-                } catch {}
-                throw new Error(errorMessage);
-            }
-
-            const json: ProductionMonthlyResponse = await response.json();
-            const rows = Array.isArray(json.data) ? json.data : [];
-
-            // Orden defensivo por fecha (aunque ya venga ordenado)
-            rows.sort((a, b) => a.reported_period_date.localeCompare(b.reported_period_date));
-
-            setCurveData(rows);
-        } catch (error) {
-            setCurveData(null);
-            setCurveError(error instanceof Error ? error.message : "Error inesperado");
-        } finally {
-            setCurveLoading(false);
-        }
-    }
-
-    function onToggleCurve() {
-        if (!selectedPozoId) return;
-
-        if (!showCurve) {
-            setShowCurve(true);
-            if (!curveData && !curveLoading) {
-                fetchProductionForSelectedWell(selectedPozoId);
-            }
-            return;
-        }
-
-        setShowCurve(false);
-    }
 
     const chartData = useMemo(() => {
         if (!curveData || curveData.length === 0) return null;
@@ -279,128 +174,8 @@ export default function Home() {
 
                 {tab === "pozo" && (
                     <div style={styles.wellDetailsContainer}>
-                        <div style={styles.mapContainer}>
-                            <div style={styles.legendBar}>
-                                {LEGEND_ITEMS.map((item) => (
-                                    <LegendItem key={item.label} color={item.color} label={item.label} />
-                                ))}
-                            </div>
-                            <Map
-                                initialViewState={{
-                                    longitude: -68.059167,
-                                    latitude: -38.951944,
-                                    zoom: 6,
-                                }}
-                                style={styles.map}
-                                mapStyle="mapbox://styles/mapbox/streets-v11"
-                                mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}>
-                                {reservorioFiltrado.map((item) => {
-                                    if (!item.geojson) return null;
-
-                                    let lon: number, lat: number;
-                                    try {
-                                        const geo = JSON.parse(item.geojson);
-                                        [lon, lat] = geo.coordinates;
-                                    } catch {
-                                        return null;
-                                    }
-
-                                    const isSelected = selectedPozoId === item.well_id;
-
-                                    return (
-                                        <Marker key={item.well_id} longitude={lon} latitude={lat} anchor="center">
-                                            <div
-                                                role="button"
-                                                tabIndex={0}
-                                                aria-label={`${item.status || "Well"} ${item.well_id}`}
-                                                onMouseEnter={() => setActivePozo({ id: item.well_id, lon, lat })}
-                                                onMouseLeave={() => setActivePozo(null)}
-                                                onClick={() => setSelectedPozoId(item.well_id)}
-                                                onFocus={() => setFocusedPozoId(item.well_id)}
-                                                onBlur={() => setFocusedPozoId(null)}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === "Enter" || e.key === " ") {
-                                                        e.preventDefault();
-                                                        e.stopPropagation();
-                                                        setSelectedPozoId(item.well_id);
-                                                    }
-                                                }}
-                                                style={styles.markerDot({selected: isSelected, status: item.status, focused: focusedPozoId == item.well_id})}/>
-                                        </Marker>
-                                    );
-                                })}
-
-                                {activePozo && (
-                                    <Popup
-                                        longitude={activePozo.lon}
-                                        latitude={activePozo.lat}
-                                        closeButton={false}
-                                        closeOnClick
-                                        anchor="top"
-                                    >
-                                        <div style={styles.popupBox}>
-                                            <b>Pozo:</b> {activePozo.id}
-                                        </div>
-                                    </Popup>
-                                )}
-                            </Map>
-                        </div>
-                        <div style={styles.infoContainer}>
-                            {!selectedPozoId && <p style={styles.sidePanelHint}>Seleccioná un pozo en el mapa</p>}
-                            {loadingPozo && <p>Cargando información...</p>}
-
-                            {pozoDetail && !loadingPozo && (
-                                <>
-                                    <h3 style={styles.sidePanelTitle}>Pozo {pozoDetail.well_id}</h3>
-
-                                    <dl style={styles.detailGrid}>
-                                        {[
-                                            ["Cuenca", pozoDetail.watershed],
-                                            ["Provincia", pozoDetail.province],
-                                            ["Área", pozoDetail.area],
-                                            ["Empresa", pozoDetail.company],
-                                            ["Yacimiento", pozoDetail.field],
-                                            ["Formación", pozoDetail.formation],
-                                            ["Clasificación", pozoDetail.classification],
-                                            ["Tipo recurso", pozoDetail.resource_type],
-                                            ["Tipo pozo", pozoDetail.type],
-                                            ["Estado", pozoDetail.status],
-                                            ["Profundidad", `${pozoDetail.depth} metros`],
-                                        ].map(([label, value]) => (
-                                            <React.Fragment key={label}>
-                                                <dt style={styles.detailLabel}>{label}</dt>
-                                                <dd>{value}</dd>
-                                            </React.Fragment>
-                                        ))}
-                                    </dl>
-
-                                    <div style={styles.showCurveButtonContainer}>
-                                        <button
-                                            style={styles.showCurveButton(showCurve)}
-                                            disabled={!selectedPozoId || curveLoading}
-                                            onClick={onToggleCurve}
-                                            title={!selectedPozoId ? "Seleccioná un pozo" : "Ver curva de vida"}>
-                                            {showCurve ? "Ocultar curva de vida" : "Ver curva de vida"}
-                                        </button>
-
-                                        {showCurve && (
-                                            <button
-                                                style={styles.showCurveSecondaryButton}
-                                                disabled={!selectedPozoId || curveLoading}
-                                                onClick={() => selectedPozoId && fetchProductionForSelectedWell(selectedPozoId)}
-                                                title="Volver a pedir a la API">
-                                                Refrescar
-                                            </button>
-                                        )}
-                                    </div>
-
-                                    {showCurve && curveLoading && <p style={styles.curveHint}>Cargando producción mensual...</p>}
-                                    {showCurve && curveError && (
-                                        <p style={{ ...styles.curveHint, color: "#fecaca" }}>{curveError}</p>
-                                    )}
-                                </>
-                            )}
-                        </div>
+                        <MyMap reservorios={reservorioFiltrado} selectedPozoId={selectedPozoId} onSelectedPozo={(well_id) => setSelectedPozoId(well_id)} />
+                        <MyInfoContainer selectedPozoId={selectedPozoId} showCurve={showCurve} curveData={curveData} onShowCurve={(show_curve) => setShowCurve(show_curve)} onCurveData={(curve_data) => setCurveData(curve_data)} />
                     </div>
                 )}
 
@@ -425,27 +200,6 @@ export default function Home() {
                 )}
             </main>
         </>
-    );
-}
-
-function CurveChart({ data }: { data: { date: string; oil: number | null; gas: number | null; water: number | null }[] }) {
-    return (
-        <div style={styles.curveChartWrapper}>
-            <div style={{ height: 320 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="date" minTickGap={18} />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Line type="monotone" dataKey="oil" name="Petróleo" dot={false} connectNulls={false}/>
-                        <Line type="monotone" dataKey="gas" name="Gas" dot={false} connectNulls={false}/>
-                        <Line type="monotone" dataKey="water" name="Agua" dot={false} connectNulls={false}/>
-                    </LineChart>
-                </ResponsiveContainer>
-            </div>
-        </div>
     );
 }
 
@@ -492,19 +246,6 @@ const styles = {
         flexDirection: "row",
         height: 560
     } as React.CSSProperties,
-    mapContainer: {
-        flex: 3,
-        marginRight: 24
-    } as React.CSSProperties,
-    infoContainer: {
-        flex: 1,
-        borderRadius: 14,
-        border: `1px solid ${colors.panelBorder}`,
-        marginTop: 60,
-        padding: 18,
-        backgroundColor: colors.panel,
-        color: colors.textLight
-    } as React.CSSProperties,
     limitLabel: {
         fontSize: 14,
         color: colors.text,
@@ -516,109 +257,11 @@ const styles = {
         border: `1px solid ${colors.secondary}`,
         backgroundColor: "#fff",
     } as React.CSSProperties,
-    legendBar: {
-        position: "relative",
-        top: 50,
-        width: "25%",
-        left: 12,
-        zIndex: 10,
-        display: "flex",
-        flexDirection: "row",
-        gap: 14,
-        justifyContent: "center",
-        padding: "8px 12px",
-        borderRadius: 10,
-        backgroundColor: "rgba(243,238,230,0.95)",
-        fontSize: 13,
-        color: colors.text,
-        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-    } as React.CSSProperties,
-    map: {
-        width: "100%",
-        borderRadius: 14,
-    } as React.CSSProperties,
-    markerDot: (opts: {selected: boolean; status: string, focused: boolean}) => ({
-        width: opts.selected ? 10 : 8,
-        height: opts.selected ? 10 : 8,
-        backgroundColor: opts.selected ? colors.accent : getPozoColor(opts.status),
-        borderRadius: "50%",
-        border: "1px solid rgba(0,0,0,0.3)",
-        cursor: "pointer",
-        outline: "none",
-        boxShadow: opts.focused ? `0 0 0 2px ${colors.accent}` : "none",
-    }) as React.CSSProperties,
-    popupBox: {
-        backgroundColor: colors.panel,
-        color: colors.textLight,
-        padding: "6px 10px",
-        borderRadius: 8,
-        fontSize: 13,
-        border: `1px solid ${colors.accent}`,
-    } as React.CSSProperties,
-    sidePanelHint: {
-        opacity: 0.8,
-    } as React.CSSProperties,
-    sidePanelTitle: {
-        marginBottom: 16,
-        color: colors.accent,
-    } as React.CSSProperties,
-    detailGrid: {
-        display: "grid",
-        gridTemplateColumns: "130px 1fr",
-        rowGap: 10,
-        columnGap: 12,
-        fontSize: 14,
-    } as React.CSSProperties,
-    detailLabel: {
-        color: colors.accent,
-        fontWeight: 500,
-    } as React.CSSProperties,
     errorMessageContainer: {
         display: "flex"
     } as React.CSSProperties,
     loadingContainer: {
         display: "flex"
-    } as React.CSSProperties,
-    showCurveButtonContainer: {
-        display: "flex",
-        gap: 10,
-        alignItems: "center",
-        marginTop: 6,
-    } as React.CSSProperties,
-    showCurveButton: (active: boolean) => ({
-        padding: "8px 10px",
-        borderRadius: 10,
-        border: `1px solid ${colors.accent}`,
-        backgroundColor: active ? colors.accent : "transparent",
-        color: active ? "#0b0b0b" : colors.accent,
-        fontSize: 13,
-        fontWeight: 600,
-        cursor: "pointer",
-        transition: "all 0.2s ease",
-    }) as React.CSSProperties,
-    showCurveSecondaryButton: {
-        padding: "8px 10px",
-        borderRadius: 10,
-        border: `1px solid rgba(243,238,230,0.35)`,
-        backgroundColor: "rgba(243,238,230,0.08)",
-        color: "rgba(243,238,230,0.9)",
-        fontSize: 13,
-        fontWeight: 600,
-        cursor: "pointer",
-    } as React.CSSProperties,
-    curveHint: {
-        margin: 0,
-        fontSize: 13,
-        opacity: 0.9,
-    } as React.CSSProperties,
-    curveChartWrapper: {
-        display: "flex",
-        flexDirection: "column",
-        gap: 10,
-        borderRadius: 14,
-        border: `1px solid ${colors.panelBorder}`,
-        color: colors.textLight,
-        marginTop: 50,
     } as React.CSSProperties,
 } as const;
 
