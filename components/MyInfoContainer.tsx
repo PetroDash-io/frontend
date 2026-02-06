@@ -83,9 +83,6 @@ export function MyInfoContainer({ selectedPozoId, showCurve, curveData, onShowCu
             const json: ProductionMonthlyResponse = await response.json();
             const rows = Array.isArray(json.data) ? json.data : [];
 
-            // Orden defensivo por fecha (aunque ya venga ordenado)
-            rows.sort((a, b) => a.reported_period_date.localeCompare(b.reported_period_date));
-
             onCurveData(rows);
         } catch (error) {
             onCurveData(null);
