@@ -62,7 +62,11 @@ export function ProductionAnalytics() {
 
   const handleEndYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value === "" ? undefined : Number(e.target.value);
-    setFilters({ ...filters, fin_anio: value });
+    const nextFilters = { ...filters, fin_anio: value };
+    if (value === undefined) {
+      nextFilters.fin_mes = undefined;
+    }
+    setFilters(nextFilters);
   };
 
   const handleEndMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
