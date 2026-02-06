@@ -4,7 +4,7 @@ import { colors } from "@/utils/constants";
 
 import React, { useState, useEffect } from "react";
 
-interface MyInfoContainersProps {
+interface MyInfoContainerProps {
     selectedPozoId: string | null;
     showCurve: boolean;
     curveData: ProductionMonthly[] | null;
@@ -13,7 +13,7 @@ interface MyInfoContainersProps {
     onCurveData: (data: ProductionMonthly[] | null) => void;
 }
 
-export function MyInfoContainer({ selectedPozoId, showCurve, curveData, onShowCurve, onCurveData }: MyInfoContainersProps) {
+export function MyInfoContainer({ selectedPozoId, showCurve, curveData, onShowCurve, onCurveData }: MyInfoContainerProps) {
 
     const [pozoDetail, setPozoDetail] = useState<PozoDetail | null>(null);
     const [loadingPozo, setLoadingPozo] = useState(false);
