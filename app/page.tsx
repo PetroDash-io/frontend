@@ -11,6 +11,7 @@ import { CurveChart } from "@/components/CurveChart";
 
 import { MyMap } from "@/components/MyMap";
 import { MyInfoContainer } from "@/components/MyInfoContainer";
+import { ProductionAnalytics } from "@/components/ProductionAnalytics";
 
 export default function Home() {
     const [reservorio, setReservorio] = useState<PozoDetail[]>([]);
@@ -22,7 +23,7 @@ export default function Home() {
         company: "ALL",
     });
 
-    const [tab, setTab] = useState<"pozo" | "tabla">("pozo");
+    const [tab, setTab] = useState<"pozo" | "tabla" | "produccion">("pozo");
     const [limit, setLimit] = useState(100);
     const [selectedPozoId, setSelectedPozoId] = useState<string | null>(null);
 
@@ -112,13 +113,18 @@ export default function Home() {
                 <button style={tabButtonStyle(tab === "tabla")} onClick={() => setTab("tabla")}>
                     Tabla
                 </button>
+
+                <button style={tabButtonStyle(tab === "produccion")} onClick={() => setTab("produccion")}>
+                    Producción
+                </button>
             </div>
 
             <div style={styles.topControlsRow}>
                 <select
                     value={filters.province}
                     onChange={(e) => setFilters({ ...filters, province: e.target.value })}
-                    className="select-filter">
+                    className="select-filter"
+                    style={{ display: tab === "produccion" ? "none" : "block" }}>
                     <option value="ALL">Todas las provinces</option>
                     {provinces.map((p) => (
                         <option key={p} value={p}>
@@ -130,7 +136,8 @@ export default function Home() {
                 <select
                     value={filters.status}
                     onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                    className="select-filter">
+                    className="select-filter"
+                    style={{ display: tab === "produccion" ? "none" : "block" }}>
                     <option value="ALL">Todos los estados</option>
                     {statuses.map((s) => (
                         <option key={s} value={s}>
@@ -142,7 +149,8 @@ export default function Home() {
                 <select
                     value={filters.company}
                     onChange={(e) => setFilters({ ...filters, company: e.target.value })}
-                    className="select-filter">
+                    className="select-filter"
+                    style={{ display: tab === "produccion" ? "none" : "block" }}>
                     <option value="ALL">Todas las empresas</option>
                     {companies.map((emp) => (
                         <option key={emp} value={emp}>
@@ -153,24 +161,26 @@ export default function Home() {
             </div>
 
             <main style={styles.main(tab)}>
-                <div style={styles.limitFilterContainer}>
-                    <label style={styles.limitLabel}>
-                        Cantidad de pozos:&nbsp;
-                        <input
-                            type="number"
-                            min={1}
-                            max={MAX_POZOS}
-                            value={limit}
-                            onChange={(e) => {
-                                const value = Number(e.target.value);
-                                if (!Number.isNaN(value) && value >= 1 && value <= MAX_POZOS) {
-                                    setLimit(value);
-                                }
-                            }}
-                            style={styles.limitInput}
-                        />
-                    </label>
-                </div>
+                {tab !== "produccion" && (
+                    <div style={styles.limitFilterContainer}>
+                        <label style={styles.limitLabel}>
+                            Cantidad de pozos:&nbsp;
+                            <input
+                                type="number"
+                                min={1}
+                                max={MAX_POZOS}
+                                value={limit}
+                                onChange={(e) => {
+                                    const value = Number(e.target.value);
+                                    if (!Number.isNaN(value) && value >= 1 && value <= MAX_POZOS) {
+                                        setLimit(value);
+                                    }
+                                }}
+                                style={styles.limitInput}
+                            />
+                        </label>
+                    </div>
+                )}
 
                 {tab === "pozo" && (
                     <div style={styles.wellDetailsContainer}>
@@ -181,6 +191,10 @@ export default function Home() {
 
                 {tab === "tabla" && (
                     <WellsTable data={reservorioFiltrado} onSelectedPozo={(well_id) => setSelectedPozoId(well_id)} />
+                )}
+
+                {tab === "produccion" && (
+                    <ProductionAnalytics />
                 )}
 
                 {error && (
@@ -228,7 +242,7 @@ const styles = {
         gap: 12,
         padding: "12px 24px",
     } as React.CSSProperties,
-    main: (tab: "pozo" | "tabla") => ({
+    main: (tab: "pozo" | "tabla" | "produccion") => ({
         display: "flex",
         flexDirection: "column",
         gap: 24,

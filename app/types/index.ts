@@ -30,3 +30,27 @@ export interface ProductionMonthly {
   water_production: number;
 }
 
+export interface Company {
+  empresa: string;
+  cantidad_pozos: number;
+}
+
+export interface AggregationData {
+  total: number;
+  avg: number;
+}
+
+export interface ProductionAggregates {
+  oil: AggregationData;
+  gas: AggregationData;
+  water: AggregationData;
+}
+
+export interface ProductionAggregatesFilters {
+  empresa?: string;
+  inicio_anio?: number;
+  inicio_mes?: number;
+  fin_anio?: number;
+  fin_mes?: number;
+}
+
