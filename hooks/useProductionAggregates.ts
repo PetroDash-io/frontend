@@ -7,7 +7,7 @@ interface UseProductionAggregatesResult {
   error: string | null;
 }
 
-export function useProductionAggregates(filters: ProductionAggregatesFilters): UseProductionAggregatesResult {
+export function useProductionAggregates(filters: Partial<ProductionAggregatesFilters>): UseProductionAggregatesResult {
   const [data, setData] = useState<ProductionAggregates | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

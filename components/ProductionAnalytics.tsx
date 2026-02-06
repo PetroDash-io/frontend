@@ -8,13 +8,7 @@ import { ProductionBarChart } from "@/components/ProductionBarChart";
 import { ProductionAggregatesFilters } from "@/app/types";
 
 export function ProductionAnalytics() {
-  const [filters, setFilters] = useState<ProductionAggregatesFilters>({
-    empresa: undefined,
-    inicio_anio: undefined,
-    inicio_mes: undefined,
-    fin_anio: undefined,
-    fin_mes: undefined,
-  });
+  const [filters, setFilters] = useState<Partial<ProductionAggregatesFilters>>({});
 
   const { companies, loading: loadingCompanies, error: errorCompanies } = useCompanies();
   const { data: productionData, loading: loadingProduction, error: errorProduction } = useProductionAggregates(filters);
@@ -47,35 +41,52 @@ export function ProductionAnalytics() {
 
   const handleCompanyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
-    setFilters({ ...filters, empresa: value === "" ? undefined : value });
+    if (value) {
+      setFilters({ ...filters, empresa: value });
+    } else {
+      const { empresa, ...rest } = filters;
+      setFilters(rest);
+    }
   };
 
   const handleStartYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value === "" ? undefined : Number(e.target.value);
-    setFilters((prev) => ({
-      ...prev,
-      inicio_anio: value,
-      inicio_mes: value === undefined ? undefined : prev.inicio_mes,
-    }));
+    const value = e.target.value;
+    if (value) {
+      setFilters({ ...filters, inicio_anio: Number(value) });
+    } else {
+      const { inicio_anio, inicio_mes, ...rest } = filters;
+      setFilters(rest);
+    }
   };
 
   const handleStartMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value === "" ? undefined : Number(e.target.value);
-    setFilters({ ...filters, inicio_mes: value });
+    const value = e.target.value;
+    if (value) {
+      setFilters({ ...filters, inicio_mes: Number(value) });
+    } else {
+      const { inicio_mes, ...rest } = filters;
+      setFilters(rest);
+    }
   };
 
   const handleEndYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value === "" ? undefined : Number(e.target.value);
-    const nextFilters = { ...filters, fin_anio: value };
-    if (value === undefined) {
-      nextFilters.fin_mes = undefined;
+    const value = e.target.value;
+    if (value) {
+      setFilters({ ...filters, fin_anio: Number(value) });
+    } else {
+      const { fin_anio, fin_mes, ...rest } = filters;
+      setFilters(rest);
     }
-    setFilters(nextFilters);
   };
 
   const handleEndMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value === "" ? undefined : Number(e.target.value);
-    setFilters({ ...filters, fin_mes: value });
+    const value = e.target.value;
+    if (value) {
+      setFilters({ ...filters, fin_mes: Number(value) });
+    } else {
+      const { fin_mes, ...rest } = filters;
+      setFilters(rest);
+    }
   };
 
   const startYear = 2013;
