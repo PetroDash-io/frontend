@@ -74,7 +74,9 @@ export function ProductionAnalytics() {
     setFilters({ ...filters, fin_mes: value });
   };
 
-  const years = Array.from({ length: 2026 - 2013 + 1 }, (_, i) => 2013 + i);
+  const startYear = 2013;
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: currentYear - startYear + 1 }, (_, i) => startYear + i);
 
   const months = [
     { value: 1, label: "Enero" },
