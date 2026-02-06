@@ -38,11 +38,7 @@ export function useCompanies(searchQuery?: string): UseCompaniesResult {
         const json = await response.json();
         const { data } = json;
 
-        console.log("Companies API response:", json);
-        console.log("Companies data:", data);
-
         const normalized: Company[] = Array.isArray(data) ? data : data ? [data] : [];
-        console.log("Normalized companies:", normalized);
         setCompanies(normalized);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unexpected error");
