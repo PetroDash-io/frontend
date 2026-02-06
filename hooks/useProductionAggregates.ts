@@ -25,12 +25,23 @@ export function useProductionAggregates(filters: ProductionAggregatesFilters): U
 
       try {
         const params = new URLSearchParams();
-        if (filters.empresa) params.append("empresa", filters.empresa);
-        if (filters.inicio_anio) params.append("inicio_anio", filters.inicio_anio.toString());
-        if (filters.inicio_mes) params.append("inicio_mes", filters.inicio_mes.toString());
-        if (filters.fin_anio) params.append("fin_anio", filters.fin_anio.toString());
-        if (filters.fin_mes) params.append("fin_mes", filters.fin_mes.toString());
+        if (filters.empresa) {
+          params.append("empresa", filters.empresa);
+        }
 
+        if (filters.inicio_anio) {
+          params.append("inicio_anio", filters.inicio_anio.toString());
+          if (filters.inicio_mes) {
+            params.append("inicio_mes", filters.inicio_mes.toString());
+          }
+        }
+
+        if (filters.fin_anio) {
+          params.append("fin_anio", filters.fin_anio.toString());
+          if (filters.fin_mes) {
+            params.append("fin_mes", filters.fin_mes.toString());
+          }
+        }
         const url = `${process.env.NEXT_PUBLIC_API_URL}/pozos/produccion?${params.toString()}`;
         
         const response = await fetch(url, {
