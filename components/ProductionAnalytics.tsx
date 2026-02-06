@@ -52,7 +52,11 @@ export function ProductionAnalytics() {
 
   const handleStartYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value === "" ? undefined : Number(e.target.value);
-    setFilters({ ...filters, inicio_anio: value });
+    setFilters((prev) => ({
+      ...prev,
+      inicio_anio: value,
+      inicio_mes: value === undefined ? undefined : prev.inicio_mes,
+    }));
   };
 
   const handleStartMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
