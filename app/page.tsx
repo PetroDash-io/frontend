@@ -125,7 +125,7 @@ export default function Home() {
                     onChange={(e) => setFilters({ ...filters, province: e.target.value })}
                     className="select-filter"
                     style={{ display: tab === "produccion" ? "none" : "block" }}>
-                    <option value="ALL">Todas las provinces</option>
+                    <option value="ALL">Todas las provincias</option>
                     {provinces.map((p) => (
                         <option key={p} value={p}>
                             {p}
