@@ -63,7 +63,7 @@ export function MyMap({ reservorios, selectedPozoId, onSelectedPozo }: MyMapProp
                                         onSelectedPozo(item.well_id);
                                     }
                                 }}
-                                style={styles.markerDot({selected: isSelected, status: item.status, focused: focusedPozoId == item.well_id})}/>
+                                style={styles.markerDot({selected: isSelected, status: item.status, focused: focusedPozoId === item.well_id})}/>
                         </Marker>
                     );
                 })}
