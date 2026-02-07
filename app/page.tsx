@@ -184,8 +184,8 @@ export default function Home() {
 
                 {tab === "pozo" && (
                     <div style={styles.wellDetailsContainer}>
-                        <MyMap reservorios={reservorioFiltrado} selectedPozoId={selectedPozoId} onSelectedPozo={(well_id) => setSelectedPozoId(well_id)} />
-                        <MyInfoContainer selectedPozoId={selectedPozoId} showCurve={showCurve} curveData={curveData} onShowCurve={(show_curve) => setShowCurve(show_curve)} onCurveData={(curve_data) => setCurveData(curve_data)} />
+                        <MyMap reservorios={reservorioFiltrado} selectedPozoId={selectedPozoId} onSelectedPozo={setSelectedPozoId} />
+                        <MyInfoContainer selectedPozoId={selectedPozoId} showCurve={showCurve} curveData={curveData} onShowCurve={setShowCurve} onCurveData={setCurveData} />
                     </div>
                 )}
 

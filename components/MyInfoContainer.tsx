@@ -41,7 +41,7 @@ export function MyInfoContainer({ selectedPozoId, showCurve, curveData, onShowCu
 
                 const json = await response.json();
                 const data = json?.data;
-        setPozoDetail(Array.isArray(data) && data.length > 0 ? data[0] : null);
+                setPozoDetail(Array.isArray(data) && data.length > 0 ? data[0] : null);
             } catch {
                 setPozoDetail(null);
             } finally {
