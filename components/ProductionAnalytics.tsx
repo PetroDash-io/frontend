@@ -12,32 +12,49 @@ export function ProductionAnalytics() {
 
   const { companies, loading: loadingCompanies, error: errorCompanies } = useCompanies();
   const { data: productionData, loading: loadingProduction, error: errorProduction } = useProductionAggregates(filters);
+  const M3_TO_BBL = 6.28981;
+  type Unit = "m3" | "bbl";
+  
+  const [unit, setUnit] = useState<Unit>("m3");
 
   const totalChartData = useMemo(() => {
     if (!productionData) return [];
-    
+  
     return [
       {
         name: "Producción Total",
-        petróleo: productionData.oil.total,
-        gas: productionData.gas.total,
-        agua: productionData.water.total,
+        petróleo:
+          unit === "bbl"
+            ? productionData.oil.total * M3_TO_BBL
+            : productionData.oil.total,
+        agua:
+          unit === "bbl"
+            ? productionData.water.total * M3_TO_BBL
+            : productionData.water.total,
+        gas: productionData.gas.total, // NO se convierte
       },
     ];
-  }, [productionData]);
+  }, [productionData, unit]);
 
   const avgChartData = useMemo(() => {
     if (!productionData) return [];
-    
+  
     return [
       {
         name: "Producción Promedio",
-        petróleo: productionData.oil.avg,
+        petróleo:
+          unit === "bbl"
+            ? productionData.oil.avg * M3_TO_BBL
+            : productionData.oil.avg,
+        agua:
+          unit === "bbl"
+            ? productionData.water.avg * M3_TO_BBL
+            : productionData.water.avg,
         gas: productionData.gas.avg,
-        agua: productionData.water.avg,
       },
     ];
-  }, [productionData]);
+  }, [productionData, unit]);
+  
 
   const handleCompanyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -231,6 +248,23 @@ export function ProductionAnalytics() {
         </div>
       )}
 
+      <div style={topControlsStyles.topControlsRow}>
+        <button
+          style={tabButtonStyle(unit === "m3")}
+          onClick={() => setUnit("m3")}
+        >
+          m³
+        </button>
+
+        <button
+          style={tabButtonStyle(unit === "bbl")}
+          onClick={() => setUnit("bbl")}
+        >
+          BBL
+        </button>
+      </div>
+
+
       {showResults && !loadingProduction && productionData && (
         <div style={styles.chartsContainer}>
           <ProductionBarChart data={totalChartData} title="Producción Total" />
@@ -327,4 +361,27 @@ const styles = {
     borderRadius: 8,
     fontSize: 14,
   } as React.CSSProperties,
+} as const;
+
+function tabButtonStyle(active: boolean): React.CSSProperties {
+    return {
+        padding: "8px 16px",
+        borderRadius: 8,
+        border: "1px solid #3F6B4F",
+        backgroundColor: active ? "#3F6B4F" : "transparent",
+        color: active ? "#F3EEE6" : "#3F6B4F",
+        fontSize: 14,
+        fontWeight: 500,
+        cursor: "pointer",
+        transition: "all 0.2s ease",
+    };
+}
+
+
+const topControlsStyles = {
+    topControlsRow: {
+        display: "flex",
+        gap: 12,
+        padding: "12px 24px",
+    } as React.CSSProperties
 } as const;
