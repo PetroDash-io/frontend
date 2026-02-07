@@ -86,7 +86,7 @@ export function CurveChart({ data }: CurveChartProps) {
                             }
                         />
                     <Tooltip
-                    formatter={(value: any, name: string | number) => {
+                        formatter={(value: any, name?: string | number) => {
                         if (name === "gas") {
                         return [`${Number(value).toFixed(2)} Mm³`, "Gas"];
                         }
