@@ -14,6 +14,13 @@ import {
 const M3_TO_BBL = 6.28981; // 1 m³ = 6.28981 bbl (barriles)
 type Unit = "m3" | "bbl";
 
+const SERIES_COLORS = {
+    oil: "#3F6B4F",    // verde petróleo
+    water: "#3A7CA5",  // azul agua
+    gas: "#D97A00",    // naranja gas
+  };
+
+  
 interface CurveDataPoint {
   date: string;
   oil: number | null;
@@ -73,12 +80,57 @@ export function CurveChart({ data }: CurveChartProps) {
                     <LineChart data={convertedData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="date" minTickGap={18} />
-                        <YAxis />
-                        <Tooltip />
+                        <YAxis
+                            tickFormatter={(v) =>
+                                unit === "bbl" ? v.toFixed(0) : v.toFixed(1)
+                            }
+                        />
+                    <Tooltip
+                    formatter={(value: any, name: string | number) => {
+                        if (name === "gas") {
+                        return [`${Number(value).toFixed(2)} Mm³`, "Gas"];
+                        }
+
+                        const unitLabel = unit === "bbl" ? "BBL" : "m³";
+
+                        if (name === "oil") {
+                        return [`${Number(value).toFixed(2)} ${unitLabel}`, "Petróleo"];
+                        }
+
+                        if (name === "water") {
+                        return [`${Number(value).toFixed(2)} ${unitLabel}`, "Agua"];
+                        }
+
+                        return value;
+                    }}
+                    />
+
+
                         <Legend />
-                        <Line type="monotone" dataKey="oil" name="Petróleo" dot={false} connectNulls={false}/>
-                        <Line type="monotone" dataKey="gas" name="Gas" dot={false} connectNulls={false}/>
-                        <Line type="monotone" dataKey="water" name="Agua" dot={false} connectNulls={false}/>
+                        <Line
+                            type="monotone"
+                            dataKey="oil"
+                            name={`Petróleo (${unit === "bbl" ? "BBL" : "m³"})`}
+                            stroke={SERIES_COLORS.oil}
+                            dot={false}
+                        />
+
+                        <Line
+                            type="monotone"
+                            dataKey="gas"
+                            name="Gas (Mm³)"
+                            stroke={SERIES_COLORS.gas}
+                            dot={false}
+                        />
+
+                            <Line
+                            type="monotone"
+                            dataKey="water"
+                            name={`Agua (${unit === "bbl" ? "BBL" : "m³"})`}
+                            stroke={SERIES_COLORS.water}
+                            dot={false}
+                            />
+
                     </LineChart>
                 </ResponsiveContainer>
             </div>
