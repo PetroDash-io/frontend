@@ -1,4 +1,4 @@
-import { ESTADOS_POZO, colors } from "./constants";
+import { ESTADOS_POZO, colors } from "@/utils/constants";
 
 export const normalize = (value?: string) =>
   value
