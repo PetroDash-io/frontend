@@ -57,7 +57,7 @@ export function MyInfoContainer({ selectedPozoId, showCurve, curveData, onShowCu
         setCurveLoading(false);
         setCurveError(null);
         onCurveData(null);
-    }, [selectedPozoId]);
+    }, [selectedPozoId, onShowCurve, onCurveData]);
 
     async function fetchProductionForSelectedWell(wellId: string) {
         setCurveLoading(true);

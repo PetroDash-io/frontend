@@ -14,6 +14,11 @@ export const colors = {
   pozoInactivo: "#EF4444",
   pozoNoInformado: "#9CA3AF",
   pozoUnknown: "#6B7280",
+  // Production colors
+  oil: "#D6A23A",
+  gas: "#3F6B4F",
+  water: "#6B7280",
+  filtersBg: "#FAFAF9",
 };
 
 export const ESTADOS_POZO = {
