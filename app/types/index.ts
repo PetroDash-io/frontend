@@ -47,10 +47,10 @@ export interface ProductionAggregates {
 }
 
 export interface ProductionAggregatesFilters {
-  empresa?: string;
-  inicio_anio?: number;
-  inicio_mes?: number;
-  fin_anio?: number;
-  fin_mes?: number;
+  empresa: string;
+  inicio_anio: number;
+  inicio_mes: number;
+  fin_anio: number;
+  fin_mes: number;
 }
 

@@ -4,7 +4,7 @@ import { colors } from "@/utils/constants";
 
 import React, { useState, useEffect } from "react";
 
-interface MyInfoContainersProps {
+interface MyInfoContainerProps {
     selectedPozoId: string | null;
     showCurve: boolean;
     curveData: ProductionMonthly[] | null;
@@ -13,7 +13,7 @@ interface MyInfoContainersProps {
     onCurveData: (data: ProductionMonthly[] | null) => void;
 }
 
-export function MyInfoContainer({ selectedPozoId, showCurve, curveData, onShowCurve, onCurveData }: MyInfoContainersProps) {
+export function MyInfoContainer({ selectedPozoId, showCurve, curveData, onShowCurve, onCurveData }: MyInfoContainerProps) {
 
     const [pozoDetail, setPozoDetail] = useState<PozoDetail | null>(null);
     const [loadingPozo, setLoadingPozo] = useState(false);
@@ -41,7 +41,7 @@ export function MyInfoContainer({ selectedPozoId, showCurve, curveData, onShowCu
 
                 const json = await response.json();
                 const data = json?.data;
-        setPozoDetail(Array.isArray(data) && data.length > 0 ? data[0] : null);
+                setPozoDetail(Array.isArray(data) && data.length > 0 ? data[0] : null);
             } catch {
                 setPozoDetail(null);
             } finally {
@@ -82,9 +82,6 @@ export function MyInfoContainer({ selectedPozoId, showCurve, curveData, onShowCu
 
             const json: ProductionMonthlyResponse = await response.json();
             const rows = Array.isArray(json.data) ? json.data : [];
-
-            // Orden defensivo por fecha (aunque ya venga ordenado)
-            rows.sort((a, b) => a.reported_period_date.localeCompare(b.reported_period_date));
 
             onCurveData(rows);
         } catch (error) {
