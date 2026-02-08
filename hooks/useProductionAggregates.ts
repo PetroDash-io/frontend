@@ -42,7 +42,7 @@ export function useProductionAggregates(filters: Partial<ProductionAggregatesFil
             params.append("fin_mes", filters.fin_mes.toString());
           }
         }
-        const url = `${process.env.NEXT_PUBLIC_API_URL}/pozos/produccion?${params.toString()}`;
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/empresas/${filters.empresa}/produccion?${params.toString()}`;
         
         const response = await fetch(url, {
           headers: {

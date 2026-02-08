@@ -4,14 +4,20 @@ import React, { useState, useMemo } from "react";
 import { colors } from "@/utils/constants";
 import { useCompanies } from "@/hooks/useCompanies";
 import { useProductionAggregates } from "@/hooks/useProductionAggregates";
+import { useCompanyComparison } from "@/hooks/useCompanyComparison";
 import { ProductionBarChart } from "@/components/ProductionBarChart";
-import { ProductionAggregatesFilters } from "@/app/types";
+import { CompanyComparisonPanel } from "@/components/CompanyComparisonPanel";
+import { CompanyComparisonCharts } from "@/components/CompanyComparisonCharts";
+import { ProductionAggregatesFilters, ComparisonFilters } from "@/app/types";
 
 export function ProductionAnalytics() {
   const [filters, setFilters] = useState<Partial<ProductionAggregatesFilters>>({});
+  const [comparisonFilters, setComparisonFilters] = useState<Partial<ComparisonFilters>>({});
 
   const { companies, loading: loadingCompanies, error: errorCompanies } = useCompanies();
   const { data: productionData, loading: loadingProduction, error: errorProduction } = useProductionAggregates(filters);
+  const { data: comparisonData, loading: loadingComparison, error: errorComparison } = useCompanyComparison(comparisonFilters);
+  
   const M3_TO_BBL = 6.28981;
   type Unit = "m3" | "bbl";
   
@@ -126,6 +132,9 @@ export function ProductionAnalytics() {
   ];
 
   const showResults = filters.empresa || filters.inicio_anio || filters.fin_anio;
+  const showComparison = comparisonFilters.empresa_1 && comparisonFilters.empresa_2;
+  const duplicateCompanies = comparisonFilters.empresa_1 && comparisonFilters.empresa_2 && 
+    comparisonFilters.empresa_1.toLowerCase().trim() === comparisonFilters.empresa_2.toLowerCase().trim();
 
   return (
     <div style={styles.container}>
@@ -271,6 +280,69 @@ export function ProductionAnalytics() {
           <ProductionBarChart data={avgChartData} title="Producción Promedio" />
         </div>
       )}
+
+      <div style={styles.divider} />
+
+      <CompanyComparisonPanel
+        companies={companies}
+        loadingCompanies={loadingCompanies}
+        empresa1={comparisonFilters.empresa_1 || ""}
+        empresa2={comparisonFilters.empresa_2 || ""}
+        inicioAnio={comparisonFilters.inicio_anio}
+        inicioMes={comparisonFilters.inicio_mes}
+        finAnio={comparisonFilters.fin_anio}
+        finMes={comparisonFilters.fin_mes}
+        onEmpresa1Change={(value) =>
+          setComparisonFilters({ ...comparisonFilters, empresa_1: value })
+        }
+        onEmpresa2Change={(value) =>
+          setComparisonFilters({ ...comparisonFilters, empresa_2: value })
+        }
+        onInicioAnioChange={(value) => {
+          const newFilters = { ...comparisonFilters, inicio_anio: value };
+          if (!value) {
+            delete newFilters.inicio_mes;
+          }
+          setComparisonFilters(newFilters);
+        }}
+        onInicioMesChange={(value) =>
+          setComparisonFilters({ ...comparisonFilters, inicio_mes: value })
+        }
+        onFinAnioChange={(value) => {
+          const newFilters = { ...comparisonFilters, fin_anio: value };
+          if (!value) {
+            delete newFilters.fin_mes;
+          }
+          setComparisonFilters(newFilters);
+        }}
+        onFinMesChange={(value) =>
+          setComparisonFilters({ ...comparisonFilters, fin_mes: value })
+        }
+      />
+
+      {duplicateCompanies && (
+        <div style={styles.error}>No podés seleccionar la misma empresa dos veces. Por favor, elegí dos empresas diferentes para comparar.</div>
+      )}
+
+      {errorComparison && (
+        <div style={styles.error}>Error al comparar empresas: {errorComparison}</div>
+      )}
+
+      {!showComparison && !duplicateCompanies && (
+        <div style={styles.placeholder}>
+          <p>Seleccione dos empresas para comparar su producción</p>
+        </div>
+      )}
+
+      {showComparison && loadingComparison && (
+        <div style={styles.loading}>
+          <p>Cargando comparación...</p>
+        </div>
+      )}
+
+      {showComparison && !duplicateCompanies && !loadingComparison && comparisonData && (
+        <CompanyComparisonCharts companies={comparisonData.companies} unit={unit} />
+      )}
     </div>
   );
 }
@@ -360,6 +432,11 @@ const styles = {
     color: "#B91C1C",
     borderRadius: 8,
     fontSize: 14,
+  } as React.CSSProperties,
+  divider: {
+    height: 1,
+    backgroundColor: colors.panelBorder,
+    margin: "24px 0",
   } as React.CSSProperties,
 } as const;
 

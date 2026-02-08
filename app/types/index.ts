@@ -54,3 +54,26 @@ export interface ProductionAggregatesFilters {
   fin_mes: number;
 }
 
+export interface CompanyProductionData {
+  company: string;
+  data: ProductionAggregates;
+}
+
+export interface CompanyComparisonResponse {
+  source: string;
+  start_year: number | null;
+  start_month: number | null;
+  end_year: number | null;
+  end_month: number | null;
+  companies: CompanyProductionData[];
+}
+
+export interface ComparisonFilters {
+  empresa_1: string;
+  empresa_2: string;
+  inicio_anio?: number;
+  inicio_mes?: number;
+  fin_anio?: number;
+  fin_mes?: number;
+}
+
