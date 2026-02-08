@@ -144,7 +144,7 @@ export function ProductionAnalytics() {
               <option value="">Seleccione una empresa</option>
               {companies.map((company, index) => (
                 <option key={`${company.empresa}-${index}`} value={company.empresa}>
-                  {company.empresa} ({company.cantidad_pozos} pozos)
+                  {(company.empresa && company.empresa.trim()) ? company.empresa : "(Sin nombre de empresa)"} ({company.cantidad_pozos} pozos)
                 </option>
               ))}
             </select>
