@@ -23,7 +23,7 @@ export function useCompanies(searchQuery?: string): UseCompaniesResult {
           params.append("q", searchQuery);
         }
 
-        const url = `${process.env.NEXT_PUBLIC_API_URL}/pozos/empresas${params.toString() ? `?${params.toString()}` : ""}`;
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/empresas${params.toString() ? `?${params.toString()}` : ""}`;
         
         const response = await fetch(url, {
           headers: {
@@ -41,7 +41,7 @@ export function useCompanies(searchQuery?: string): UseCompaniesResult {
         const rawArray: any[] = Array.isArray(data) ? data : data ? [data] : [];
         const normalized: Company[] = rawArray.map((item) => ({
           empresa: item.empresa ?? item.company ?? item.name ?? "",
-          cantidad_pozos: item.cantidad_pozos ?? item.count ?? item.cantidad ?? 0,
+          cantidad_pozos: item.cantidad_pozos ?? item.wells_count ?? item.count ?? item.cantidad ?? 0,
         }));
 
         setCompanies(normalized);

@@ -15,11 +15,25 @@ export const colors = {
   pozoNoInformado: "#9CA3AF",
   pozoUnknown: "#6B7280",
   // Production colors
-  oil: "#D6A23A",
-  gas: "#3F6B4F",
-  water: "#6B7280",
+  oil: "#3F6B4F",
+  gas: "#D97A00",
+  water: "#3A7CA5",
   filtersBg: "#FAFAF9",
+  // Company comparison colors
+  company1: "#3F6B4F",
+  company2: "#D6A23A",
+  company3: "#4B2A1A",
+  company4: "#2F3E34",
+  company5: "#6B7280",
 };
+
+export const COMPANY_COLORS = [
+  "#3F6B4F", // Verde oscuro (secondary)
+  "#D6A23A", // Dorado (accent/oil)
+  "#4B2A1A", // Marrón oscuro (primary)
+  "#2F3E34", // Verde muy oscuro (panel)
+  "#6B7280", // Gris (water)
+];
 
 export const ESTADOS_POZO = {
   ACTIVO: [
