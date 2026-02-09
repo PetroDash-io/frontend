@@ -5,8 +5,8 @@ import { colors } from "@/utils/constants";
 import { Company } from "@/app/types";
 
 interface CompanyComparisonPanelProps {
-  companies: Company[];
-  loadingCompanies: boolean;
+  empresas: Company[];
+  cargandoEmpresas: boolean;
   empresa1: string;
   empresa2: string;
   inicioAnio: number | undefined;
@@ -43,9 +43,154 @@ const months = [
   { value: 12, label: "Diciembre" },
 ];
 
+interface CompanySelectProps {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  empresas: Company[];
+  disabled: boolean;
+}
+
+function CompanySelect({ label, value, onChange, empresas, disabled }: CompanySelectProps) {
+  return (
+    <div style={styles.filterGroup}>
+      <label style={styles.label}>
+        {label}
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          style={styles.select}
+          disabled={disabled}
+        >
+          <option value="">Seleccione una empresa</option>
+          {empresas.map((company, index) => (
+            <option
+              key={`${company.empresa}-${index}`}
+              value={company.empresa}
+            >
+              {company.empresa && company.empresa.trim()
+                ? company.empresa
+                : "(Sin nombre de empresa)"}{" "}
+              ({company.cantidad_pozos} pozos)
+            </option>
+          ))}
+        </select>
+      </label>
+    </div>
+  );
+}
+
+interface DateRangeFilterProps {
+  inicioAnio: number | undefined;
+  inicioMes: number | undefined;
+  finAnio: number | undefined;
+  finMes: number | undefined;
+  onInicioAnioChange: (value: number | undefined) => void;
+  onInicioMesChange: (value: number | undefined) => void;
+  onFinAnioChange: (value: number | undefined) => void;
+  onFinMesChange: (value: number | undefined) => void;
+}
+
+function DateRangeFilter({
+  inicioAnio,
+  inicioMes,
+  finAnio,
+  finMes,
+  onInicioAnioChange,
+  onInicioMesChange,
+  onFinAnioChange,
+  onFinMesChange,
+}: DateRangeFilterProps) {
+  return (
+    <div style={styles.dateRangeContainer}>
+      <div style={styles.filterGroup}>
+        <label style={styles.label}>
+          Año inicio:
+          <select
+            value={inicioAnio || ""}
+            onChange={(e) =>
+              onInicioAnioChange(e.target.value ? Number(e.target.value) : undefined)
+            }
+            style={styles.select}
+          >
+            <option value="">Seleccionar</option>
+            {years.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      <div style={styles.filterGroup}>
+        <label style={styles.label}>
+          Mes inicio:
+          <select
+            value={inicioMes || ""}
+            onChange={(e) =>
+              onInicioMesChange(e.target.value ? Number(e.target.value) : undefined)
+            }
+            style={styles.select}
+            disabled={!inicioAnio}
+          >
+            <option value="">Todos</option>
+            {months.map((month) => (
+              <option key={month.value} value={month.value}>
+                {month.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      <div style={styles.filterGroup}>
+        <label style={styles.label}>
+          Año fin:
+          <select
+            value={finAnio || ""}
+            onChange={(e) =>
+              onFinAnioChange(e.target.value ? Number(e.target.value) : undefined)
+            }
+            style={styles.select}
+          >
+            <option value="">Seleccionar</option>
+            {years.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      <div style={styles.filterGroup}>
+        <label style={styles.label}>
+          Mes fin:
+          <select
+            value={finMes || ""}
+            onChange={(e) =>
+              onFinMesChange(e.target.value ? Number(e.target.value) : undefined)
+            }
+            style={styles.select}
+            disabled={!finAnio}
+          >
+            <option value="">Todos</option>
+            {months.map((month) => (
+              <option key={month.value} value={month.value}>
+                {month.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+    </div>
+  );
+}
+
 export function CompanyComparisonPanel({
-  companies,
-  loadingCompanies,
+  empresas,
+  cargandoEmpresas,
   empresa1,
   empresa2,
   inicioAnio,
@@ -65,140 +210,32 @@ export function CompanyComparisonPanel({
 
       <div style={styles.filtersContainer}>
         <div style={styles.companiesRow}>
-          <div style={styles.filterGroup}>
-            <label style={styles.label}>
-              Primera Empresa:
-              <select
-                value={empresa1}
-                onChange={(e) => onEmpresa1Change(e.target.value)}
-                style={styles.select}
-                disabled={loadingCompanies}
-              >
-                <option value="">Seleccione una empresa</option>
-                {companies.map((company, index) => (
-                  <option
-                    key={`${company.empresa}-${index}`}
-                    value={company.empresa}
-                  >
-                    {company.empresa && company.empresa.trim()
-                      ? company.empresa
-                      : "(Sin nombre de empresa)"}{" "}
-                    ({company.cantidad_pozos} pozos)
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-
-          <div style={styles.filterGroup}>
-            <label style={styles.label}>
-              Segunda Empresa:
-              <select
-                value={empresa2}
-                onChange={(e) => onEmpresa2Change(e.target.value)}
-                style={styles.select}
-                disabled={loadingCompanies}
-              >
-                <option value="">Seleccione una empresa</option>
-                {companies.map((company, index) => (
-                  <option
-                    key={`${company.empresa}-${index}`}
-                    value={company.empresa}
-                  >
-                    {company.empresa && company.empresa.trim()
-                      ? company.empresa
-                      : "(Sin nombre de empresa)"}{" "}
-                    ({company.cantidad_pozos} pozos)
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
+          <CompanySelect
+            label="Primera Empresa:"
+            value={empresa1}
+            onChange={onEmpresa1Change}
+            empresas={empresas}
+            disabled={cargandoEmpresas}
+          />
+          <CompanySelect
+            label="Segunda Empresa:"
+            value={empresa2}
+            onChange={onEmpresa2Change}
+            empresas={empresas}
+            disabled={cargandoEmpresas}
+          />
         </div>
 
-        <div style={styles.dateRangeContainer}>
-          <div style={styles.filterGroup}>
-            <label style={styles.label}>
-              Año inicio:
-              <select
-                value={inicioAnio || ""}
-                onChange={(e) =>
-                  onInicioAnioChange(e.target.value ? Number(e.target.value) : undefined)
-                }
-                style={styles.select}
-              >
-                <option value="">Seleccionar</option>
-                {years.map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-
-          <div style={styles.filterGroup}>
-            <label style={styles.label}>
-              Mes inicio:
-              <select
-                value={inicioMes || ""}
-                onChange={(e) =>
-                  onInicioMesChange(e.target.value ? Number(e.target.value) : undefined)
-                }
-                style={styles.select}
-                disabled={!inicioAnio}
-              >
-                <option value="">Todos</option>
-                {months.map((month) => (
-                  <option key={month.value} value={month.value}>
-                    {month.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-
-          <div style={styles.filterGroup}>
-            <label style={styles.label}>
-              Año fin:
-              <select
-                value={finAnio || ""}
-                onChange={(e) =>
-                  onFinAnioChange(e.target.value ? Number(e.target.value) : undefined)
-                }
-                style={styles.select}
-              >
-                <option value="">Seleccionar</option>
-                {years.map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-
-          <div style={styles.filterGroup}>
-            <label style={styles.label}>
-              Mes fin:
-              <select
-                value={finMes || ""}
-                onChange={(e) =>
-                  onFinMesChange(e.target.value ? Number(e.target.value) : undefined)
-                }
-                style={styles.select}
-                disabled={!finAnio}
-              >
-                <option value="">Todos</option>
-                {months.map((month) => (
-                  <option key={month.value} value={month.value}>
-                    {month.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-        </div>
+        <DateRangeFilter
+          inicioAnio={inicioAnio}
+          inicioMes={inicioMes}
+          finAnio={finAnio}
+          finMes={finMes}
+          onInicioAnioChange={onInicioAnioChange}
+          onInicioMesChange={onInicioMesChange}
+          onFinAnioChange={onFinAnioChange}
+          onFinMesChange={onFinMesChange}
+        />
       </div>
     </div>
   );

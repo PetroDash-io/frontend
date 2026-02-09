@@ -284,8 +284,8 @@ export function ProductionAnalytics() {
       <div style={styles.divider} />
 
       <CompanyComparisonPanel
-        companies={companies}
-        loadingCompanies={loadingCompanies}
+        empresas={companies}
+        cargandoEmpresas={loadingCompanies}
         empresa1={comparisonFilters.empresa_1 || ""}
         empresa2={comparisonFilters.empresa_2 || ""}
         inicioAnio={comparisonFilters.inicio_anio}

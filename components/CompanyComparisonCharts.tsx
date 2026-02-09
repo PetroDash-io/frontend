@@ -37,6 +37,41 @@ const formatTooltip = (value: number | string | undefined) => {
   return value;
 };
 
+interface ComparisonChartProps {
+  title: string;
+  data: Record<string, string | number>[];
+  companies: CompanyProductionData[];
+}
+
+function ComparisonChart({ title, data, companies }: ComparisonChartProps) {
+  return (
+    <div style={styles.chartWrapper}>
+      <h3 style={styles.title}>{title}</h3>
+      <div style={{ height: 350 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            data={data}
+            margin={{ top: 10, right: 30, left: 20, bottom: 20 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis tickFormatter={formatYAxis} width={70} />
+            <Tooltip formatter={formatTooltip} />
+            <Legend />
+            {companies.map((company, index) => (
+              <Bar
+                key={company.company}
+                dataKey={company.company}
+                fill={COMPANY_COLORS[index % COMPANY_COLORS.length]}
+              />
+            ))}
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
+}
+
 export function CompanyComparisonCharts({
   companies,
   unit,
@@ -98,55 +133,16 @@ export function CompanyComparisonCharts({
 
   return (
     <div style={styles.chartsContainer}>
-      <div style={styles.chartWrapper}>
-        <h3 style={styles.title}>Producción Total - Comparación</h3>
-        <div style={{ height: 350 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={totalChartData}
-              margin={{ top: 10, right: 30, left: 20, bottom: 20 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis tickFormatter={formatYAxis} width={70} />
-              <Tooltip formatter={formatTooltip} />
-              <Legend />
-              {companies.map((company, index) => (
-                <Bar
-                  key={company.company}
-                  dataKey={company.company}
-                  fill={COMPANY_COLORS[index % COMPANY_COLORS.length]}
-                />
-              ))}
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      <div style={styles.chartWrapper}>
-        <h3 style={styles.title}>Producción Promedio - Comparación</h3>
-        <div style={{ height: 350 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={avgChartData}
-              margin={{ top: 10, right: 30, left: 20, bottom: 20 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis tickFormatter={formatYAxis} width={70} />
-              <Tooltip formatter={formatTooltip} />
-              <Legend />
-              {companies.map((company, index) => (
-                <Bar
-                  key={company.company}
-                  dataKey={company.company}
-                  fill={COMPANY_COLORS[index % COMPANY_COLORS.length]}
-                />
-              ))}
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
+      <ComparisonChart
+        title="Producción Total - Comparación"
+        data={totalChartData}
+        companies={companies}
+      />
+      <ComparisonChart
+        title="Producción Promedio - Comparación"
+        data={avgChartData}
+        companies={companies}
+      />
     </div>
   );
 }
