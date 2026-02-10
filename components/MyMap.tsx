@@ -51,7 +51,7 @@ export function MyMap({ reservorios, selectedPozoId, onSelectedPozo }: MyMapProp
                                 role="button"
                                 tabIndex={0}
                                 aria-label={`${item.status || "Well"} ${item.well_id}`}
-                                onMouseEnter={() => setActivePozo({ id: item.well_id, lon, lat })}
+                                onMouseEnter={() => setActivePozo({id: item.well_id, lon, lat, company: item.company, resource_type: item.resource_type})}
                                 onMouseLeave={() => setActivePozo(null)}
                                 onClick={() => onSelectedPozo(item.well_id)}
                                 onFocus={() => setFocusedPozoId(item.well_id)}
@@ -74,10 +74,13 @@ export function MyMap({ reservorios, selectedPozoId, onSelectedPozo }: MyMapProp
                         latitude={activePozo.lat}
                         closeButton={false}
                         closeOnClick
-                        anchor="top"
-                    >
+                        anchor="top">
                         <div style={styles.popupBox}>
                             <b>Pozo:</b> {activePozo.id}
+                            <br />
+                            {activePozo.company}
+                            <br />
+                            <b>{activePozo.resource_type}</b>
                         </div>
                     </Popup>
                 )}

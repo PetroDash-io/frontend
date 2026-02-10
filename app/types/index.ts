@@ -2,6 +2,8 @@ export interface ActivePozo {
   id: string;
   lon: number;
   lat: number;
+  company: string;
+  resource_type: string;
 }
 
 export interface PozoDetail {
