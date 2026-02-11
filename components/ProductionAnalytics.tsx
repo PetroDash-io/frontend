@@ -8,6 +8,7 @@ import { useCompanyComparison } from "@/hooks/useCompanyComparison";
 import { ProductionBarChart } from "@/components/ProductionBarChart";
 import { CompanyComparisonPanel } from "@/components/CompanyComparisonPanel";
 import { CompanyComparisonCharts } from "@/components/CompanyComparisonCharts";
+import { CompaniesPieChart } from "@/components/CompaniesPieChart";
 import { ProductionAggregatesFilters, ComparisonFilters } from "@/app/types";
 
 export function ProductionAnalytics() {
@@ -138,7 +139,20 @@ export function ProductionAnalytics() {
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.heading}>Análisis de Producción por Empresa</h2>
+      <h2 style={styles.heading}>Análisis de Empresas y Producción</h2>
+
+      {/* Pie Chart Section */}
+      <div style={styles.pieChartSection}>
+        <CompaniesPieChart 
+          companies={companies} 
+          title="Distribución de Pozos por Empresa"
+          maxCompanies={10}
+        />
+      </div>
+
+      <div style={styles.divider} />
+
+      <h3 style={styles.subHeading}>Análisis de Producción por Empresa</h3>
 
       <div style={styles.filtersContainer}>
         <div style={styles.filterGroup}>
@@ -356,10 +370,21 @@ const styles = {
     backgroundColor: colors.bg,
   } as React.CSSProperties,
   heading: {
-    fontSize: 24,
+    fontSize: 28,
+    fontWeight: 700,
+    color: colors.text,
+    margin: 0,
+  } as React.CSSProperties,
+  subHeading: {
+    fontSize: 22,
     fontWeight: 600,
     color: colors.text,
     margin: 0,
+  } as React.CSSProperties,
+  pieChartSection: {
+    width: "100%",
+    maxWidth: "900px",
+    margin: "0 auto",
   } as React.CSSProperties,
   filtersContainer: {
     display: "flex",
