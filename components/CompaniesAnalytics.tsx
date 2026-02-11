@@ -7,6 +7,7 @@ import { useState } from "react";
 export function CompaniesAnalytics() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [debouncedQuery, setDebouncedQuery] = useState<string>("");
+  const [maxCompanies, setMaxCompanies] = useState<number>(10);
   const { companies, loading, error } = useCompanies(debouncedQuery);
 
   const handleSearchChange = (value: string) => {
@@ -56,10 +57,23 @@ export function CompaniesAnalytics() {
 
       <div style={styles.content}>
         <div style={styles.chartContainer}>
+          <div style={styles.chartControls}>
+            <label style={styles.sliderLabel}>
+              Número de empresas: <strong>{maxCompanies}</strong>
+            </label>
+            <input
+              type="range"
+              min="3"
+              max="15"
+              value={maxCompanies}
+              onChange={(e) => setMaxCompanies(Number(e.target.value))}
+              style={styles.slider}
+            />
+          </div>
           <CompaniesBarChart 
             companies={companies} 
             title="Distribución de Pozos por Empresa"
-            maxCompanies={10}
+            maxCompanies={maxCompanies}
           />
         </div>
 
@@ -166,6 +180,30 @@ const styles: Record<string, React.CSSProperties> = {
   },
   chartContainer: {
     width: "100%",
+  },
+  chartControls: {
+    backgroundColor: "white",
+    borderRadius: "12px",
+    padding: "16px 24px",
+    marginBottom: "16px",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+    border: "1px solid #e5e7eb",
+    display: "flex",
+    alignItems: "center",
+    gap: "16px",
+  },
+  sliderLabel: {
+    fontSize: "14px",
+    color: "#374151",
+    minWidth: "180px",
+  },
+  slider: {
+    flex: 1,
+    height: "6px",
+    borderRadius: "3px",
+    outline: "none",
+    opacity: 0.9,
+    cursor: "pointer",
   },
   statsContainer: {
     display: "grid",

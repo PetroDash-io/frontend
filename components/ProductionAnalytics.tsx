@@ -14,6 +14,7 @@ import { ProductionAggregatesFilters, ComparisonFilters } from "@/app/types";
 export function ProductionAnalytics() {
   const [filters, setFilters] = useState<Partial<ProductionAggregatesFilters>>({});
   const [comparisonFilters, setComparisonFilters] = useState<Partial<ComparisonFilters>>({});
+  const [maxCompanies, setMaxCompanies] = useState<number>(7);
 
   const { companies, loading: loadingCompanies, error: errorCompanies } = useCompanies();
   const { data: productionData, loading: loadingProduction, error: errorProduction } = useProductionAggregates(filters);
@@ -143,10 +144,23 @@ export function ProductionAnalytics() {
 
       {/* Bar Chart Section */}
       <div style={styles.pieChartSection}>
+        <div style={styles.chartControls}>
+          <label style={styles.sliderLabel}>
+            Número de empresas: <strong>{maxCompanies}</strong>
+          </label>
+          <input
+            type="range"
+            min="3"
+            max="15"
+            value={maxCompanies}
+            onChange={(e) => setMaxCompanies(Number(e.target.value))}
+            style={styles.slider}
+          />
+        </div>
         <CompaniesBarChart 
           companies={companies} 
-          title="Top 7 Empresas por Cantidad de Pozos"
-          maxCompanies={7}
+          title={`Top ${maxCompanies} Empresas por Cantidad de Pozos`}
+          maxCompanies={maxCompanies}
         />
       </div>
 
@@ -385,6 +399,30 @@ const styles = {
     width: "100%",
     maxWidth: "900px",
     margin: "0 auto",
+  } as React.CSSProperties,
+  chartControls: {
+    backgroundColor: "white",
+    borderRadius: 12,
+    padding: "16px 24px",
+    marginBottom: 16,
+    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+    border: "1px solid #e5e7eb",
+    display: "flex",
+    alignItems: "center",
+    gap: 16,
+  } as React.CSSProperties,
+  sliderLabel: {
+    fontSize: 14,
+    color: "#374151",
+    minWidth: 180,
+  } as React.CSSProperties,
+  slider: {
+    flex: 1,
+    height: 6,
+    borderRadius: 3,
+    outline: "none",
+    opacity: 0.9,
+    cursor: "pointer",
   } as React.CSSProperties,
   filtersContainer: {
     display: "flex",
