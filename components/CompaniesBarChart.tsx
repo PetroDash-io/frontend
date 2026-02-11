@@ -51,21 +51,15 @@ const formatXAxis = (value: number) => {
   return value.toString();
 };
 
-const renderBarLabel = (props: {
-  x?: number;
-  y?: number;
-  width?: number;
-  height?: number;
-  value?: number;
-}) => {
+const renderBarLabel = (props: any) => {
   const { x, y, width, height, value } = props;
 
   if (
-    x === undefined ||
-    y === undefined ||
-    width === undefined ||
-    height === undefined ||
-    value === undefined
+    x == null ||
+    y == null ||
+    width == null ||
+    height == null ||
+    value == null
   ) {
     return null;
   }
@@ -73,13 +67,14 @@ const renderBarLabel = (props: {
   return (
     <text
       x={x + width + 10}
-      y={y + height / 2 + 5}
+      y={y + height / 2}
       fill="#374151"
       fontSize={13}
       fontWeight={600}
       textAnchor="start"
+      dominantBaseline="middle"
     >
-      {value.toLocaleString("es-AR")}
+      {Number(value).toLocaleString("es-AR")}
     </text>
   );
 };
