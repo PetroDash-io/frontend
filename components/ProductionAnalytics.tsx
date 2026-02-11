@@ -8,7 +8,7 @@ import { useCompanyComparison } from "@/hooks/useCompanyComparison";
 import { ProductionBarChart } from "@/components/ProductionBarChart";
 import { CompanyComparisonPanel } from "@/components/CompanyComparisonPanel";
 import { CompanyComparisonCharts } from "@/components/CompanyComparisonCharts";
-import { CompaniesPieChart } from "@/components/CompaniesPieChart";
+import { CompaniesBarChart } from "@/components/CompaniesBarChart";
 import { ProductionAggregatesFilters, ComparisonFilters } from "@/app/types";
 
 export function ProductionAnalytics() {
@@ -141,12 +141,12 @@ export function ProductionAnalytics() {
     <div style={styles.container}>
       <h2 style={styles.heading}>Análisis de Empresas y Producción</h2>
 
-      {/* Pie Chart Section */}
+      {/* Bar Chart Section */}
       <div style={styles.pieChartSection}>
-        <CompaniesPieChart 
+        <CompaniesBarChart 
           companies={companies} 
-          title="Distribución de Pozos por Empresa"
-          maxCompanies={10}
+          title="Top 7 Empresas por Cantidad de Pozos"
+          maxCompanies={7}
         />
       </div>
 

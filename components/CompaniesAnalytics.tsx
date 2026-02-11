@@ -1,7 +1,7 @@
 'use client';
 
 import { useCompanies } from "@/hooks/useCompanies";
-import { CompaniesPieChart } from "@/components/CompaniesPieChart";
+import { CompaniesBarChart } from "@/components/CompaniesBarChart";
 import { useState } from "react";
 
 export function CompaniesAnalytics() {
@@ -56,7 +56,7 @@ export function CompaniesAnalytics() {
 
       <div style={styles.content}>
         <div style={styles.chartContainer}>
-          <CompaniesPieChart 
+          <CompaniesBarChart 
             companies={companies} 
             title="Distribución de Pozos por Empresa"
             maxCompanies={10}
