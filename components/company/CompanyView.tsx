@@ -5,12 +5,12 @@ import { colors } from "@/utils/constants";
 import { useCompanies } from "@/hooks/useCompanies";
 import { useProductionAggregates } from "@/hooks/useProductionAggregates";
 import { useCompanyComparison } from "@/hooks/useCompanyComparison";
-import { ProductionBarChart } from "@/components/ProductionBarChart";
-import { CompanyComparisonPanel } from "@/components/CompanyComparisonPanel";
-import { CompanyComparisonCharts } from "@/components/CompanyComparisonCharts";
+import { ProductionBarChart } from "@/components/company/ProductionBarChart";
+import { CompanyComparisonPanel } from "@/components/company/CompanyComparisonPanel";
+import { CompanyComparisonCharts } from "@/components/company/CompanyComparisonCharts";
 import { ProductionAggregatesFilters, ComparisonFilters } from "@/app/types";
 
-export function ProductionAnalytics() {
+export function CompanyView() {
   const [filters, setFilters] = useState<Partial<ProductionAggregatesFilters>>({});
   const [comparisonFilters, setComparisonFilters] = useState<Partial<ComparisonFilters>>({});
 

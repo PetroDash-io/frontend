@@ -4,10 +4,9 @@ import { colors } from "@/utils/constants";
 
 interface WellsTableProps {
   data: PozoDetail[];
-  onSelectedPozo?: (id: string) => void;
 }
 
-export function WellsTable({ data, onSelectedPozo }: WellsTableProps) {
+export function WellsTable({data}: WellsTableProps) {
     return (
       <div
         style={{
@@ -61,7 +60,6 @@ export function WellsTable({ data, onSelectedPozo }: WellsTableProps) {
             {data.map((pozo) => (
               <tr
                 key={pozo.well_id}
-                onClick={() => onSelectedPozo?.(pozo.well_id)}
                 style={{
                   cursor: "pointer",
                   borderBottom: "1px solid #eee",

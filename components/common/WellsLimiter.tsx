@@ -1,6 +1,6 @@
 import { colors, MAX_POZOS} from "@/utils/constants";
 import { PozoDetail } from "@/app/types";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useReservoirs } from "@/hooks/useReservorios";
 
 interface WellsLimiterProps {
