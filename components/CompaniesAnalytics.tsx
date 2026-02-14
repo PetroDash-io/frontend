@@ -3,21 +3,23 @@
 import { useCompanies } from "@/hooks/useCompanies";
 import { CompaniesBarChart } from "@/components/CompaniesBarChart";
 import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export function CompaniesAnalytics() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [debouncedQuery, setDebouncedQuery] = useState<string>("");
-  const [maxCompanies, setMaxCompanies] = useState<number>(10);
   const { companies, loading, error } = useCompanies(debouncedQuery);
 
-  const handleSearchChange = (value: string) => {
-    setSearchQuery(value);
-    
+  useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedQuery(value);
+      setDebouncedQuery(searchQuery);
     }, 500);
 
     return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
   };
 
   if (loading) {
