@@ -126,7 +126,7 @@ export function CompaniesAnalytics() {
                     const percentage = totalWells > 0 ? (company.cantidad_pozos / totalWells) * 100 : 0;
                     
                     return (
-                      <tr key={company.empresa} style={styles.tableRow}>
+                      <tr key={`${company.empresa || 'unknown'}-${index}`} style={styles.tableRow}>
                         <td style={styles.tableCell}>{index + 1}</td>
                         <td style={{...styles.tableCell, textAlign: 'left', fontWeight: 500}}>
                           {company.empresa}
