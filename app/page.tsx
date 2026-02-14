@@ -13,6 +13,7 @@ import { MyInfoContainer } from "@/components/MyInfoContainer";
 import { ProductionAnalytics } from "@/components/ProductionAnalytics";
 import { WellsLimiter } from "@/components/WellsLimiter";
 import { MyTabs, TabTrigger, TabContent } from "@/components/MyTabs";
+import { WellProductionComparisonChart } from "@/components/WellProductionComparisonChart";
 
 export default function Home() {
   const [reservoirs, setReservoirs] = useState<PozoDetail[]>([]);
@@ -78,6 +79,7 @@ export default function Home() {
           <TabTrigger value="Map">Pozo</TabTrigger>
           <TabTrigger value="Table">Tabla</TabTrigger>
           <TabTrigger value="Production">Producción</TabTrigger>
+          <TabTrigger value="Analysis">Análisis de Producción</TabTrigger>
         </nav>
 
         <br/>
@@ -204,9 +206,12 @@ export default function Home() {
             <CurveChart data={chartData} />
           )}
         </TabContent>
-
         <TabContent value="Production">
           <ProductionAnalytics />
+        </TabContent>
+
+        <TabContent value="Analysis">
+          <WellProductionComparisonChart />
         </TabContent>
       </MyTabs>
     </>
