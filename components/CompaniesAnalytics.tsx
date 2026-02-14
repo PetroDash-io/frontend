@@ -1,13 +1,13 @@
 'use client';
 
+import React, { useState, useEffect } from "react";
 import { useCompanies } from "@/hooks/useCompanies";
 import { CompaniesBarChart } from "@/components/CompaniesBarChart";
-import { useState } from "react";
-import { useState, useEffect } from "react";
 
 export function CompaniesAnalytics() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [debouncedQuery, setDebouncedQuery] = useState<string>("");
+  const [maxCompanies, setMaxCompanies] = useState<number>(7);
   const { companies, loading, error } = useCompanies(debouncedQuery);
 
   useEffect(() => {
