@@ -1,9 +1,9 @@
-import type { PozoDetail } from "@/app/types";
+import type { WellDetail } from "@/app/types";
 import { colors } from "@/utils/constants";
 
 
 interface WellsTableProps {
-  data: PozoDetail[];
+  data: WellDetail[];
 }
 
 export function WellsTable({data}: WellsTableProps) {

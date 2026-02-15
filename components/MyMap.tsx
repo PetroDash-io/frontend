@@ -1,5 +1,5 @@
 import { colors, LEGEND_ITEMS } from "@/utils/constants";
-import { ActivePozo, PozoDetail } from "@/app/types";
+import { ActiveWell, WellDetail } from "@/app/types";
 import { LegendItem } from "@/components/LegendItem";
 import { getPozoColor } from "@/utils/helpers";
 
@@ -7,14 +7,14 @@ import Map, {Marker, Popup} from "react-map-gl/mapbox";
 import React, {useState} from "react";
 
 interface MyMapProps {
-  reservorios: PozoDetail[];
+  reservorios: WellDetail[];
   selectedPozoId: string | null;
   onSelectedPozo: (id: string) => void;
 }
 
 export function MyMap({ reservorios, selectedPozoId, onSelectedPozo }: MyMapProps) {
     const [focusedPozoId, setFocusedPozoId] = useState<string | null>(null);
-    const [activePozo, setActivePozo] = useState<ActivePozo | null>(null);
+    const [activePozo, setActivePozo] = useState<ActiveWell | null>(null);
 
     return (
         <div style={styles.mapContainer}>

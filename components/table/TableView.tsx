@@ -1,40 +1,51 @@
 import React, {useMemo, useState} from "react";
-import {WellsLimiter} from "@/components/common/WellsLimiter";
 import {WellsTable} from "@/components/table/WellsTable";
-import {PozoDetail} from "@/app/types";
+import {useWells} from "@/hooks/useWells";
+import {LimitFilter} from "@/components/map/LimitFilter";
+import {WellDetail} from "@/app/types";
+
+const DEFAULT_FILTERS = {
+    province: "ALL",
+    status: "ALL",
+    company: "ALL",
+    limit: 100,
+}
 
 export function TableView() {
-    const [reservoirs, setReservoirs] = useState<PozoDetail[]>([]);
+    const [filters, setFilters] = useState(DEFAULT_FILTERS);
+    const {data: wells, loading: loadingWells, error: errorGettingWells} = useWells({filters});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const [filters, setFilters] = useState({
-        province: "ALL",
-        status: "ALL",
-        company: "ALL",
-    });
+    const filteredWells = useMemo(() => {
+        if (!wells) return [];
 
-    const filteredReservoirs = useMemo(() => {
-        return reservoirs.filter((pozo) => {
-            if (filters.province !== "ALL" && pozo.province !== filters.province) return false;
-            if (filters.status !== "ALL" && pozo.status !== filters.status) return false;
-            if (filters.company !== "ALL" && pozo.company !== filters.company) return false;
+        return wells.filter((well: WellDetail) => {
+            if (filters.province !== "ALL" && well.province !== filters.province) return false;
+            if (filters.status !== "ALL" && well.status !== filters.status) return false;
+            if (filters.company !== "ALL" && well.company !== filters.company) return false;
             return true;
         });
-    }, [reservoirs, filters]);
+    }, [wells, filters]);
 
-    const provinces = useMemo(
-        () => [...new Set(reservoirs.map((w) => w.province))].filter(Boolean),
-        [reservoirs]
-    );
-    const statuses = useMemo(
-        () => [...new Set(reservoirs.map((w) => w.status))].filter(Boolean),
-        [reservoirs]
-    );
-    const companies = useMemo(
-        () => [...new Set(reservoirs.map((w) => w.company))].filter(Boolean),
-        [reservoirs]
-    );
+    const provinces = useMemo(() => {
+        if (!wells) return [];
+        return [...new Set(wells.map((well) => well.province))].filter(Boolean);
+    }, [wells]);
+
+    const statuses = useMemo(() => {
+        if (!wells) return [];
+        return [...new Set(wells.map((well) => well.status))].filter(Boolean);
+    }, [wells]);
+
+    const companies = useMemo(() => {
+        if (!wells) return [];
+        return [...new Set(wells.map((well) => well.company))].filter(Boolean);
+    }, [wells]);
+
+    const updateFilters = (filterName: string, value: unknown) => {
+        setFilters((previousValues) => ({...previousValues, [filterName]: value}));
+    }
 
     return (
         <>
@@ -76,9 +87,9 @@ export function TableView() {
                 </select>
             </div>
 
-            <WellsLimiter setReservoirs={setReservoirs} setLoading={setLoading} setError={setError} />
+            <LimitFilter filterName="limit" limit={filters.limit} onDefineLimit={updateFilters}/>
 
-            <WellsTable data={filteredReservoirs}/>
+            <WellsTable data={filteredWells}/>
 
             {error && (
                 <div style={styles.errorMessageContainer}>

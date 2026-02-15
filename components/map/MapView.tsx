@@ -1,55 +1,59 @@
 import React, {useMemo, useState} from "react";
-import {WellsLimiter} from "@/components/common/WellsLimiter";
-import {PozoDetail, ProductionMonthly} from "@/app/types";
+import {WellDetail} from "@/app/types";
 import {toNumber} from "@/utils/helpers";
-import {CurveChart} from "@/components/CurveChart";
-import {MyInfoContainer} from "@/components/MyInfoContainer";
+import {TimeSeriesChart} from "@/components/TimeSeriesChart";
+import {WellInfo} from "@/components/WellInfo";
 import {MyMap} from "@/components/MyMap";
+import {Filter} from "@/components/map/Filter";
+import {LimitFilter} from "@/components/map/LimitFilter";
+import {useWells} from "@/hooks/useWells";
+import {useWell} from "@/hooks/useWell";
+import {useWellsProduction} from "@/hooks/useWellProduction";
 
-
+const DEFAULT_FILTERS = {
+    province: "ALL",
+    status: "ALL",
+    company: "ALL",
+    limit: 100,
+}
 
 export function MapView() {
-    const [reservoirs, setReservoirs] = useState<PozoDetail[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const [filters, setFilters] = useState(DEFAULT_FILTERS);
+    const {data: wells, loading: loadingWells, error: errorGettingWells} = useWells({filters});
+    const [selectedPozoId, setSelectedPozoId] = useState<string | null>(null);
+    const {data: selectedWellDetails, loading: loadingWell, error: errorGettingWellDetails} = useWell({wellId: selectedPozoId});
+    const {data: wellProduction, loading: loadingWellProduction, error: errorGettingWellProduction} = useWellsProduction({wellId: selectedPozoId});
 
-    const [filters, setFilters] = useState({
-        province: "ALL",
-        status: "ALL",
-        company: "ALL",
-    });
+    const filteredWells = useMemo(() => {
+        if (!wells) return [];
 
-    const filteredReservoirs = useMemo(() => {
-        return reservoirs.filter((pozo) => {
-            if (filters.province !== "ALL" && pozo.province !== filters.province) return false;
-            if (filters.status !== "ALL" && pozo.status !== filters.status) return false;
-            if (filters.company !== "ALL" && pozo.company !== filters.company) return false;
+        return wells.filter((well: WellDetail) => {
+            if (filters.province !== "ALL" && well.province !== filters.province) return false;
+            if (filters.status !== "ALL" && well.status !== filters.status) return false;
+            if (filters.company !== "ALL" && well.company !== filters.company) return false;
             return true;
         });
-    }, [reservoirs, filters]);
+    }, [wells, filters]);
 
-    const provinces = useMemo(
-        () => [...new Set(reservoirs.map((w) => w.province))].filter(Boolean),
-        [reservoirs]
-    );
-    const statuses = useMemo(
-        () => [...new Set(reservoirs.map((w) => w.status))].filter(Boolean),
-        [reservoirs]
-    );
-    const companies = useMemo(
-        () => [...new Set(reservoirs.map((w) => w.company))].filter(Boolean),
-        [reservoirs]
-    );
+    const provinces = useMemo(() => {
+        if (!wells) return [];
+        return [...new Set(wells.map((well) => well.province))].filter(Boolean);
+    }, [wells]);
 
-    const [selectedPozoId, setSelectedPozoId] = useState<string | null>(null);
+    const statuses = useMemo(() => {
+        if (!wells) return [];
+        return [...new Set(wells.map((well) => well.status))].filter(Boolean);
+    }, [wells]);
 
-    const [showCurve, setShowCurve] = useState(false);
-    const [curveData, setCurveData] = useState<ProductionMonthly[] | null>(null);
+    const companies = useMemo(() => {
+        if (!wells) return [];
+        return [...new Set(wells.map((well) => well.company))].filter(Boolean);
+    }, [wells]);
 
-    const chartData = useMemo(() => {
-        if (!curveData || curveData.length === 0) return null;
+    const timeSeriesChartData = useMemo(() => {
+        if (!wellProduction || wellProduction.length === 0) return null;
 
-        return curveData
+        return wellProduction
             .slice()
             .sort((a, b) => a.reported_period_date.localeCompare(b.reported_period_date))
             .map((record) => ({
@@ -58,69 +62,41 @@ export function MapView() {
                 gas: toNumber(record.gas_production) ?? 0,
                 water: toNumber(record.water_production) ?? 0,
             }));
-    }, [curveData]);
+    }, [wellProduction]);
+
+    const updateFilters = (filterName: string, value: unknown) => {
+        setFilters((previousValues) => ({...previousValues, [filterName]: value}));
+    }
 
     return (
         <>
             <div style={styles.filterPanel}>
-                <select
-                    value={filters.province}
-                    onChange={(e) => setFilters({ ...filters, province: e.target.value })}
-                    className="select-filter">
-                    <option value="ALL">Todas las provincias</option>
-                    {provinces.map((p) => (
-                        <option key={p} value={p}>
-                            {p}
-                        </option>
-                    ))}
-                </select>
-
-                <select
-                    value={filters.status}
-                    onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                    className="select-filter">
-                    <option value="ALL">Todos los estados</option>
-                    {statuses.map((s) => (
-                        <option key={s} value={s}>
-                            {s}
-                        </option>
-                    ))}
-                </select>
-
-                <select
-                    value={filters.company}
-                    onChange={(e) => setFilters({ ...filters, company: e.target.value })}
-                    className="select-filter">
-                    <option value="ALL">Todas las empresas</option>
-                    {companies.map((emp) => (
-                        <option key={emp} value={emp}>
-                            {emp}
-                        </option>
-                    ))}
-                </select>
+                <Filter filterName="province" value={filters.province} onSelect={updateFilters} options={provinces}
+                        defaultText="Todas las provincias"/>
+                <Filter filterName="status" value={filters.status} onSelect={updateFilters} options={statuses}
+                        defaultText="Todos los estados"/>
+                <Filter filterName="company" value={filters.company} onSelect={updateFilters} options={companies}
+                        defaultText="Todas las empresas"/>
+                <LimitFilter filterName="limit" limit={filters.limit} onDefineLimit={updateFilters}/>
             </div>
-
-            <WellsLimiter setReservoirs={setReservoirs} setLoading={setLoading} setError={setError} />
 
             <div style={styles.wellDetailsContainer}>
-                <MyMap reservorios={filteredReservoirs} selectedPozoId={selectedPozoId} onSelectedPozo={setSelectedPozoId} />
-                <MyInfoContainer selectedPozoId={selectedPozoId} showCurve={showCurve} curveData={curveData} onShowCurve={setShowCurve} onCurveData={setCurveData} />
+                <MyMap reservorios={filteredWells} selectedPozoId={selectedPozoId} onSelectedPozo={setSelectedPozoId} />
+                <WellInfo wellInfo={selectedWellDetails} loadingWell={loadingWell}/>
             </div>
 
-            {error && (
+            {wellProduction && <TimeSeriesChart data={timeSeriesChartData}/>}
+
+            {errorGettingWells && (
                 <div style={styles.errorMessageContainer}>
-                    <p style={{ color: "#b91c1c" }}>Error: {error}</p>
+                    <p style={{ color: "#b91c1c" }}>Error: {errorGettingWells}</p>
                 </div>
             )}
 
-            {loading && (
+            {loadingWells && (
                 <div style={styles.loadingContainer}>
                     <p>Cargando pozos...</p>
                 </div>
-            )}
-
-            {showCurve && selectedPozoId && chartData && (
-                <CurveChart data={chartData} />
             )}
         </>
     )

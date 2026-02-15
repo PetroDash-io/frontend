@@ -1,4 +1,4 @@
-export const MAX_POZOS = 32817;
+export const MAX_WELLS = 32817;
 
 export const colors = {
   bg: "#F3EEE6",

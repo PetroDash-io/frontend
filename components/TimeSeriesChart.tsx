@@ -30,12 +30,19 @@ interface CurveDataPoint {
 
 
 interface CurveChartProps {
-    data: CurveDataPoint[];
+    data: CurveDataPoint[] | null;
 }
 
-export function CurveChart({ data }: CurveChartProps) {
-
+export function TimeSeriesChart({data}: CurveChartProps) {
     const [unit, setUnit] = useState<Unit>("m3");
+
+    if (!data || data.length === 0) {
+        return (
+            <div style={styles.curveChartWrapper}>
+                <p style={{ padding: 20, textAlign: "center" }}>No hay datos de producción disponibles para este pozo.</p>
+            </div>
+        );
+    }
 
     const convertedData = data.map(d => ({
       ...d,
@@ -58,22 +65,14 @@ export function CurveChart({ data }: CurveChartProps) {
         <div style={styles.curveChartWrapper}>
             {/* Botón de unidades */}
             <div style={topControlsStyles.topControlsRow}>
-        <button
-            style={tabButtonStyle(unit === "m3")}
-            onClick={() => setUnit("m3")}
-        >
-            m³
-        </button>
+                <button style={tabButtonStyle(unit === "m3")}  onClick={() => setUnit("m3")}>
+                    m³
+                </button>
 
-        <button
-            style={tabButtonStyle(unit === "bbl")}
-            onClick={() => setUnit("bbl")}
-        >
-            BBL
-        </button>
-        </div>
-                
-
+                <button  style={tabButtonStyle(unit === "bbl")}  onClick={() => setUnit("bbl")} >
+                    BBL
+                </button>
+            </div>
 
             <div style={{ height: 320 }}>
                 <ResponsiveContainer width="100%" height="100%">
