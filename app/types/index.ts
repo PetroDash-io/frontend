@@ -37,6 +37,12 @@ export interface Company {
   cantidad_pozos: number;
 }
 
+export interface CompaniesResponse {
+  source: string;
+  total: number;
+  data: Company[];
+}
+
 export interface AggregationData {
   total: number;
   avg: number;

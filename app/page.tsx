@@ -77,7 +77,7 @@ export default function Home() {
         <nav style={styles.topControlsRow}>
           <TabTrigger value="Map">Pozo</TabTrigger>
           <TabTrigger value="Table">Tabla</TabTrigger>
-          <TabTrigger value="Production">Producción</TabTrigger>
+          <TabTrigger value="Production">Empresas</TabTrigger>
         </nav>
 
         <br/>
