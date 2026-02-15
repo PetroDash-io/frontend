@@ -136,7 +136,7 @@ export function WellProductionComparisonChart() {
               style={styles.select}
               className="select-filter"
             >
-              <option value="">Seleccione año</option>
+              <option value="">Seleccionar</option>
               {YEARS.map((year) => (
                 <option key={year} value={year}>
                   {year}
