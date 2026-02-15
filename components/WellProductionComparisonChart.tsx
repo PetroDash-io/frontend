@@ -44,7 +44,10 @@ const MONTHS = [
   { value: 12, label: "Diciembre" },
 ];
 
-const YEARS = Array.from({ length: 2026 - 2013 + 1 }, (_, i) => 2013 + i);
+const YEARS = Array.from(
+  { length: new Date().getFullYear() - 2013 + 1 },
+  (_, i) => 2013 + i
+);
 
 export function WellProductionComparisonChart() {
   const [wellId, setWellId] = useState<number | null>(null);
