@@ -71,7 +71,7 @@ export function useWellProductionComparison(
     };
 
     fetchData();
-  }, [wellId, filters.inicio_anio, filters.inicio_mes, filters.fin_anio, filters.fin_mes, JSON.stringify(filters.median_by)]);
+  }, [wellId, filters.inicio_anio, filters.inicio_mes, filters.fin_anio, filters.fin_mes, ...(filters.median_by || [])]);
 
   return { data, loading, error };
 }
