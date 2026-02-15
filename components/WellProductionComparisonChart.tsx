@@ -159,7 +159,7 @@ export function WellProductionComparisonChart() {
               className="select-filter"
               disabled={!filters.inicio_anio}
             >
-              <option value="">Seleccione mes</option>
+              <option value="">Todos</option>
               {MONTHS.map((month) => (
                 <option key={month.value} value={month.value}>
                   {month.label}
