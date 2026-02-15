@@ -3,6 +3,7 @@ import {WellsTable} from "@/components/table/WellsTable";
 import {useWells} from "@/hooks/useWells";
 import {LimitFilter} from "@/components/map/LimitFilter";
 import {WellDetail} from "@/app/types";
+import {Filter} from "@/components/map/Filter";
 
 const DEFAULT_FILTERS = {
     province: "ALL",
@@ -13,9 +14,7 @@ const DEFAULT_FILTERS = {
 
 export function TableView() {
     const [filters, setFilters] = useState(DEFAULT_FILTERS);
-    const {data: wells, loading: loadingWells, error: errorGettingWells} = useWells({filters});
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const {data: wells, loading: loading, error: error} = useWells({filters});
 
     const filteredWells = useMemo(() => {
         if (!wells) return [];
@@ -50,44 +49,14 @@ export function TableView() {
     return (
         <>
             <div style={styles.filterPanel}>
-                <select
-                    value={filters.province}
-                    onChange={(e) => setFilters({ ...filters, province: e.target.value })}
-                    className="select-filter">
-                    <option value="ALL">Todas las provincias</option>
-                    {provinces.map((p) => (
-                        <option key={p} value={p}>
-                            {p}
-                        </option>
-                    ))}
-                </select>
-
-                <select
-                    value={filters.status}
-                    onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                    className="select-filter">
-                    <option value="ALL">Todos los estados</option>
-                    {statuses.map((s) => (
-                        <option key={s} value={s}>
-                            {s}
-                        </option>
-                    ))}
-                </select>
-
-                <select
-                    value={filters.company}
-                    onChange={(e) => setFilters({ ...filters, company: e.target.value })}
-                    className="select-filter">
-                    <option value="ALL">Todas las empresas</option>
-                    {companies.map((emp) => (
-                        <option key={emp} value={emp}>
-                            {emp}
-                        </option>
-                    ))}
-                </select>
+                <Filter filterName="province" value={filters.province} onSelect={updateFilters} options={provinces}
+                        defaultText="Todas las provincias"/>
+                <Filter filterName="status" value={filters.status} onSelect={updateFilters} options={statuses}
+                        defaultText="Todos los estados"/>
+                <Filter filterName="company" value={filters.company} onSelect={updateFilters} options={companies}
+                        defaultText="Todas las empresas"/>
+                <LimitFilter filterName="limit" limit={filters.limit} onDefineLimit={updateFilters}/>
             </div>
-
-            <LimitFilter filterName="limit" limit={filters.limit} onDefineLimit={updateFilters}/>
 
             <WellsTable data={filteredWells}/>
 
@@ -118,4 +87,4 @@ const styles = {
     loadingContainer: {
         display: "flex"
     } as React.CSSProperties,
-} as const;
+};
