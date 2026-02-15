@@ -64,7 +64,7 @@ export function useWellProductionComparison(
         const result: WellProductionComparisonResponse = await response.json();
         setData(result);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Unknown error");
+        setError(err instanceof Error ? err.message : "Unexpected error");
       } finally {
         setLoading(false);
       }
