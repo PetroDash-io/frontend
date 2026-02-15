@@ -63,8 +63,10 @@ export function WellProductionComparisonChart() {
       setWellId(null);
     } else {
       const parsed = parseInt(value, 10);
-      if (!isNaN(parsed)) {
+      if (!isNaN(parsed) && parsed > 0) {
         setWellId(parsed);
+      } else {
+        setWellId(null);
       }
     }
   };
