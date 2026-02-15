@@ -290,7 +290,7 @@ export function WellProductionComparisonChart() {
                 <XAxis dataKey="name" />
                 <YAxis tickFormatter={formatYAxis} width={60} />
                 <Tooltip formatter={formatTooltip} />
-                <Bar dataKey="value" name="Gas (km³)">
+                <Bar dataKey="value" name="Gas (Mm³)">
                   <Cell fill={colors.gas} />
                   <Cell fill={colors.gas} opacity={0.6} />
                 </Bar>
