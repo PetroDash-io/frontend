@@ -6,6 +6,7 @@ import {CompanyView} from "@/components/company/CompanyView";
 import {MyTabs, TabContent, TabTrigger} from "@/components/MyTabs";
 import {TableView} from "@/components/table/TableView";
 import {MapView} from "@/components/map/MapView";
+import { WellProductionComparisonChart } from "@/components/WellProductionComparisonChart";
 
 export default function Home() {
     return (
@@ -19,7 +20,8 @@ export default function Home() {
                 <nav style={styles.tabButtonsContainer}>
                     <TabTrigger value="Map">Pozo</TabTrigger>
                     <TabTrigger value="Table">Tabla</TabTrigger>
-                    <TabTrigger value="Production">Producción</TabTrigger>
+                    <TabTrigger value="Production">Empresas</TabTrigger>
+                    <TabTrigger value="Analysis">Análisis deProducción</TabTrigger>
                 </nav>
                 <br/>
                 <TabContent value="Map">
@@ -29,7 +31,9 @@ export default function Home() {
                     <TableView/>
                 </TabContent>
                 <TabContent value="Production">
-                    <CompanyView/>
+                    <CompanyView/></TabContent>
+                <TabContent value="Analysis">
+                    <WellProductionComparisonChart />
                 </TabContent>
             </MyTabs>
         </>

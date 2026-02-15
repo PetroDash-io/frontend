@@ -8,11 +8,13 @@ import { useCompanyComparison } from "@/hooks/useCompanyComparison";
 import { ProductionBarChart } from "@/components/company/ProductionBarChart";
 import { CompanyComparisonPanel } from "@/components/company/CompanyComparisonPanel";
 import { CompanyComparisonCharts } from "@/components/company/CompanyComparisonCharts";
+import { CompaniesBarChart } from "@/components/CompaniesBarChart";
 import { ProductionAggregatesFilters, ComparisonFilters } from "@/app/types";
 
 export function CompanyView() {
   const [filters, setFilters] = useState<Partial<ProductionAggregatesFilters>>({});
   const [comparisonFilters, setComparisonFilters] = useState<Partial<ComparisonFilters>>({});
+  const [maxCompanies, setMaxCompanies] = useState<number>(7);
 
   const { companies, loading: loadingCompanies, error: errorCompanies } = useCompanies();
   const { data: productionData, loading: loadingProduction, error: errorProduction } = useProductionAggregates(filters);
@@ -138,7 +140,33 @@ export function CompanyView() {
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.heading}>Análisis de Producción por Empresa</h2>
+      <h2 style={styles.heading}>Análisis de Empresas y Producción</h2>
+
+      {/* Bar Chart Section */}
+      <div style={styles.pieChartSection}>
+        <div style={styles.chartControls}>
+          <label style={styles.sliderLabel}>
+            Número de empresas: <strong>{maxCompanies}</strong>
+          </label>
+          <input
+            type="range"
+            min="3"
+            max="15"
+            value={maxCompanies}
+            onChange={(e) => setMaxCompanies(Number(e.target.value))}
+            style={styles.slider}
+          />
+        </div>
+        <CompaniesBarChart
+          companies={companies}
+          title={`Top ${maxCompanies} Empresas por Cantidad de Pozos`}
+          maxCompanies={maxCompanies}
+        />
+      </div>
+
+      <div style={styles.divider} />
+
+      <h3 style={styles.subHeading}>Análisis de Producción por Empresa</h3>
 
       <div style={styles.filtersContainer}>
         <div style={styles.filterGroup}>
@@ -356,10 +384,45 @@ const styles = {
     backgroundColor: colors.bg,
   } as React.CSSProperties,
   heading: {
-    fontSize: 24,
+    fontSize: 28,
+    fontWeight: 700,
+    color: colors.text,
+    margin: 0,
+  } as React.CSSProperties,
+  subHeading: {
+    fontSize: 22,
     fontWeight: 600,
     color: colors.text,
     margin: 0,
+  } as React.CSSProperties,
+  pieChartSection: {
+    width: "100%",
+    maxWidth: "900px",
+    margin: "0 auto",
+  } as React.CSSProperties,
+  chartControls: {
+    backgroundColor: "white",
+    borderRadius: 12,
+    padding: "16px 24px",
+    marginBottom: 16,
+    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+    border: "1px solid #e5e7eb",
+    display: "flex",
+    alignItems: "center",
+    gap: 16,
+  } as React.CSSProperties,
+  sliderLabel: {
+    fontSize: 14,
+    color: "#374151",
+    minWidth: 180,
+  } as React.CSSProperties,
+  slider: {
+    flex: 1,
+    height: 6,
+    borderRadius: 3,
+    outline: "none",
+    opacity: 0.9,
+    cursor: "pointer",
   } as React.CSSProperties,
   filtersContainer: {
     display: "flex",
