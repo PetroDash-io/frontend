@@ -85,3 +85,39 @@ export interface ComparisonFilters {
   fin_mes?: number;
 }
 
+export interface WellProductionComparisonData {
+  oil: {
+    total: number;
+    median: number;
+  };
+  gas: {
+    total: number;
+    median: number;
+  };
+  water: {
+    total: number;
+    median: number;
+  };
+}
+
+export interface WellProductionComparisonResponse {
+  source: string;
+  well_id: number;
+  company: string;
+  area: string;
+  province: string;
+  start_year: number | null;
+  start_month: number | null;
+  end_year: number | null;
+  end_month: number | null;
+  data: WellProductionComparisonData[];
+}
+
+export interface WellProductionComparisonFilters {
+  inicio_anio?: number;
+  inicio_mes?: number;
+  fin_anio?: number;
+  fin_mes?: number;
+  median_by?: string[];
+}
+
