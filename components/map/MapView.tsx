@@ -3,7 +3,7 @@ import {WellDetail} from "@/app/types";
 import {toNumber} from "@/utils/helpers";
 import {TimeSeriesChart} from "@/components/TimeSeriesChart";
 import {WellInfo} from "@/components/WellInfo";
-import {MyMap} from "@/components/MyMap";
+import {WellsMap} from "@/components/WellsMap";
 import {Filter} from "@/components/map/Filter";
 import {LimitFilter} from "@/components/map/LimitFilter";
 import {useWells} from "@/hooks/useWells";
@@ -20,9 +20,9 @@ const DEFAULT_FILTERS = {
 export function MapView() {
     const [filters, setFilters] = useState(DEFAULT_FILTERS);
     const {data: wells, loading: loadingWells, error: errorGettingWells} = useWells({filters});
-    const [selectedPozoId, setSelectedPozoId] = useState<string | null>(null);
-    const {data: selectedWellDetails, loading: loadingWell, error: errorGettingWellDetails} = useWell({wellId: selectedPozoId});
-    const {data: wellProduction, loading: loadingWellProduction, error: errorGettingWellProduction} = useWellsProduction({wellId: selectedPozoId});
+    const [selectedWellId, setSelectedWellId] = useState<string | null>(null);
+    const {data: selectedWellDetails, loading: loadingWell, error: errorGettingWellDetails} = useWell({wellId: selectedWellId});
+    const {data: wellProduction, loading: loadingWellProduction, error: errorGettingWellProduction} = useWellsProduction({wellId: selectedWellId});
 
     const filteredWells = useMemo(() => {
         if (!wells) return [];
@@ -81,7 +81,7 @@ export function MapView() {
             </div>
 
             <div style={styles.wellDetailsContainer}>
-                <MyMap reservorios={filteredWells} selectedPozoId={selectedPozoId} onSelectedPozo={setSelectedPozoId} />
+                <WellsMap wells={filteredWells} selectedWellId={selectedWellId} onSelectWell={setSelectedWellId} />
                 <WellInfo wellInfo={selectedWellDetails} loadingWell={loadingWell}/>
             </div>
 

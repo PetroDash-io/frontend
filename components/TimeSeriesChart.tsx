@@ -1,24 +1,11 @@
-import { colors } from "@/utils/constants";
-import React, { useState } from "react";
-import {
-    ResponsiveContainer,
-    LineChart,
-    Line,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    Legend,
-} from "recharts";
+import {colors, PRODUCTION_TYPES} from "@/utils/constants";
 
-const M3_TO_BBL = 6.28981; // 1 m³ = 6.28981 bbl (barriles)
-type Unit = "m3" | "bbl";
+import {CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis,} from "recharts";
 
-const SERIES_COLORS = {
-    oil: "#3F6B4F",    // verde petróleo
-    water: "#3A7CA5",  // azul agua
-    gas: "#D97A00",    // naranja gas
-  };
+import {toDisplayUnit, UNITS} from "@/utils/units";
+import {useUnit} from "@/hooks/useUnit";
+import {UnitTabs} from "@/components/common/UnitTabs";
+import React, {useMemo} from "react";
 
   
 interface CurveDataPoint {
@@ -34,101 +21,78 @@ interface CurveChartProps {
 }
 
 export function TimeSeriesChart({data}: CurveChartProps) {
-    const [unit, setUnit] = useState<Unit>("m3");
+    const {unit, setUnit} = useUnit();
+
+    const convertedData = useMemo(() => {
+        if (!data) return [];
+
+        return data.map(row => ({
+            ...row,
+            oil: toDisplayUnit(row.oil, unit),
+            water: toDisplayUnit(row.water, unit),
+            gas: row.gas, // Gas queda en miles de m³
+        }));
+    }, [data, unit]);
 
     if (!data || data.length === 0) {
         return (
             <div style={styles.curveChartWrapper}>
-                <p style={{ padding: 20, textAlign: "center" }}>No hay datos de producción disponibles para este pozo.</p>
+                <p style={styles.emptyDataMessage}>No hay datos de producción disponibles para este pozo.</p>
             </div>
         );
     }
 
-    const convertedData = data.map(d => ({
-      ...d,
-      oil:
-        d.oil == null
-          ? null
-          : unit === "bbl"
-          ? d.oil * M3_TO_BBL
-          : d.oil,
-      water:
-        d.water == null
-          ? null
-          : unit === "bbl"
-          ? d.water * M3_TO_BBL
-          : d.water,
-      gas: d.gas, // gas queda en miles de m³
-    }));
+    const yAxisTickFormatter = (value: number) => {
+        return unit === UNITS.bbl ? value.toFixed(0) : value.toFixed(1)
+    }
+
+    const tooltipTextFormatter = (value?: number, name?: string)  => {
+        if (name === PRODUCTION_TYPES.gas.name) {
+            return [`${Number(value).toFixed(2)} ${UNITS.mm3}`, PRODUCTION_TYPES.gas.label];
+        }
+
+        if (name === PRODUCTION_TYPES.oil.name) {
+            return [`${Number(value).toFixed(2)} ${unit}`, PRODUCTION_TYPES.oil.label];
+        }
+
+        if (name === PRODUCTION_TYPES.water.name) {
+            return [`${Number(value).toFixed(2)} ${unit}`, PRODUCTION_TYPES.water.label];
+        }
+
+        return value;
+    }
 
     return (
         <div style={styles.curveChartWrapper}>
-            {/* Botón de unidades */}
-            <div style={topControlsStyles.topControlsRow}>
-                <button style={tabButtonStyle(unit === "m3")}  onClick={() => setUnit("m3")}>
-                    m³
-                </button>
-
-                <button  style={tabButtonStyle(unit === "bbl")}  onClick={() => setUnit("bbl")} >
-                    BBL
-                </button>
-            </div>
+           <UnitTabs onChange={setUnit} currentUnit={unit}/>
 
             <div style={{ height: 320 }}>
                 <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={convertedData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="date" minTickGap={18} />
-                        <YAxis
-                            tickFormatter={(v) =>
-                                unit === "bbl" ? v.toFixed(0) : v.toFixed(1)
-                            }
-                        />
-                    <Tooltip
-                        formatter={(value: any, name?: string | number) => {
-                        if (name === "gas") {
-                        return [`${Number(value).toFixed(2)} Mm³`, "Gas"];
-                        }
-
-                        const unitLabel = unit === "bbl" ? "BBL" : "m³";
-
-                        if (name === "oil") {
-                        return [`${Number(value).toFixed(2)} ${unitLabel}`, "Petróleo"];
-                        }
-
-                        if (name === "water") {
-                        return [`${Number(value).toFixed(2)} ${unitLabel}`, "Agua"];
-                        }
-
-                        return value;
-                    }}
-                    />
-
-
+                        <YAxis tickFormatter={yAxisTickFormatter}/>
+                        <Tooltip formatter={tooltipTextFormatter}/>
                         <Legend />
                         <Line
                             type="monotone"
-                            dataKey="oil"
-                            name={`Petróleo (${unit === "bbl" ? "BBL" : "m³"})`}
-                            stroke={SERIES_COLORS.oil}
-                            dot={false}
-                        />
+                            dataKey={PRODUCTION_TYPES.oil.name}
+                            name={`${PRODUCTION_TYPES.oil.label} (${unit})`}
+                            stroke={PRODUCTION_TYPES.oil.defaultColor}
+                            dot={false}/>
 
                         <Line
                             type="monotone"
-                            dataKey="gas"
-                            name="Gas (Mm³)"
-                            stroke={SERIES_COLORS.gas}
-                            dot={false}
-                        />
-
-                            <Line
+                            dataKey={PRODUCTION_TYPES.gas.name}
+                            name={`${PRODUCTION_TYPES.gas.label} (${UNITS.mm3})`}
+                            stroke={PRODUCTION_TYPES.gas.defaultColor}
+                            dot={false}/>
+                        <Line
                             type="monotone"
-                            dataKey="water"
-                            name={`Agua (${unit === "bbl" ? "BBL" : "m³"})`}
-                            stroke={SERIES_COLORS.water}
-                            dot={false}
-                            />
+                            dataKey={PRODUCTION_TYPES.water.name}
+                            name={`${PRODUCTION_TYPES.water.label} (${unit})`}
+                            stroke={PRODUCTION_TYPES.water.defaultColor}
+                            dot={false}/>
 
                     </LineChart>
                 </ResponsiveContainer>
@@ -147,28 +111,8 @@ const styles = {
         color: colors.textLight,
         marginTop: 50,
     } as React.CSSProperties,
-} as const;
-
-
-function tabButtonStyle(active: boolean): React.CSSProperties {
-    return {
-        padding: "8px 16px",
-        borderRadius: 8,
-        border: "1px solid #3F6B4F",
-        backgroundColor: active ? "#3F6B4F" : "transparent",
-        color: active ? "#F3EEE6" : "#3F6B4F",
-        fontSize: 14,
-        fontWeight: 500,
-        cursor: "pointer",
-        transition: "all 0.2s ease",
-    };
-}
-
-
-const topControlsStyles = {
-    topControlsRow: {
-        display: "flex",
-        gap: 12,
-        padding: "12px 24px",
-    } as React.CSSProperties
-} as const;
+    emptyDataMessage: {
+        padding: 20,
+        textAlign: "center",
+    } as React.CSSProperties,
+};

@@ -1,5 +1,24 @@
 export const MAX_WELLS = 32817;
 
+
+export const PRODUCTION_TYPES = {
+  oil: {
+    name: "oil",
+    label: "Petróleo",
+    defaultColor: "#3F6B4F"
+  },
+  gas: {
+    name: "gas",
+    label: "Gas",
+    defaultColor: "#D97A00"
+  },
+  water: {
+    name: "water",
+    label: "Agua",
+    defaultColor: "#3A7CA5"
+  }
+};
+
 export const colors = {
   bg: "#F3EEE6",
   panel: "#2F3E34",
@@ -9,11 +28,12 @@ export const colors = {
   accent: "#D6A23A",
   primary: "#4B2A1A",
   secondary: "#3F6B4F",
-  pozoActivo: "#22C55E",
-  pozoParado: "#FACC15",
-  pozoInactivo: "#EF4444",
-  pozoNoInformado: "#9CA3AF",
-  pozoUnknown: "#6B7280",
+  selectedWell: "#0641f2",
+  activeWell: "#22C55E",
+  stoppedWell: "#FACC15",
+  inactiveWell: "#EF4444",
+  notInformedWell: "#9CA3AF",
+  unknownWell: "#6B7280",
   // Production colors
   oil: "#3F6B4F",
   gas: "#D97A00",
@@ -62,10 +82,10 @@ export const ESTADOS_POZO = {
 };
 
 export const LEGEND_ITEMS = [
-  { color: colors.pozoActivo, label: "Activo" },
-  { color: colors.pozoParado, label: "Parado" },
-  { color: colors.pozoInactivo, label: "Inactivo" },
-  { color: colors.pozoNoInformado, label: "No informado" },
+  { color: colors.activeWell, label: "Activo" },
+  { color: colors.stoppedWell, label: "Parado" },
+  { color: colors.inactiveWell, label: "Inactivo" },
+  { color: colors.notInformedWell, label: "No informado" },
 ];
 
 
