@@ -1,15 +1,18 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
-import { colors } from "@/utils/constants";
-import { useCompanies } from "@/hooks/useCompanies";
-import { useProductionAggregates } from "@/hooks/useProductionAggregates";
-import { useCompanyComparison } from "@/hooks/useCompanyComparison";
-import { ProductionBarChart } from "@/components/company/ProductionBarChart";
-import { CompanyComparisonPanel } from "@/components/company/CompanyComparisonPanel";
-import { CompanyComparisonCharts } from "@/components/company/CompanyComparisonCharts";
-import { CompaniesBarChart } from "@/components/CompaniesBarChart";
-import { ProductionAggregatesFilters, ComparisonFilters } from "@/app/types";
+import React, {useMemo, useState} from "react";
+import {colors} from "@/utils/constants";
+import {useCompanies} from "@/hooks/useCompanies";
+import {useProductionAggregates} from "@/hooks/useProductionAggregates";
+import {useCompanyComparison} from "@/hooks/useCompanyComparison";
+import {ProductionBarChart} from "@/components/company/ProductionBarChart";
+import {CompanyComparisonPanel} from "@/components/company/CompanyComparisonPanel";
+import {CompanyComparisonCharts} from "@/components/company/CompanyComparisonCharts";
+import {CompaniesBarChart} from "@/components/CompaniesBarChart";
+import {ComparisonFilters, ProductionAggregatesFilters} from "@/app/types";
+import {UnitTabs} from "@/components/common/UnitTabs";
+import {useUnit} from "@/hooks/useUnit";
+import {convertValueToUnit} from "@/utils/units";
 
 export function CompanyView() {
   const [filters, setFilters] = useState<Partial<ProductionAggregatesFilters>>({});
@@ -19,50 +22,28 @@ export function CompanyView() {
   const { companies, loading: loadingCompanies, error: errorCompanies } = useCompanies();
   const { data: productionData, loading: loadingProduction, error: errorProduction } = useProductionAggregates(filters);
   const { data: comparisonData, loading: loadingComparison, error: errorComparison } = useCompanyComparison(comparisonFilters);
-  
-  const M3_TO_BBL = 6.28981;
-  type Unit = "m3" | "bbl";
-  
-  const [unit, setUnit] = useState<Unit>("m3");
+
+  const {unit, setUnit} = useUnit();
 
   const totalChartData = useMemo(() => {
     if (!productionData) return [];
-  
-    return [
-      {
-        name: "Producción Total",
-        petróleo:
-          unit === "bbl"
-            ? productionData.oil.total * M3_TO_BBL
-            : productionData.oil.total,
-        agua:
-          unit === "bbl"
-            ? productionData.water.total * M3_TO_BBL
-            : productionData.water.total,
-        gas: productionData.gas.total, // NO se convierte
-      },
-    ];
+    return [{
+      name: "Producción total",
+      oil: convertValueToUnit(productionData.oil.total, unit),
+      water: convertValueToUnit(productionData.water.total, unit),
+      gas: convertValueToUnit(productionData.gas.total, unit)
+    }];
   }, [productionData, unit]);
 
   const avgChartData = useMemo(() => {
     if (!productionData) return [];
-  
-    return [
-      {
-        name: "Producción Promedio",
-        petróleo:
-          unit === "bbl"
-            ? productionData.oil.avg * M3_TO_BBL
-            : productionData.oil.avg,
-        agua:
-          unit === "bbl"
-            ? productionData.water.avg * M3_TO_BBL
-            : productionData.water.avg,
-        gas: productionData.gas.avg,
-      },
-    ];
+    return [{
+      name: "Producción promedio",
+      oil: convertValueToUnit(productionData.oil.avg, unit),
+      water: convertValueToUnit(productionData.water.avg, unit),
+      gas: convertValueToUnit(productionData.gas.avg, unit),
+    }];
   }, [productionData, unit]);
-  
 
   const handleCompanyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -135,243 +116,228 @@ export function CompanyView() {
 
   const showResults = filters.empresa || filters.inicio_anio || filters.fin_anio;
   const showComparison = comparisonFilters.empresa_1 && comparisonFilters.empresa_2;
-  const duplicateCompanies = comparisonFilters.empresa_1 && comparisonFilters.empresa_2 && 
-    comparisonFilters.empresa_1.toLowerCase().trim() === comparisonFilters.empresa_2.toLowerCase().trim();
+  const duplicateCompanies = comparisonFilters.empresa_1 && comparisonFilters.empresa_2 &&
+      comparisonFilters.empresa_1.toLowerCase().trim() === comparisonFilters.empresa_2.toLowerCase().trim();
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.heading}>Análisis de Empresas y Producción</h2>
+      <div style={styles.container}>
+        <h2 style={styles.heading}>Análisis de Empresas y Producción</h2>
 
-      {/* Bar Chart Section */}
-      <div style={styles.pieChartSection}>
-        <div style={styles.chartControls}>
-          <label style={styles.sliderLabel}>
-            Número de empresas: <strong>{maxCompanies}</strong>
-          </label>
-          <input
-            type="range"
-            min="3"
-            max="15"
-            value={maxCompanies}
-            onChange={(e) => setMaxCompanies(Number(e.target.value))}
-            style={styles.slider}
+        {/* Bar Chart Section */}
+        <div style={styles.pieChartSection}>
+          <div style={styles.chartControls}>
+            <label style={styles.sliderLabel}>
+              Número de empresas: <strong>{maxCompanies}</strong>
+            </label>
+            <input
+                type="range"
+                min="3"
+                max="15"
+                value={maxCompanies}
+                onChange={(e) => setMaxCompanies(Number(e.target.value))}
+                style={styles.slider}
+            />
+          </div>
+          <CompaniesBarChart
+              companies={companies}
+              title={`Top ${maxCompanies} Empresas por Cantidad de Pozos`}
+              maxCompanies={maxCompanies}
           />
         </div>
-        <CompaniesBarChart
-          companies={companies}
-          title={`Top ${maxCompanies} Empresas por Cantidad de Pozos`}
-          maxCompanies={maxCompanies}
+
+        <div style={styles.divider} />
+
+        <h3 style={styles.subHeading}>Análisis de Producción por Empresa</h3>
+
+        <div style={styles.filtersContainer}>
+          <div style={styles.filterGroup}>
+            <label style={styles.label}>
+              Empresa:
+              <select
+                  value={filters.empresa || ""}
+                  onChange={handleCompanyChange}
+                  style={styles.select}
+                  disabled={loadingCompanies}
+              >
+                <option value="">Seleccione una empresa</option>
+                {companies.map((company, index) => (
+                    <option key={`${company.empresa}-${index}`} value={company.empresa}>
+                      {(company.empresa && company.empresa.trim()) ? company.empresa : "(Sin nombre de empresa)"} ({company.cantidad_pozos} pozos)
+                    </option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          <div style={styles.dateRangeContainer}>
+            <div style={styles.filterGroup}>
+              <label style={styles.label}>
+                Año inicio:
+                <select
+                    value={filters.inicio_anio || ""}
+                    onChange={handleStartYearChange}
+                    style={styles.select}
+                >
+                  <option value="">Seleccionar</option>
+                  {years.map((year) => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <div style={styles.filterGroup}>
+              <label style={styles.label}>
+                Mes inicio:
+                <select
+                    value={filters.inicio_mes || ""}
+                    onChange={handleStartMonthChange}
+                    style={styles.select}
+                    disabled={!filters.inicio_anio}
+                >
+                  <option value="">Todos</option>
+                  {months.map((month) => (
+                      <option key={month.value} value={month.value}>
+                        {month.label}
+                      </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <div style={styles.filterGroup}>
+              <label style={styles.label}>
+                Año fin:
+                <select
+                    value={filters.fin_anio || ""}
+                    onChange={handleEndYearChange}
+                    style={styles.select}
+                >
+                  <option value="">Seleccionar</option>
+                  {years.map((year) => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <div style={styles.filterGroup}>
+              <label style={styles.label}>
+                Mes fin:
+                <select
+                    value={filters.fin_mes || ""}
+                    onChange={handleEndMonthChange}
+                    style={styles.select}
+                    disabled={!filters.fin_anio}
+                >
+                  <option value="">Todos</option>
+                  {months.map((month) => (
+                      <option key={month.value} value={month.value}>
+                        {month.label}
+                      </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {errorCompanies && (
+            <div style={styles.error}>Error al cargar empresas: {errorCompanies}</div>
+        )}
+
+        {errorProduction && (
+            <div style={styles.error}>Error al cargar datos de producción: {errorProduction}</div>
+        )}
+
+        {!showResults && (
+            <div style={styles.placeholder}>
+              <p>Seleccione una empresa o rango de fechas para ver las métricas de producción</p>
+            </div>
+        )}
+
+        {showResults && loadingProduction && (
+            <div style={styles.loading}>
+              <p>Cargando datos de producción...</p>
+            </div>
+        )}
+
+        <UnitTabs onChange={setUnit} currentUnit={unit}/>
+
+        {showResults && !loadingProduction && productionData && (
+            <div style={styles.chartsContainer}>
+              <ProductionBarChart data={totalChartData} title="Producción Total" />
+              <ProductionBarChart data={avgChartData} title="Producción Promedio" />
+            </div>
+        )}
+
+        <div style={styles.divider} />
+
+        <CompanyComparisonPanel
+            empresas={companies}
+            cargandoEmpresas={loadingCompanies}
+            empresa1={comparisonFilters.empresa_1 || ""}
+            empresa2={comparisonFilters.empresa_2 || ""}
+            inicioAnio={comparisonFilters.inicio_anio}
+            inicioMes={comparisonFilters.inicio_mes}
+            finAnio={comparisonFilters.fin_anio}
+            finMes={comparisonFilters.fin_mes}
+            onEmpresa1Change={(value) =>
+                setComparisonFilters({ ...comparisonFilters, empresa_1: value })
+            }
+            onEmpresa2Change={(value) =>
+                setComparisonFilters({ ...comparisonFilters, empresa_2: value })
+            }
+            onInicioAnioChange={(value) => {
+              const newFilters = { ...comparisonFilters, inicio_anio: value };
+              if (!value) {
+                delete newFilters.inicio_mes;
+              }
+              setComparisonFilters(newFilters);
+            }}
+            onInicioMesChange={(value) =>
+                setComparisonFilters({ ...comparisonFilters, inicio_mes: value })
+            }
+            onFinAnioChange={(value) => {
+              const newFilters = { ...comparisonFilters, fin_anio: value };
+              if (!value) {
+                delete newFilters.fin_mes;
+              }
+              setComparisonFilters(newFilters);
+            }}
+            onFinMesChange={(value) =>
+                setComparisonFilters({ ...comparisonFilters, fin_mes: value })
+            }
         />
+
+        {duplicateCompanies && (
+            <div style={styles.error}>No podés seleccionar la misma empresa dos veces. Por favor, elegí dos empresas diferentes para comparar.</div>
+        )}
+
+        {errorComparison && (
+            <div style={styles.error}>Error al comparar empresas: {errorComparison}</div>
+        )}
+
+        {!showComparison && !duplicateCompanies && (
+            <div style={styles.placeholder}>
+              <p>Seleccione dos empresas para comparar su producción</p>
+            </div>
+        )}
+
+        {showComparison && loadingComparison && (
+            <div style={styles.loading}>
+              <p>Cargando comparación...</p>
+            </div>
+        )}
+
+        {showComparison && !duplicateCompanies && !loadingComparison && comparisonData && (
+            <CompanyComparisonCharts companies={comparisonData.companies} unit={unit}/>
+        )}
       </div>
-
-      <div style={styles.divider} />
-
-      <h3 style={styles.subHeading}>Análisis de Producción por Empresa</h3>
-
-      <div style={styles.filtersContainer}>
-        <div style={styles.filterGroup}>
-          <label style={styles.label}>
-            Empresa:
-            <select
-              value={filters.empresa || ""}
-              onChange={handleCompanyChange}
-              style={styles.select}
-              disabled={loadingCompanies}
-            >
-              <option value="">Seleccione una empresa</option>
-              {companies.map((company, index) => (
-                <option key={`${company.empresa}-${index}`} value={company.empresa}>
-                  {(company.empresa && company.empresa.trim()) ? company.empresa : "(Sin nombre de empresa)"} ({company.cantidad_pozos} pozos)
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-
-        <div style={styles.dateRangeContainer}>
-          <div style={styles.filterGroup}>
-            <label style={styles.label}>
-              Año inicio:
-              <select
-                value={filters.inicio_anio || ""}
-                onChange={handleStartYearChange}
-                style={styles.select}
-              >
-                <option value="">Seleccionar</option>
-                {years.map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-
-          <div style={styles.filterGroup}>
-            <label style={styles.label}>
-              Mes inicio:
-              <select
-                value={filters.inicio_mes || ""}
-                onChange={handleStartMonthChange}
-                style={styles.select}
-                disabled={!filters.inicio_anio}
-              >
-                <option value="">Todos</option>
-                {months.map((month) => (
-                  <option key={month.value} value={month.value}>
-                    {month.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-
-          <div style={styles.filterGroup}>
-            <label style={styles.label}>
-              Año fin:
-              <select
-                value={filters.fin_anio || ""}
-                onChange={handleEndYearChange}
-                style={styles.select}
-              >
-                <option value="">Seleccionar</option>
-                {years.map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-
-          <div style={styles.filterGroup}>
-            <label style={styles.label}>
-              Mes fin:
-              <select
-                value={filters.fin_mes || ""}
-                onChange={handleEndMonthChange}
-                style={styles.select}
-                disabled={!filters.fin_anio}
-              >
-                <option value="">Todos</option>
-                {months.map((month) => (
-                  <option key={month.value} value={month.value}>
-                    {month.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      {errorCompanies && (
-        <div style={styles.error}>Error al cargar empresas: {errorCompanies}</div>
-      )}
-
-      {errorProduction && (
-        <div style={styles.error}>Error al cargar datos de producción: {errorProduction}</div>
-      )}
-
-      {!showResults && (
-        <div style={styles.placeholder}>
-          <p>Seleccione una empresa o rango de fechas para ver las métricas de producción</p>
-        </div>
-      )}
-
-      {showResults && loadingProduction && (
-        <div style={styles.loading}>
-          <p>Cargando datos de producción...</p>
-        </div>
-      )}
-
-      <div style={topControlsStyles.topControlsRow}>
-        <button
-          style={tabButtonStyle(unit === "m3")}
-          onClick={() => setUnit("m3")}
-        >
-          m³
-        </button>
-
-        <button
-          style={tabButtonStyle(unit === "bbl")}
-          onClick={() => setUnit("bbl")}
-        >
-          BBL
-        </button>
-      </div>
-
-
-      {showResults && !loadingProduction && productionData && (
-        <div style={styles.chartsContainer}>
-          <ProductionBarChart data={totalChartData} title="Producción Total" />
-          <ProductionBarChart data={avgChartData} title="Producción Promedio" />
-        </div>
-      )}
-
-      <div style={styles.divider} />
-
-      <CompanyComparisonPanel
-        empresas={companies}
-        cargandoEmpresas={loadingCompanies}
-        empresa1={comparisonFilters.empresa_1 || ""}
-        empresa2={comparisonFilters.empresa_2 || ""}
-        inicioAnio={comparisonFilters.inicio_anio}
-        inicioMes={comparisonFilters.inicio_mes}
-        finAnio={comparisonFilters.fin_anio}
-        finMes={comparisonFilters.fin_mes}
-        onEmpresa1Change={(value) =>
-          setComparisonFilters({ ...comparisonFilters, empresa_1: value })
-        }
-        onEmpresa2Change={(value) =>
-          setComparisonFilters({ ...comparisonFilters, empresa_2: value })
-        }
-        onInicioAnioChange={(value) => {
-          const newFilters = { ...comparisonFilters, inicio_anio: value };
-          if (!value) {
-            delete newFilters.inicio_mes;
-          }
-          setComparisonFilters(newFilters);
-        }}
-        onInicioMesChange={(value) =>
-          setComparisonFilters({ ...comparisonFilters, inicio_mes: value })
-        }
-        onFinAnioChange={(value) => {
-          const newFilters = { ...comparisonFilters, fin_anio: value };
-          if (!value) {
-            delete newFilters.fin_mes;
-          }
-          setComparisonFilters(newFilters);
-        }}
-        onFinMesChange={(value) =>
-          setComparisonFilters({ ...comparisonFilters, fin_mes: value })
-        }
-      />
-
-      {duplicateCompanies && (
-        <div style={styles.error}>No podés seleccionar la misma empresa dos veces. Por favor, elegí dos empresas diferentes para comparar.</div>
-      )}
-
-      {errorComparison && (
-        <div style={styles.error}>Error al comparar empresas: {errorComparison}</div>
-      )}
-
-      {!showComparison && !duplicateCompanies && (
-        <div style={styles.placeholder}>
-          <p>Seleccione dos empresas para comparar su producción</p>
-        </div>
-      )}
-
-      {showComparison && loadingComparison && (
-        <div style={styles.loading}>
-          <p>Cargando comparación...</p>
-        </div>
-      )}
-
-      {showComparison && !duplicateCompanies && !loadingComparison && comparisonData && (
-        <CompanyComparisonCharts companies={comparisonData.companies} unit={unit} />
-      )}
-    </div>
   );
 }
 
@@ -501,27 +467,4 @@ const styles = {
     backgroundColor: colors.panelBorder,
     margin: "24px 0",
   } as React.CSSProperties,
-} as const;
-
-function tabButtonStyle(active: boolean): React.CSSProperties {
-    return {
-        padding: "8px 16px",
-        borderRadius: 8,
-        border: "1px solid #3F6B4F",
-        backgroundColor: active ? "#3F6B4F" : "transparent",
-        color: active ? "#F3EEE6" : "#3F6B4F",
-        fontSize: 14,
-        fontWeight: 500,
-        cursor: "pointer",
-        transition: "all 0.2s ease",
-    };
-}
-
-
-const topControlsStyles = {
-    topControlsRow: {
-        display: "flex",
-        gap: 12,
-        padding: "12px 24px",
-    } as React.CSSProperties
 } as const;

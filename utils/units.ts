@@ -6,8 +6,8 @@ export const UNITS = {
 
 const M3_TO_BBL = 6.28981; // 1 m³ = 6.28981 bbl (barriles)
 
-export const toDisplayUnit = (value: number | null, expectedUnit: string): number | null => {
-    if (value === null) return value;
+export const convertValueToUnit = (value: number | null, expectedUnit: string): number => {
+    if (value === null) return 0;
 
     if (expectedUnit === UNITS.bbl) return value * M3_TO_BBL;
 

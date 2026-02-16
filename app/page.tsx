@@ -21,7 +21,7 @@ export default function Home() {
                     <TabTrigger value="Map">Pozo</TabTrigger>
                     <TabTrigger value="Table">Tabla</TabTrigger>
                     <TabTrigger value="Production">Empresas</TabTrigger>
-                    <TabTrigger value="Analysis">Análisis deProducción</TabTrigger>
+                    <TabTrigger value="Analysis">Análisis de Producción</TabTrigger>
                 </nav>
                 <br/>
                 <TabContent value="Map">

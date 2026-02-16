@@ -2,7 +2,7 @@ import {colors, PRODUCTION_TYPES} from "@/utils/constants";
 
 import {CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis,} from "recharts";
 
-import {toDisplayUnit, UNITS} from "@/utils/units";
+import {convertValueToUnit, UNITS} from "@/utils/units";
 import {useUnit} from "@/hooks/useUnit";
 import {UnitTabs} from "@/components/common/UnitTabs";
 import React, {useMemo} from "react";
@@ -28,8 +28,8 @@ export function TimeSeriesChart({data}: CurveChartProps) {
 
         return data.map(row => ({
             ...row,
-            oil: toDisplayUnit(row.oil, unit),
-            water: toDisplayUnit(row.water, unit),
+            oil: convertValueToUnit(row.oil, unit),
+            water: convertValueToUnit(row.water, unit),
             gas: row.gas, // Gas queda en miles de m³
         }));
     }, [data, unit]);
