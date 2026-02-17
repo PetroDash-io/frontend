@@ -3,17 +3,17 @@ import {WellDetail} from "@/app/types";
 import {toNumber} from "@/utils/helpers";
 import {TimeSeriesChart} from "@/components/map/TimeSeriesChart";
 import {WellInfo} from "@/components/map/WellInfo";
-import {WellsMap} from "@/components/WellsMap";
-import {Filter} from "@/components/map/Filter";
+import {WellsMap} from "@/components/map/WellsMap";
+import {SELECT_DEFAULT_VALUE, SelectFilter} from "@/components/common/SelectFilter";
 import {LimitFilter} from "@/components/map/LimitFilter";
 import {useWells} from "@/hooks/useWells";
 import {useWell} from "@/hooks/useWell";
 import {useWellsProduction} from "@/hooks/useWellProduction";
 
 const DEFAULT_FILTERS = {
-    province: "ALL",
-    status: "ALL",
-    company: "ALL",
+    province: SELECT_DEFAULT_VALUE,
+    status: SELECT_DEFAULT_VALUE,
+    company: SELECT_DEFAULT_VALUE,
     limit: 100,
 }
 
@@ -28,24 +28,24 @@ export function MapView() {
         if (!wells) return [];
 
         return wells.filter((well: WellDetail) => {
-            if (filters.province !== "ALL" && well.province !== filters.province) return false;
-            if (filters.status !== "ALL" && well.status !== filters.status) return false;
-            if (filters.company !== "ALL" && well.company !== filters.company) return false;
+            if (filters.province !== SELECT_DEFAULT_VALUE && well.province !== filters.province) return false;
+            if (filters.status !== SELECT_DEFAULT_VALUE && well.status !== filters.status) return false;
+            if (filters.company !== SELECT_DEFAULT_VALUE && well.company !== filters.company) return false;
             return true;
         });
     }, [wells, filters]);
 
-    const provinces = useMemo(() => {
+    const provinceFilterOptions = useMemo(() => {
         if (!wells) return [];
         return [...new Set(wells.map((well) => well.province))].filter(Boolean);
     }, [wells]);
 
-    const statuses = useMemo(() => {
+    const statusFilterOptions = useMemo(() => {
         if (!wells) return [];
         return [...new Set(wells.map((well) => well.status))].filter(Boolean);
     }, [wells]);
 
-    const companies = useMemo(() => {
+    const companyFilterOptions = useMemo(() => {
         if (!wells) return [];
         return [...new Set(wells.map((well) => well.company))].filter(Boolean);
     }, [wells]);
@@ -71,12 +71,12 @@ export function MapView() {
     return (
         <>
             <div style={styles.filterPanel}>
-                <Filter filterName="province" value={filters.province} onSelect={updateFilters} options={provinces}
-                        defaultText="Todas las provincias"/>
-                <Filter filterName="status" value={filters.status} onSelect={updateFilters} options={statuses}
-                        defaultText="Todos los estados"/>
-                <Filter filterName="company" value={filters.company} onSelect={updateFilters} options={companies}
-                        defaultText="Todas las empresas"/>
+                <SelectFilter filterName="province" value={filters.province} onSelect={updateFilters} options={provinceFilterOptions}
+                              defaultOptionLabel="Todas las provincias"/>
+                <SelectFilter filterName="status" value={filters.status} onSelect={updateFilters} options={statusFilterOptions}
+                              defaultOptionLabel="Todos los estados"/>
+                <SelectFilter filterName="company" value={filters.company} onSelect={updateFilters} options={companyFilterOptions}
+                              defaultOptionLabel="Todas las empresas"/>
                 <LimitFilter filterName="limit" limit={filters.limit} onDefineLimit={updateFilters}/>
             </div>
 

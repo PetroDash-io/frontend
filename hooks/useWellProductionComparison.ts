@@ -31,16 +31,16 @@ export function useWellProductionComparison(
       try {
         const params = new URLSearchParams();
 
-        if (filters.inicio_anio !== undefined) {
+        if (filters.inicio_anio) {
           params.append("inicio_anio", filters.inicio_anio.toString());
         }
-        if (filters.inicio_mes !== undefined) {
+        if (filters.inicio_mes) {
           params.append("inicio_mes", filters.inicio_mes.toString());
         }
-        if (filters.fin_anio !== undefined) {
+        if (filters.fin_anio) {
           params.append("fin_anio", filters.fin_anio.toString());
         }
-        if (filters.fin_mes !== undefined) {
+        if (filters.fin_mes) {
           params.append("fin_mes", filters.fin_mes.toString());
         }
         if (filters.median_by && filters.median_by.length > 0) {
@@ -71,7 +71,7 @@ export function useWellProductionComparison(
     };
 
     fetchData();
-  }, [wellId, filters.inicio_anio, filters.inicio_mes, filters.fin_anio, filters.fin_mes, ...(filters.median_by || [])]);
+  }, [wellId, filters.inicio_anio, filters.inicio_mes, filters.fin_anio, filters.fin_mes, filters.median_by]);
 
   return { data, loading, error };
 }

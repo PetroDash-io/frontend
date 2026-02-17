@@ -3,12 +3,12 @@ import {WellsTable} from "@/components/table/WellsTable";
 import {useWells} from "@/hooks/useWells";
 import {LimitFilter} from "@/components/map/LimitFilter";
 import {WellDetail} from "@/app/types";
-import {Filter} from "@/components/map/Filter";
+import {SELECT_DEFAULT_VALUE, SelectFilter} from "@/components/common/SelectFilter";
 
 const DEFAULT_FILTERS = {
-    province: "ALL",
-    status: "ALL",
-    company: "ALL",
+    province: SELECT_DEFAULT_VALUE,
+    status: SELECT_DEFAULT_VALUE,
+    company: SELECT_DEFAULT_VALUE,
     limit: 100,
 }
 
@@ -20,9 +20,9 @@ export function TableView() {
         if (!wells) return [];
 
         return wells.filter((well: WellDetail) => {
-            if (filters.province !== "ALL" && well.province !== filters.province) return false;
-            if (filters.status !== "ALL" && well.status !== filters.status) return false;
-            if (filters.company !== "ALL" && well.company !== filters.company) return false;
+            if (filters.province !== SELECT_DEFAULT_VALUE && well.province !== filters.province) return false;
+            if (filters.status !== SELECT_DEFAULT_VALUE && well.status !== filters.status) return false;
+            if (filters.company !== SELECT_DEFAULT_VALUE && well.company !== filters.company) return false;
             return true;
         });
     }, [wells, filters]);
@@ -49,12 +49,12 @@ export function TableView() {
     return (
         <>
             <div style={styles.filterPanel}>
-                <Filter filterName="province" value={filters.province} onSelect={updateFilters} options={provinces}
-                        defaultText="Todas las provincias"/>
-                <Filter filterName="status" value={filters.status} onSelect={updateFilters} options={statuses}
-                        defaultText="Todos los estados"/>
-                <Filter filterName="company" value={filters.company} onSelect={updateFilters} options={companies}
-                        defaultText="Todas las empresas"/>
+                <SelectFilter filterName="province" value={filters.province} onSelect={updateFilters} options={provinces}
+                              defaultOptionLabel="Todas las provincias"/>
+                <SelectFilter filterName="status" value={filters.status} onSelect={updateFilters} options={statuses}
+                              defaultOptionLabel="Todos los estados"/>
+                <SelectFilter filterName="company" value={filters.company} onSelect={updateFilters} options={companies}
+                              defaultOptionLabel="Todas las empresas"/>
                 <LimitFilter filterName="limit" limit={filters.limit} onDefineLimit={updateFilters}/>
             </div>
 

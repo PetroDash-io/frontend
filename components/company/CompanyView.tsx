@@ -1,16 +1,17 @@
 "use client";
 
 import React, {useMemo, useState} from "react";
-import {colors} from "@/utils/constants";
+import {colors, MONTHS, YEARS} from "@/utils/constants";
 import {useCompanies} from "@/hooks/useCompanies";
 import {useProductionAggregates} from "@/hooks/useProductionAggregates";
 import {useCompanyComparison} from "@/hooks/useCompanyComparison";
 import {ProductionBarChart} from "@/components/company/ProductionBarChart";
 import {CompanyComparisonPanel} from "@/components/company/CompanyComparisonPanel";
 import {CompanyComparisonCharts} from "@/components/company/CompanyComparisonCharts";
-import {CompaniesBarChart} from "@/components/CompaniesBarChart";
+import {CompaniesBarChart} from "@/components/common/CompaniesBarChart";
 import {ComparisonFilters, ProductionAggregatesFilters} from "@/app/types";
 import {UnitTabs} from "@/components/common/UnitTabs";
+import {SelectFilterOption, SelectFilter} from "@/components/common/SelectFilter";
 import {useUnit} from "@/hooks/useUnit";
 import {convertValueToUnit} from "@/utils/units";
 
@@ -45,79 +46,24 @@ export function CompanyView() {
     }];
   }, [productionData, unit]);
 
-  const handleCompanyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    if (value) {
-      setFilters({ ...filters, empresa: value });
-    } else {
-      const { empresa, ...rest } = filters;
-      setFilters(rest);
-    }
-  };
+  const updateProductionFilters = (filterName: string, value: unknown) => {
+    setFilters((previousValues) => ({...previousValues, [filterName]: value}));
+  }
 
-  const handleStartYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    if (value) {
-      setFilters({ ...filters, inicio_anio: Number(value) });
-    } else {
-      const { inicio_anio, inicio_mes, ...rest } = filters;
-      setFilters(rest);
-    }
-  };
+  const updateComparisonFilters = (filterName: string, value: unknown) => {
+    setComparisonFilters((previousValues) => ({...previousValues, [filterName]: value}));
+  }
 
-  const handleStartMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    if (value) {
-      setFilters({ ...filters, inicio_mes: Number(value) });
-    } else {
-      const { inicio_mes, ...rest } = filters;
-      setFilters(rest);
-    }
-  };
+  const companyFilterOptions = useMemo(() => {
+    return companies.map((company) : SelectFilterOption => {
+      const name = company.empresa ? company.empresa.trim() : "(Sin nombre de empresa)";
+      return  {value: name, label: `${name} (${company.cantidad_pozos} pozos)`}
+    });
+  }, [companies]);
 
-  const handleEndYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    if (value) {
-      setFilters({ ...filters, fin_anio: Number(value) });
-    } else {
-      const { fin_anio, fin_mes, ...rest } = filters;
-      setFilters(rest);
-    }
-  };
-
-  const handleEndMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    if (value) {
-      setFilters({ ...filters, fin_mes: Number(value) });
-    } else {
-      const { fin_mes, ...rest } = filters;
-      setFilters(rest);
-    }
-  };
-
-  const startYear = 2013;
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: currentYear - startYear + 1 }, (_, i) => startYear + i);
-
-  const months = [
-    { value: 1, label: "Enero" },
-    { value: 2, label: "Febrero" },
-    { value: 3, label: "Marzo" },
-    { value: 4, label: "Abril" },
-    { value: 5, label: "Mayo" },
-    { value: 6, label: "Junio" },
-    { value: 7, label: "Julio" },
-    { value: 8, label: "Agosto" },
-    { value: 9, label: "Septiembre" },
-    { value: 10, label: "Octubre" },
-    { value: 11, label: "Noviembre" },
-    { value: 12, label: "Diciembre" },
-  ];
-
-  const showResults = filters.empresa || filters.inicio_anio || filters.fin_anio;
-  const showComparison = comparisonFilters.empresa_1 && comparisonFilters.empresa_2;
-  const duplicateCompanies = comparisonFilters.empresa_1 && comparisonFilters.empresa_2 &&
+  const duplicatedCompanies = comparisonFilters.empresa_1 && comparisonFilters.empresa_2 &&
       comparisonFilters.empresa_1.toLowerCase().trim() === comparisonFilters.empresa_2.toLowerCase().trim();
+
 
   return (
       <div style={styles.container}>
@@ -146,103 +92,45 @@ export function CompanyView() {
         </div>
 
         <div style={styles.divider} />
-
+        <UnitTabs onChange={setUnit} currentUnit={unit}/>
         <h3 style={styles.subHeading}>Análisis de Producción por Empresa</h3>
 
         <div style={styles.filtersContainer}>
-          <div style={styles.filterGroup}>
-            <label style={styles.label}>
-              Empresa:
-              <select
-                  value={filters.empresa || ""}
-                  onChange={handleCompanyChange}
-                  style={styles.select}
-                  disabled={loadingCompanies}
-              >
-                <option value="">Seleccione una empresa</option>
-                {companies.map((company, index) => (
-                    <option key={`${company.empresa}-${index}`} value={company.empresa}>
-                      {(company.empresa && company.empresa.trim()) ? company.empresa : "(Sin nombre de empresa)"} ({company.cantidad_pozos} pozos)
-                    </option>
-                ))}
-              </select>
-            </label>
-          </div>
+          <SelectFilter value={filters.empresa || ""}
+                        onSelect={updateProductionFilters}
+                        filterName="empresa"
+                        options={companyFilterOptions}
+                        inputLabel="Empresa"
+                        defaultOptionLabel="Seleccione una empresa"/>
 
           <div style={styles.dateRangeContainer}>
-            <div style={styles.filterGroup}>
-              <label style={styles.label}>
-                Año inicio:
-                <select
-                    value={filters.inicio_anio || ""}
-                    onChange={handleStartYearChange}
-                    style={styles.select}
-                >
-                  <option value="">Seleccionar</option>
-                  {years.map((year) => (
-                      <option key={year} value={year}>
-                        {year}
-                      </option>
-                  ))}
-                </select>
-              </label>
-            </div>
+            <SelectFilter value={filters.inicio_anio || ""}
+                          onSelect={updateProductionFilters}
+                          filterName="inicio_anio"
+                          inputLabel="Año de inicio"
+                          options={YEARS}/>
 
-            <div style={styles.filterGroup}>
-              <label style={styles.label}>
-                Mes inicio:
-                <select
-                    value={filters.inicio_mes || ""}
-                    onChange={handleStartMonthChange}
-                    style={styles.select}
-                    disabled={!filters.inicio_anio}
-                >
-                  <option value="">Todos</option>
-                  {months.map((month) => (
-                      <option key={month.value} value={month.value}>
-                        {month.label}
-                      </option>
-                  ))}
-                </select>
-              </label>
-            </div>
+            <SelectFilter value={filters.inicio_mes || ""}
+                          onSelect={updateProductionFilters}
+                          filterName="inicio_mes"
+                          disabled={!filters.inicio_anio}
+                          defaultOptionLabel="Todos"
+                          inputLabel="Mes de inicio"
+                          options={MONTHS}/>
 
-            <div style={styles.filterGroup}>
-              <label style={styles.label}>
-                Año fin:
-                <select
-                    value={filters.fin_anio || ""}
-                    onChange={handleEndYearChange}
-                    style={styles.select}
-                >
-                  <option value="">Seleccionar</option>
-                  {years.map((year) => (
-                      <option key={year} value={year}>
-                        {year}
-                      </option>
-                  ))}
-                </select>
-              </label>
-            </div>
+            <SelectFilter value={filters.fin_anio || ""}
+                          onSelect={updateProductionFilters}
+                          filterName="fin_anio"
+                          inputLabel="Año de fin"
+                          options={YEARS}/>
 
-            <div style={styles.filterGroup}>
-              <label style={styles.label}>
-                Mes fin:
-                <select
-                    value={filters.fin_mes || ""}
-                    onChange={handleEndMonthChange}
-                    style={styles.select}
-                    disabled={!filters.fin_anio}
-                >
-                  <option value="">Todos</option>
-                  {months.map((month) => (
-                      <option key={month.value} value={month.value}>
-                        {month.label}
-                      </option>
-                  ))}
-                </select>
-              </label>
-            </div>
+            <SelectFilter value={filters.fin_mes || ""}
+                          onSelect={updateProductionFilters}
+                          filterName="fin_mes"
+                          disabled={!filters.fin_anio}
+                          defaultOptionLabel="Todos"
+                          inputLabel="Mes de fin"
+                          options={MONTHS}/>
           </div>
         </div>
 
@@ -254,21 +142,19 @@ export function CompanyView() {
             <div style={styles.error}>Error al cargar datos de producción: {errorProduction}</div>
         )}
 
-        {!showResults && (
+        {!productionData && (
             <div style={styles.placeholder}>
-              <p>Seleccione una empresa o rango de fechas para ver las métricas de producción</p>
+              <p>Seleccione una empresa y un rango de fechas para ver las métricas de producción</p>
             </div>
         )}
 
-        {showResults && loadingProduction && (
+        {loadingProduction && (
             <div style={styles.loading}>
               <p>Cargando datos de producción...</p>
             </div>
         )}
 
-        <UnitTabs onChange={setUnit} currentUnit={unit}/>
-
-        {showResults && !loadingProduction && productionData && (
+        {productionData && !loadingProduction && (
             <div style={styles.chartsContainer}>
               <ProductionBarChart data={totalChartData} title="Producción Total" />
               <ProductionBarChart data={avgChartData} title="Producción Promedio" />
@@ -278,63 +164,32 @@ export function CompanyView() {
         <div style={styles.divider} />
 
         <CompanyComparisonPanel
-            empresas={companies}
-            cargandoEmpresas={loadingCompanies}
-            empresa1={comparisonFilters.empresa_1 || ""}
-            empresa2={comparisonFilters.empresa_2 || ""}
-            inicioAnio={comparisonFilters.inicio_anio}
-            inicioMes={comparisonFilters.inicio_mes}
-            finAnio={comparisonFilters.fin_anio}
-            finMes={comparisonFilters.fin_mes}
-            onEmpresa1Change={(value) =>
-                setComparisonFilters({ ...comparisonFilters, empresa_1: value })
-            }
-            onEmpresa2Change={(value) =>
-                setComparisonFilters({ ...comparisonFilters, empresa_2: value })
-            }
-            onInicioAnioChange={(value) => {
-              const newFilters = { ...comparisonFilters, inicio_anio: value };
-              if (!value) {
-                delete newFilters.inicio_mes;
-              }
-              setComparisonFilters(newFilters);
-            }}
-            onInicioMesChange={(value) =>
-                setComparisonFilters({ ...comparisonFilters, inicio_mes: value })
-            }
-            onFinAnioChange={(value) => {
-              const newFilters = { ...comparisonFilters, fin_anio: value };
-              if (!value) {
-                delete newFilters.fin_mes;
-              }
-              setComparisonFilters(newFilters);
-            }}
-            onFinMesChange={(value) =>
-                setComparisonFilters({ ...comparisonFilters, fin_mes: value })
-            }
-        />
+            companies={companyFilterOptions}
+            loadingCompanies={loadingCompanies}
+            filters={comparisonFilters}
+            updateFilters={updateComparisonFilters}/>
 
-        {duplicateCompanies && (
-            <div style={styles.error}>No podés seleccionar la misma empresa dos veces. Por favor, elegí dos empresas diferentes para comparar.</div>
+        {duplicatedCompanies && (
+            <div style={styles.error}>Por favor, elegí dos empresas diferentes para comparar.</div>
         )}
 
         {errorComparison && (
             <div style={styles.error}>Error al comparar empresas: {errorComparison}</div>
         )}
 
-        {!showComparison && !duplicateCompanies && (
+        {!comparisonData && !duplicatedCompanies && (
             <div style={styles.placeholder}>
               <p>Seleccione dos empresas para comparar su producción</p>
             </div>
         )}
 
-        {showComparison && loadingComparison && (
+        {loadingComparison && (
             <div style={styles.loading}>
               <p>Cargando comparación...</p>
             </div>
         )}
 
-        {showComparison && !duplicateCompanies && !loadingComparison && comparisonData && (
+        {comparisonData && !loadingComparison && (
             <CompanyComparisonCharts companies={comparisonData.companies} unit={unit}/>
         )}
       </div>
@@ -403,28 +258,6 @@ const styles = {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
     gap: 16,
-  } as React.CSSProperties,
-  filterGroup: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
-  } as React.CSSProperties,
-  label: {
-    fontSize: 14,
-    fontWeight: 500,
-    color: colors.text,
-    display: "flex",
-    flexDirection: "column",
-    gap: 6,
-  } as React.CSSProperties,
-  select: {
-    padding: "8px 12px",
-    borderRadius: 8,
-    border: `1px solid ${colors.secondary}`,
-    backgroundColor: "#fff",
-    fontSize: 14,
-    color: colors.text,
-    cursor: "pointer",
   } as React.CSSProperties,
   input: {
     padding: "8px 12px",

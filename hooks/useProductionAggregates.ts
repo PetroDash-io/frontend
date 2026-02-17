@@ -14,7 +14,9 @@ export function useProductionAggregates(filters: Partial<ProductionAggregatesFil
 
   useEffect(() => {
     // Only fetch if at least empresa or date filters are provided
-    if (!filters.empresa && !filters.inicio_anio && !filters.fin_anio) {
+    const company_selected = filters.empresa
+    const date_selected = filters.inicio_anio || filters.fin_anio
+    if (!company_selected || !date_selected) {
       setData(null);
       return;
     }

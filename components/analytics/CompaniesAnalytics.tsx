@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useCompanies } from "@/hooks/useCompanies";
-import { CompaniesBarChart } from "@/components/CompaniesBarChart";
+import { CompaniesBarChart } from "@/components/common/CompaniesBarChart";
 
 export function CompaniesAnalytics() {
   const [searchQuery, setSearchQuery] = useState<string>("");

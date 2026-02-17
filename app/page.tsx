@@ -3,10 +3,10 @@
 import React from "react";
 import "mapbox-gl/dist/mapbox-gl.css";
 import {CompanyView} from "@/components/company/CompanyView";
-import {MyTabs, TabContent, TabTrigger} from "@/components/MyTabs";
+import {Tabs, TabContent, TabTrigger} from "@/components/common/Tabs";
 import {TableView} from "@/components/table/TableView";
 import {MapView} from "@/components/map/MapView";
-import { WellProductionComparisonChart } from "@/components/WellProductionComparisonChart";
+import { WellProductionComparisonChart } from "@/components/wells/WellProductionComparisonChart";
 
 export default function Home() {
     return (
@@ -16,7 +16,7 @@ export default function Home() {
                 <h1 style={styles.title}>PetroDash</h1>
             </header>
 
-            <MyTabs defaultValue="Map">
+            <Tabs defaultValue="Map">
                 <nav style={styles.tabButtonsContainer}>
                     <TabTrigger value="Map">Pozo</TabTrigger>
                     <TabTrigger value="Table">Tabla</TabTrigger>
@@ -35,7 +35,7 @@ export default function Home() {
                 <TabContent value="Analysis">
                     <WellProductionComparisonChart />
                 </TabContent>
-            </MyTabs>
+            </Tabs>
         </>
     );
 }
