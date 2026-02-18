@@ -10,14 +10,28 @@ export function useWells({filters}: useWellsParams) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/pozos?limit=${filters.limit}`;
     useEffect(() => {
-
         const fetchWells = async () => {
             setLoading(true);
             setError(null);
 
             try {
+                // Construir query params incluyendo filtros
+                const params = new URLSearchParams();
+                params.append('limit', filters.limit.toString());
+                
+                if (filters.company) {
+                    params.append('company', filters.company);
+                }
+                if (filters.province) {
+                    params.append('province', filters.province);
+                }
+                if (filters.status) {
+                    params.append('status', filters.status);
+                }
+
+                const url = `${process.env.NEXT_PUBLIC_API_URL}/pozos?${params.toString()}`;
+
                 const response = await fetch(url, {
                     headers: {
                         "X-API-Key": process.env.NEXT_PUBLIC_API_KEY || "",
@@ -38,7 +52,7 @@ export function useWells({filters}: useWellsParams) {
         };
 
         fetchWells();
-    }, [filters]);
+    }, [filters.limit, filters.company, filters.province, filters.status]);
 
     return {data, loading, error};
 }

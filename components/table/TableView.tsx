@@ -16,31 +16,23 @@ export function TableView() {
     const [filters, setFilters] = useState(DEFAULT_FILTERS);
     const {data: wells, loading: loading, error: error} = useWells({filters});
 
-    const filteredWells = useMemo(() => {
-        if (!wells) return [];
-
-        return wells.filter((well: WellDetail) => {
-            if (filters.province !== SELECT_DEFAULT_VALUE && well.province !== filters.province) return false;
-            if (filters.status !== SELECT_DEFAULT_VALUE && well.status !== filters.status) return false;
-            if (filters.company !== SELECT_DEFAULT_VALUE && well.company !== filters.company) return false;
-            return true;
-        });
-    }, [wells, filters]);
+    // Cargar todos los pozos para obtener opciones de filtro
+    const {data: allWells} = useWells({filters: {...DEFAULT_FILTERS, limit: 10000}});
 
     const provinces = useMemo(() => {
-        if (!wells) return [];
-        return [...new Set(wells.map((well) => well.province))].filter(Boolean);
-    }, [wells]);
+        if (!allWells) return [];
+        return [...new Set(allWells.map((well) => well.province))].filter(Boolean);
+    }, [allWells]);
 
     const statuses = useMemo(() => {
-        if (!wells) return [];
-        return [...new Set(wells.map((well) => well.status))].filter(Boolean);
-    }, [wells]);
+        if (!allWells) return [];
+        return [...new Set(allWells.map((well) => well.status))].filter(Boolean);
+    }, [allWells]);
 
     const companies = useMemo(() => {
-        if (!wells) return [];
-        return [...new Set(wells.map((well) => well.company))].filter(Boolean);
-    }, [wells]);
+        if (!allWells) return [];
+        return [...new Set(allWells.map((well) => well.company))].filter(Boolean);
+    }, [allWells]);
 
     const updateFilters = (filterName: string, value: unknown) => {
         setFilters((previousValues) => ({...previousValues, [filterName]: value}));
@@ -58,7 +50,7 @@ export function TableView() {
                 <LimitFilter filterName="limit" limit={filters.limit} onDefineLimit={updateFilters}/>
             </div>
 
-            <WellsTable data={filteredWells}/>
+            <WellsTable data={wells || []}/>
 
             {error && (
                 <div style={styles.errorMessageContainer}>
