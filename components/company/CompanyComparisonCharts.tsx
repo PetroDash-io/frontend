@@ -163,7 +163,7 @@ export function CompanyComparisonCharts({
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip formatter={(value: number) => `${value.toFixed(2)}%`} />
+              <Tooltip formatter={(value: number | undefined) => value !== undefined ? `${value.toFixed(2)}%` : ''} />
               <Legend />
             </PieChart>
           </ResponsiveContainer>
