@@ -143,15 +143,6 @@ export function CompanyComparisonCharts({
       return null;
     }
 
-    const renderCustomLabel = (entry: any) => {
-      return {
-        children: `${entry.value.toFixed(1)}%`,
-        fill: '#fff',
-        fontWeight: 'bold',
-        fontSize: 16,
-      };
-    };
-
     return (
       <div style={styles.chartWrapper}>
         <h3 style={styles.title}>{title}</h3>
@@ -163,7 +154,7 @@ export function CompanyComparisonCharts({
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={renderCustomLabel}
+                label={(entry) => `${entry.value.toFixed(1)}%`}
                 outerRadius={110}
                 fill="#8884d8"
                 dataKey="value"
