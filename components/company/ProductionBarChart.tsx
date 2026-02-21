@@ -1,4 +1,5 @@
-import { colors } from "@/utils/constants";
+import React from "react";
+import {colors, PRODUCTION_TYPES} from "@/utils/constants";
 import {
     ResponsiveContainer,
     BarChart,
@@ -12,9 +13,9 @@ import {
 
 interface ProductionBarChartData {
   name: string;
-  petróleo: number;
+  oil: number;
+  water: number;
   gas: number;
-  agua: number;
 }
 
 interface ProductionBarChartProps {
@@ -44,15 +45,15 @@ export function ProductionBarChart({ data, title }: ProductionBarChartProps) {
             <h3 style={styles.title}>{title}</h3>
             <div style={{ height: 320 }}>
                 <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={data} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
+                    <BarChart data={data} margin={styles.barChartMargins}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="name" />
                         <YAxis tickFormatter={formatYAxis} width={60} />
                         <Tooltip formatter={formatTooltip} />
                         <Legend />
-                        <Bar dataKey="petróleo" fill={colors.oil} name="Petróleo" />
-                        <Bar dataKey="gas" fill={colors.gas} name="Gas" />
-                        <Bar dataKey="agua" fill={colors.water} name="Agua" />
+                        <Bar dataKey={PRODUCTION_TYPES.oil.name} fill={colors.oil} name={PRODUCTION_TYPES.oil.label} />
+                        <Bar dataKey={PRODUCTION_TYPES.gas.name} fill={colors.gas} name={PRODUCTION_TYPES.gas.label} />
+                        <Bar dataKey={PRODUCTION_TYPES.water.name} fill={colors.water} name={PRODUCTION_TYPES.water.label} />
                     </BarChart>
                 </ResponsiveContainer>
             </div>
@@ -76,4 +77,10 @@ const styles = {
         color: colors.text,
         margin: 0,
     } as React.CSSProperties,
+    barChartMargins: {
+        top: 10,
+        right: 20,
+        left: 10,
+        bottom: 10
+    }
 } as const;

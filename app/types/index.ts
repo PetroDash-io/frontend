@@ -1,4 +1,4 @@
-export interface ActivePozo {
+export interface ActiveWell {
   id: string;
   lon: number;
   lat: number;
@@ -6,7 +6,7 @@ export interface ActivePozo {
   resource_type: string;
 }
 
-export interface PozoDetail {
+export interface WellDetail {
   well_id: string;
   watershed: string;
   province: string;

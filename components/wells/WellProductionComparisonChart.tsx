@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { colors } from "@/utils/constants";
+import {colors, MONTHS, YEARS} from "@/utils/constants";
 import {
   ResponsiveContainer,
   BarChart,
@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import { useWellProductionComparison } from "@/hooks/useWellProductionComparison";
 import { WellProductionComparisonFilters } from "@/app/types";
+import {SelectFilter} from "@/components/common/SelectFilter";
 
 const formatYAxis = (value: number) => {
   if (value >= 1000000) {
@@ -29,32 +30,9 @@ const formatTooltip = (value: number | string | undefined) => {
   return value;
 };
 
-const MONTHS = [
-  { value: 1, label: "Enero" },
-  { value: 2, label: "Febrero" },
-  { value: 3, label: "Marzo" },
-  { value: 4, label: "Abril" },
-  { value: 5, label: "Mayo" },
-  { value: 6, label: "Junio" },
-  { value: 7, label: "Julio" },
-  { value: 8, label: "Agosto" },
-  { value: 9, label: "Septiembre" },
-  { value: 10, label: "Octubre" },
-  { value: 11, label: "Noviembre" },
-  { value: 12, label: "Diciembre" },
-];
-
-const YEARS = Array.from(
-  { length: new Date().getFullYear() - 2013 + 1 },
-  (_, i) => 2013 + i
-);
-
 export function WellProductionComparisonChart() {
   const [wellId, setWellId] = useState<number | null>(null);
-  const [filters, setFilters] = useState<Partial<WellProductionComparisonFilters>>({
-    median_by: [],
-  });
-
+  const [filters, setFilters] = useState<Partial<WellProductionComparisonFilters>>({median_by: []});
   const { data, loading, error } = useWellProductionComparison(wellId, filters);
 
   const handleWellIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,6 +59,10 @@ export function WellProductionComparisonChart() {
       }
     });
   };
+
+  const updateFilters = (filterName: string, value: unknown) => {
+    setFilters((previousValues) => ({...previousValues, [filterName]: value}));
+  }
 
   // Preparar datos para los gráficos
   const oilData = data?.data?.[0]
@@ -123,99 +105,33 @@ export function WellProductionComparisonChart() {
         </div>
 
         <div style={styles.filterRow}>
-          <label style={styles.label}>
-            Año Inicio:
-            <select
-              value={filters.inicio_anio || ""}
-              onChange={(e) => {
-                const year = e.target.value ? parseInt(e.target.value, 10) : undefined;
-                setFilters({
-                  ...filters,
-                  inicio_anio: year,
-                  inicio_mes: year ? filters.inicio_mes : undefined,
-                });
-              }}
-              style={styles.select}
-              className="select-filter"
-            >
-              <option value="">Seleccionar</option>
-              {YEARS.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
-          </label>
+          <SelectFilter value={filters.inicio_anio || ""}
+                        onSelect={updateFilters}
+                        filterName="inicio_anio"
+                        inputLabel="Año de inicio"
+                        options={YEARS}/>
 
-          <label style={styles.label}>
-            Mes Inicio:
-            <select
-              value={filters.inicio_mes || ""}
-              onChange={(e) =>
-                setFilters({
-                  ...filters,
-                  inicio_mes: e.target.value ? parseInt(e.target.value, 10) : undefined,
-                })
-              }
-              style={styles.select}
-              className="select-filter"
-              disabled={!filters.inicio_anio}
-            >
-              <option value="">Todos</option>
-              {MONTHS.map((month) => (
-                <option key={month.value} value={month.value}>
-                  {month.label}
-                </option>
-              ))}
-            </select>
-          </label>
+          <SelectFilter value={filters.inicio_mes || ""}
+                        onSelect={updateFilters}
+                        filterName="inicio_mes"
+                        disabled={!filters.inicio_anio}
+                        defaultOptionLabel="Todos"
+                        inputLabel="Mes de inicio"
+                        options={MONTHS}/>
 
-          <label style={styles.label}>
-            Año Fin:
-            <select
-              value={filters.fin_anio || ""}
-              onChange={(e) => {
-                const year = e.target.value ? parseInt(e.target.value, 10) : undefined;
-                setFilters({
-                  ...filters,
-                  fin_anio: year,
-                  fin_mes: year ? filters.fin_mes : undefined,
-                });
-              }}
-              style={styles.select}
-              className="select-filter"
-            >
-              <option value="">Seleccionar</option>
-              {YEARS.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
-          </label>
+          <SelectFilter value={filters.fin_anio || ""}
+                        onSelect={updateFilters}
+                        filterName="fin_anio"
+                        inputLabel="Año de fin"
+                        options={YEARS}/>
 
-          <label style={styles.label}>
-            Mes Fin:
-            <select
-              value={filters.fin_mes || ""}
-              onChange={(e) =>
-                setFilters({
-                  ...filters,
-                  fin_mes: e.target.value ? parseInt(e.target.value, 10) : undefined,
-                })
-              }
-              style={styles.select}
-              className="select-filter"
-              disabled={!filters.fin_anio}
-            >
-              <option value="">Seleccione mes</option>
-              {MONTHS.map((month) => (
-                <option key={month.value} value={month.value}>
-                  {month.label}
-                </option>
-              ))}
-            </select>
-          </label>
+          <SelectFilter value={filters.fin_mes || ""}
+                        onSelect={updateFilters}
+                        filterName="fin_mes"
+                        disabled={!filters.fin_anio}
+                        defaultOptionLabel="Todos"
+                        inputLabel="Mes de fin"
+                        options={MONTHS}/>
         </div>
 
         <div style={styles.filterRow}>

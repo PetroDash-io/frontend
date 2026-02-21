@@ -1,25 +1,15 @@
 "use client";
 
-import React, { useMemo } from "react";
-import { colors, COMPANY_COLORS } from "@/utils/constants";
-import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-} from "recharts";
-import { CompanyProductionData } from "@/app/types";
+import React, {useMemo} from "react";
+import {colors, COMPANY_COLORS} from "@/utils/constants";
+import {Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis,} from "recharts";
+import {CompanyProductionData} from "@/app/types";
+import {convertValueToUnit} from "@/utils/units";
 
 interface CompanyComparisonChartsProps {
   companies: CompanyProductionData[];
-  unit: "m3" | "bbl";
+  unit: string;
 }
-
-const M3_TO_BBL = 6.28981;
 
 const formatYAxis = (value: number) => {
   if (value >= 1000000) {
@@ -79,7 +69,7 @@ export function CompanyComparisonCharts({
   // Transformar los datos para agrupar por tipo de recurso
   const totalChartData = useMemo(() => {
     if (companies.length === 0) return [];
-    
+
     const resources = ["Petróleo", "Gas", "Agua"];
     return resources.map((resource) => {
       const dataPoint: Record<string, string | number> = { name: resource };
@@ -87,15 +77,11 @@ export function CompanyComparisonCharts({
       companies.forEach((company) => {
         let value = 0;
         if (resource === "Petróleo") {
-          value = unit === "bbl"
-            ? company.data.oil.total * M3_TO_BBL
-            : company.data.oil.total;
+          value = convertValueToUnit(company.data.oil.total, unit);
         } else if (resource === "Gas") {
-          value = company.data.gas.total;
+          value = convertValueToUnit(company.data.gas.total, unit);
         } else if (resource === "Agua") {
-          value = unit === "bbl"
-            ? company.data.water.total * M3_TO_BBL
-            : company.data.water.total;
+          value = convertValueToUnit(company.data.water.total, unit);
         }
         dataPoint[company.company] = value;
       });
@@ -114,15 +100,11 @@ export function CompanyComparisonCharts({
       companies.forEach((company) => {
         let value = 0;
         if (resource === "Petróleo") {
-          value = unit === "bbl"
-            ? company.data.oil.avg * M3_TO_BBL
-            : company.data.oil.avg;
+          value = convertValueToUnit(company.data.oil.total, unit);
         } else if (resource === "Gas") {
-          value = company.data.gas.avg;
+          value = convertValueToUnit(company.data.gas.total, unit);
         } else if (resource === "Agua") {
-          value = unit === "bbl"
-            ? company.data.water.avg * M3_TO_BBL
-            : company.data.water.avg;
+          value = convertValueToUnit(company.data.water.total, unit);
         }
         dataPoint[company.company] = value;
       });

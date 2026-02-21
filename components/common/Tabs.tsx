@@ -13,7 +13,7 @@ interface TabsProps {
   defaultValue: string;
 }
 
-export const MyTabs = ({ children, defaultValue }: TabsProps) => {
+export const Tabs = ({ children, defaultValue }: TabsProps) => {
   const [activeTab, setActiveTab] = useState<string>(defaultValue);
 
   return (
