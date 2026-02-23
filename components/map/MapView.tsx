@@ -24,31 +24,23 @@ export function MapView() {
     const {data: selectedWellDetails, loading: loadingWell, error: errorGettingWellDetails} = useWell({wellId: selectedWellId});
     const {data: wellProduction, loading: loadingWellProduction, error: errorGettingWellProduction} = useWellsProduction({wellId: selectedWellId});
 
-    const filteredWells = useMemo(() => {
-        if (!wells) return [];
-
-        return wells.filter((well: WellDetail) => {
-            if (filters.province !== SELECT_DEFAULT_VALUE && well.province !== filters.province) return false;
-            if (filters.status !== SELECT_DEFAULT_VALUE && well.status !== filters.status) return false;
-            if (filters.company !== SELECT_DEFAULT_VALUE && well.company !== filters.company) return false;
-            return true;
-        });
-    }, [wells, filters]);
+    // Cargar todos los pozos para obtener opciones de filtro
+    const {data: allWells} = useWells({filters: {...DEFAULT_FILTERS, limit: 10000}});
 
     const provinceFilterOptions = useMemo(() => {
-        if (!wells) return [];
-        return [...new Set(wells.map((well) => well.province))].filter(Boolean);
-    }, [wells]);
+        if (!allWells) return [];
+        return [...new Set(allWells.map((well) => well.province))].filter(Boolean);
+    }, [allWells]);
 
     const statusFilterOptions = useMemo(() => {
-        if (!wells) return [];
-        return [...new Set(wells.map((well) => well.status))].filter(Boolean);
-    }, [wells]);
+        if (!allWells) return [];
+        return [...new Set(allWells.map((well) => well.status))].filter(Boolean);
+    }, [allWells]);
 
     const companyFilterOptions = useMemo(() => {
-        if (!wells) return [];
-        return [...new Set(wells.map((well) => well.company))].filter(Boolean);
-    }, [wells]);
+        if (!allWells) return [];
+        return [...new Set(allWells.map((well) => well.company))].filter(Boolean);
+    }, [allWells]);
 
     const timeSeriesChartData = useMemo(() => {
         if (!wellProduction || wellProduction.length === 0) return null;
@@ -81,7 +73,7 @@ export function MapView() {
             </div>
 
             <div style={styles.wellDetailsContainer}>
-                <WellsMap wells={filteredWells} selectedWellId={selectedWellId} onSelectWell={setSelectedWellId} />
+                <WellsMap wells={wells || []} selectedWellId={selectedWellId} onSelectWell={setSelectedWellId} />
                 <WellInfo wellInfo={selectedWellDetails} loadingWell={loadingWell}/>
             </div>
 
