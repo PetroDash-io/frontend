@@ -46,6 +46,7 @@ export interface CompaniesResponse {
 export interface AggregationData {
   total: number;
   avg: number;
+  percentage?: number;
 }
 
 export interface ProductionAggregates {
