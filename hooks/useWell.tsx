@@ -29,7 +29,7 @@ export function useWell({wellId}: useWellParams) {
                 );
 
                 if (!response.ok) {
-                    throw new Error("Error al cargar el pozo");
+                    throw new Error("Error loading well data");
                 }
 
                 const json = await response.json();
