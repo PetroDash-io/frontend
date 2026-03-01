@@ -1,4 +1,4 @@
-import { ESTADOS_POZO, colors } from "./constants";
+import { ESTADOS_POZO, colors } from "@/utils/constants";
 
 export const normalize = (value?: string) =>
   value
@@ -30,21 +30,21 @@ const NORMALIZED_ESTADOS_POZO = {
   ),
 };
 
-export const getPozoColor = (tipoestado?: string) => {
-  if (!tipoestado) return colors.pozoNoInformado;
+export const getWellColor = (status?: string) => {
+  if (!status) return colors.notInformedWell;
 
-  const estado = normalize(tipoestado);
-  if (!estado) return colors.pozoNoInformado;
+  const normalizedStatus = normalize(status);
+  if (!normalizedStatus) return colors.notInformedWell;
 
-  if (NORMALIZED_ESTADOS_POZO.ACTIVO.has(estado)) return colors.pozoActivo;
+  if (NORMALIZED_ESTADOS_POZO.ACTIVO.has(normalizedStatus)) return colors.activeWell;
 
-  if (NORMALIZED_ESTADOS_POZO.PARADO.has(estado)) return colors.pozoParado;
+  if (NORMALIZED_ESTADOS_POZO.PARADO.has(normalizedStatus)) return colors.stoppedWell;
 
-  if (NORMALIZED_ESTADOS_POZO.INACTIVO.has(estado)) return colors.pozoInactivo;
+  if (NORMALIZED_ESTADOS_POZO.INACTIVO.has(normalizedStatus)) return colors.inactiveWell;
 
-  if (NORMALIZED_ESTADOS_POZO.NO_INFORMADO.has(estado)) return colors.pozoNoInformado;
+  if (NORMALIZED_ESTADOS_POZO.NO_INFORMADO.has(normalizedStatus)) return colors.notInformedWell;
 
-  return colors.pozoUnknown;
+  return colors.unknownWell;
 };
 
 export const toNumber = (value: unknown): number | null => {
