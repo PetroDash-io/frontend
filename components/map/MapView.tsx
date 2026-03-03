@@ -1,5 +1,4 @@
 import React, {useMemo, useState} from "react";
-import {WellDetail} from "@/app/types";
 import {toNumber} from "@/utils/helpers";
 import {TimeSeriesChart} from "@/components/map/TimeSeriesChart";
 import {WellInfo} from "@/components/map/WellInfo";
