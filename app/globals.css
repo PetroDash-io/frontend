@@ -75,3 +75,13 @@ main {
   border-color: #3f6b4f;
   box-shadow: 0 0 0 2px rgba(63, 107, 79, 0.15);
 }
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
