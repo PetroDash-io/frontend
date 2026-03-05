@@ -14,7 +14,9 @@ export function useProductionAggregates(filters: Partial<ProductionAggregatesFil
 
   useEffect(() => {
     // Only fetch if at least empresa or date filters are provided
-    if (!filters.empresa && !filters.inicio_anio && !filters.fin_anio) {
+    const company_selected = filters.empresa
+    const date_selected = filters.inicio_anio || filters.fin_anio
+    if (!company_selected || !date_selected) {
       setData(null);
       return;
     }
@@ -42,7 +44,7 @@ export function useProductionAggregates(filters: Partial<ProductionAggregatesFil
             params.append("fin_mes", filters.fin_mes.toString());
           }
         }
-        const url = `${process.env.NEXT_PUBLIC_API_URL}/pozos/produccion?${params.toString()}`;
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/empresas/${filters.empresa}/produccion?${params.toString()}`;
         
         const response = await fetch(url, {
           headers: {
