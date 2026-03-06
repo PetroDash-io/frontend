@@ -6,6 +6,9 @@ import {SELECT_DEFAULT_VALUE, SelectFilter} from "@/components/common/SelectFilt
 import {LoadingState} from "@/components/common/LoadingState";
 import {InlineMessage} from "@/components/common/InlineMessage";
 import {toast} from "react-toastify";
+// Ensure the correct path to the module
+import { WellFilters } from "@/app/types/wellFilters";
+
 
 const DEFAULT_FILTERS = {
     province: SELECT_DEFAULT_VALUE,
@@ -14,9 +17,17 @@ const DEFAULT_FILTERS = {
     limit: 100,
 }
 
-export function TableView() {
-    const [filters, setFilters] = useState(DEFAULT_FILTERS);
-    const {data: wells, loading: loading, error: error} = useWells({filters});
+
+
+type TableViewProps = {
+    filters: WellFilters;
+
+};
+
+
+export function TableView({filters}: TableViewProps) {
+
+    const {data: wells, loading, error} = useWells({filters});
     const errorMessage = error || null;
 
     useEffect(() => {
@@ -24,45 +35,13 @@ export function TableView() {
         toast.error(errorMessage || "Unexpected error", {toastId: errorMessage || "Unexpected error"});
     }, [errorMessage]);
 
-    // Cargar todos los pozos para obtener opciones de filtro
-    const {data: allWells} = useWells({filters: {...DEFAULT_FILTERS, limit: 10000}});
-
-    const provinces = useMemo(() => {
-        if (!allWells) return [];
-        return [...new Set(allWells.map((well) => well.province))].filter(Boolean);
-    }, [allWells]);
-
-    const statuses = useMemo(() => {
-        if (!allWells) return [];
-        return [...new Set(allWells.map((well) => well.status))].filter(Boolean);
-    }, [allWells]);
-
-    const companies = useMemo(() => {
-        if (!allWells) return [];
-        return [...new Set(allWells.map((well) => well.company))].filter(Boolean);
-    }, [allWells]);
-
-    const updateFilters = (filterName: string, value: unknown) => {
-        setFilters((previousValues) => ({...previousValues, [filterName]: value}));
-    }
-
     return (
         <>
-            <div style={styles.filterPanel}>
-                <SelectFilter filterName="province" value={filters.province} onSelect={updateFilters} options={provinces}
-                              defaultOptionLabel="Todas las provincias"/>
-                <SelectFilter filterName="status" value={filters.status} onSelect={updateFilters} options={statuses}
-                              defaultOptionLabel="Todos los estados"/>
-                <SelectFilter filterName="company" value={filters.company} onSelect={updateFilters} options={companies}
-                              defaultOptionLabel="Todas las empresas"/>
-                <LimitFilter filterName="limit" limit={filters.limit} onDefineLimit={updateFilters}/>
-            </div>
-
             <WellsTable data={wells || []}/>
 
             {errorMessage && (
                 <div style={styles.errorMessageContainer}>
-                    <InlineMessage message={errorMessage || "Unexpected error"} variant="error"/>
+                    <InlineMessage message={errorMessage} variant="error"/>
                 </div>
             )}
 

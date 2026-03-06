@@ -4,8 +4,7 @@ import React, {useState} from "react";
 import "mapbox-gl/dist/mapbox-gl.css";
 import {CompanyView} from "@/components/company/CompanyView";
 import {Tabs, TabContent, TabTrigger} from "@/components/common/Tabs";
-import {TableView} from "@/components/table/TableView";
-import {MapView} from "@/components/map/MapView";
+import { WellView } from "@/components/wells/WellView"; // Update the path to match the actual file structure
 import {WellProductionComparisonChart} from "@/components/wells/WellProductionComparisonChart";
 import styles from "./page.module.css";
 
@@ -45,8 +44,8 @@ export default function Home() {
                         className={`${styles.drawer} ${isDrawerOpen ? styles.drawerOpen : ""}`}
                     >
                         <nav className={styles.drawerNav}>
-                            <TabTrigger value="Map" variant="drawer" onSelect={closeDrawer}>Pozo</TabTrigger>
-                            <TabTrigger value="Table" variant="drawer" onSelect={closeDrawer}>Tabla</TabTrigger>
+                            <TabTrigger value="Well" variant="drawer" onSelect={closeDrawer}>Pozo</TabTrigger>
+
                             <TabTrigger value="Production" variant="drawer" onSelect={closeDrawer}>Empresas</TabTrigger>
                             <TabTrigger value="Analysis" variant="drawer" onSelect={closeDrawer}>Análisis de
                                 Producción</TabTrigger>
@@ -54,11 +53,8 @@ export default function Home() {
                     </aside>
 
                     <div className={styles.contentArea}>
-                        <TabContent value="Map">
-                            <MapView/>
-                        </TabContent>
-                        <TabContent value="Table">
-                            <TableView/>
+                        <TabContent value="Well">
+                            <WellView/>
                         </TabContent>
                         <TabContent value="Production">
                             <CompanyView/>
