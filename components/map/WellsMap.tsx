@@ -97,8 +97,8 @@ const styles = {
     } as React.CSSProperties,
     legendBar: {
         position: "relative",
-        top: 50,
-        width: "25%",
+        top: "60px",
+        width: "30%",
         left: 12,
         zIndex: 10,
         display: "flex",

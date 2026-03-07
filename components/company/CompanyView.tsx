@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {colors, MONTHS, YEARS} from "@/utils/constants";
 import {useCompanies} from "@/hooks/useCompanies";
 import {useProductionAggregates} from "@/hooks/useProductionAggregates";
@@ -14,6 +14,9 @@ import {UnitTabs} from "@/components/common/UnitTabs";
 import {SelectFilterOption, SelectFilter} from "@/components/common/SelectFilter";
 import {useUnit} from "@/hooks/useUnit";
 import {convertValueToUnit} from "@/utils/units";
+import {LoadingState} from "@/components/common/LoadingState";
+import {InlineMessage} from "@/components/common/InlineMessage";
+import {toast} from "react-toastify";
 
 export function CompanyView() {
   const [filters, setFilters] = useState<Partial<ProductionAggregatesFilters>>({});
@@ -25,6 +28,12 @@ export function CompanyView() {
   const { data: comparisonData, loading: loadingComparison, error: errorComparison } = useCompanyComparison(comparisonFilters);
 
   const {unit, setUnit} = useUnit();
+  const errorMessage = errorCompanies || errorProduction || errorComparison || null;
+
+  useEffect(() => {
+    if (!errorMessage) return;
+    toast.error(errorMessage || "Unexpected error", {toastId: errorMessage || "Unexpected error"});
+  }, [errorMessage]);
 
   const totalChartData = useMemo(() => {
     if (!productionData) return [];
@@ -134,24 +143,16 @@ export function CompanyView() {
           </div>
         </div>
 
-        {errorCompanies && (
-            <div style={styles.error}>Error al cargar empresas: {errorCompanies}</div>
-        )}
-
-        {errorProduction && (
-            <div style={styles.error}>Error al cargar datos de producción: {errorProduction}</div>
+        {errorMessage && (
+            <InlineMessage message={errorMessage || "Unexpected error"} variant="error"/>
         )}
 
         {!productionData && (
-            <div style={styles.placeholder}>
-              <p>Seleccione una empresa y un rango de fechas para ver las métricas de producción</p>
-            </div>
+            <InlineMessage message="Seleccione una empresa y un rango de fechas para ver las métricas de producción." />
         )}
 
         {loadingProduction && (
-            <div style={styles.loading}>
-              <p>Cargando datos de producción...</p>
-            </div>
+            <LoadingState/>
         )}
 
         {productionData && !loadingProduction && (
@@ -170,23 +171,15 @@ export function CompanyView() {
             updateFilters={updateComparisonFilters}/>
 
         {duplicatedCompanies && (
-            <div style={styles.error}>Por favor, elegí dos empresas diferentes para comparar.</div>
-        )}
-
-        {errorComparison && (
-            <div style={styles.error}>Error al comparar empresas: {errorComparison}</div>
+            <InlineMessage message="Por favor, elegí dos empresas diferentes para comparar." variant="warning"/>
         )}
 
         {!comparisonData && !duplicatedCompanies && (
-            <div style={styles.placeholder}>
-              <p>Seleccione dos empresas para comparar su producción</p>
-            </div>
+            <InlineMessage message="Seleccione dos empresas para comparar su producción." />
         )}
 
         {loadingComparison && (
-            <div style={styles.loading}>
-              <p>Cargando comparación...</p>
-            </div>
+            <LoadingState/>
         )}
 
         {comparisonData && !loadingComparison && (

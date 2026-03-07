@@ -1,5 +1,4 @@
-import React, {useMemo, useState} from "react";
-import {WellDetail} from "@/app/types";
+import React, {useEffect, useMemo, useState} from "react";
 import {toNumber} from "@/utils/helpers";
 import {TimeSeriesChart} from "@/components/map/TimeSeriesChart";
 import {WellInfo} from "@/components/map/WellInfo";
@@ -9,6 +8,9 @@ import {LimitFilter} from "@/components/map/LimitFilter";
 import {useWells} from "@/hooks/useWells";
 import {useWell} from "@/hooks/useWell";
 import {useWellsProduction} from "@/hooks/useWellProduction";
+import {LoadingState} from "@/components/common/LoadingState";
+import {InlineMessage} from "@/components/common/InlineMessage";
+import {toast} from "react-toastify";
 
 const DEFAULT_FILTERS = {
     province: SELECT_DEFAULT_VALUE,
@@ -23,6 +25,13 @@ export function MapView() {
     const [selectedWellId, setSelectedWellId] = useState<string | null>(null);
     const {data: selectedWellDetails, loading: loadingWell, error: errorGettingWellDetails} = useWell({wellId: selectedWellId});
     const {data: wellProduction, loading: loadingWellProduction, error: errorGettingWellProduction} = useWellsProduction({wellId: selectedWellId});
+
+    const errorMessage = errorGettingWells || errorGettingWellDetails || errorGettingWellProduction || null;
+
+    useEffect(() => {
+        if (!errorMessage) return;
+        toast.error(errorMessage || "Unexpected error", {toastId: errorMessage || "Unexpected error"});
+    }, [errorMessage]);
 
     // Cargar todos los pozos para obtener opciones de filtro
     const {data: allWells} = useWells({filters: {...DEFAULT_FILTERS, limit: 10000}});
@@ -77,17 +86,23 @@ export function MapView() {
                 <WellInfo wellInfo={selectedWellDetails} loadingWell={loadingWell}/>
             </div>
 
+            {loadingWellProduction && selectedWellId && (
+                <div style={styles.loadingContainer}>
+                    <LoadingState/>
+                </div>
+            )}
+
             {wellProduction && <TimeSeriesChart data={timeSeriesChartData}/>}
 
-            {errorGettingWells && (
+            {errorMessage && (
                 <div style={styles.errorMessageContainer}>
-                    <p style={{ color: "#b91c1c" }}>Error: {errorGettingWells}</p>
+                    <InlineMessage message={errorMessage || "Unexpected error"} variant="error"/>
                 </div>
             )}
 
             {loadingWells && (
                 <div style={styles.loadingContainer}>
-                    <p>Cargando pozos...</p>
+                    <LoadingState/>
                 </div>
             )}
         </>

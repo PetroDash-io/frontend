@@ -1,9 +1,11 @@
-import React, {useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {WellsTable} from "@/components/table/WellsTable";
 import {useWells} from "@/hooks/useWells";
 import {LimitFilter} from "@/components/map/LimitFilter";
-import {WellDetail} from "@/app/types";
 import {SELECT_DEFAULT_VALUE, SelectFilter} from "@/components/common/SelectFilter";
+import {LoadingState} from "@/components/common/LoadingState";
+import {InlineMessage} from "@/components/common/InlineMessage";
+import {toast} from "react-toastify";
 
 const DEFAULT_FILTERS = {
     province: SELECT_DEFAULT_VALUE,
@@ -15,6 +17,12 @@ const DEFAULT_FILTERS = {
 export function TableView() {
     const [filters, setFilters] = useState(DEFAULT_FILTERS);
     const {data: wells, loading: loading, error: error} = useWells({filters});
+    const errorMessage = error || null;
+
+    useEffect(() => {
+        if (!errorMessage) return;
+        toast.error(errorMessage || "Unexpected error", {toastId: errorMessage || "Unexpected error"});
+    }, [errorMessage]);
 
     // Cargar todos los pozos para obtener opciones de filtro
     const {data: allWells} = useWells({filters: {...DEFAULT_FILTERS, limit: 10000}});
@@ -52,15 +60,15 @@ export function TableView() {
 
             <WellsTable data={wells || []}/>
 
-            {error && (
+            {errorMessage && (
                 <div style={styles.errorMessageContainer}>
-                    <p style={{ color: "#b91c1c" }}>Error: {error}</p>
+                    <InlineMessage message={errorMessage || "Unexpected error"} variant="error"/>
                 </div>
             )}
 
             {loading && (
                 <div style={styles.loadingContainer}>
-                    <p>Cargando pozos...</p>
+                    <LoadingState/>
                 </div>
             )}
         </>
