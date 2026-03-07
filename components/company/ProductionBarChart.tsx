@@ -10,6 +10,7 @@ import {
     Tooltip,
     Legend,
 } from "recharts";
+import { exportToExcel } from "@/utils/excel";
 
 interface ProductionBarChartData {
   name: string;
@@ -21,6 +22,9 @@ interface ProductionBarChartData {
 interface ProductionBarChartProps {
   data: ProductionBarChartData[];
   title: string;
+  empresa?: string;
+  fechaInicio?: string;
+  fechaFin?: string;
 }
 
 const formatYAxis = (value: number) => {
@@ -39,10 +43,46 @@ const formatTooltip = (value: number | string | undefined) => {
   return value;
 };
 
-export function ProductionBarChart({ data, title }: ProductionBarChartProps) {
+export function ProductionBarChart({ data, title, empresa, fechaInicio, fechaFin }: ProductionBarChartProps) {
+    const handleDownloadExcel = () => {
+        const dataToExport = data.map((item) => ({
+            Periodo: item.name,
+            'Petróleo (m³)': item.oil,
+            'Gas (miles m³)': item.gas,
+            'Agua (m³)': item.water,
+        }));
+
+        const today = new Date().toISOString().split('T')[0];
+        let fileName = 'produccion';
+        if (empresa) fileName += `-${empresa.replace(/[^a-zA-Z0-9]/g, '-')}`;
+        if (fechaInicio) fileName += `-desde-${fechaInicio}`;
+        if (fechaFin) fileName += `-hasta-${fechaFin}`;
+        fileName += `-${today}`;
+
+        exportToExcel(
+            dataToExport,
+            fileName,
+            'Producción'
+        );
+    };
+
     return (
         <div style={styles.chartWrapper}>
-            <h3 style={styles.title}>{title}</h3>
+            <div style={styles.header}>
+                <h3 style={styles.title}>{title}</h3>
+                <button
+                    onClick={handleDownloadExcel}
+                    style={styles.downloadButton}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = "#2F5A3F";
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "#3F6B4F";
+                    }}
+                >
+                    📊 Descargar Excel
+                </button>
+            </div>
             <div style={{ height: 320 }}>
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={data} margin={styles.barChartMargins}>
@@ -71,11 +111,30 @@ const styles = {
         padding: 24,
         backgroundColor: "#fff",
     } as React.CSSProperties,
+    header: {
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+    } as React.CSSProperties,
     title: {
         fontSize: 18,
         fontWeight: 600,
         color: colors.text,
         margin: 0,
+    } as React.CSSProperties,
+    downloadButton: {
+        backgroundColor: "#3F6B4F",
+        color: "white",
+        border: "none",
+        borderRadius: "8px",
+        padding: "8px 14px",
+        fontSize: "13px",
+        fontWeight: 600,
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        gap: "6px",
+        transition: "background-color 0.2s",
     } as React.CSSProperties,
     barChartMargins: {
         top: 10,

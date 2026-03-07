@@ -13,6 +13,7 @@ import {
   LabelList
 } from "recharts";
 import { Company } from "@/app/types";
+import { exportToExcel } from "@/utils/excel";
 
 interface CompaniesBarChartProps {
   companies: Company[];
@@ -99,6 +100,22 @@ export function CompaniesBarChart({
     }));
   }, [companies, maxCompanies]);
 
+  const handleDownloadExcel = () => {
+    const dataToExport = chartData.map((item) => ({
+      Empresa: item.name,
+      'Cantidad de Pozos': item.pozos,
+    }));
+
+    const today = new Date().toISOString().split('T')[0];
+    const fileName = `empresas-top${maxCompanies}-${today}`;
+
+    exportToExcel(
+      dataToExport,
+      fileName,
+      'Top Empresas'
+    );
+  };
+
   if (!companies || companies.length === 0) {
     return (
       <div style={styles.container}>
@@ -110,7 +127,21 @@ export function CompaniesBarChart({
 
   return (
     <div style={styles.container}>
-      <h3 style={styles.title}>{title}</h3>
+      <div style={styles.header}>
+        <h3 style={styles.title}>{title}</h3>
+        <button
+          onClick={handleDownloadExcel}
+          style={styles.downloadButton}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = styles.downloadButtonHover.backgroundColor;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = styles.downloadButton.backgroundColor;
+          }}
+        >
+          📊 Descargar Excel
+        </button>
+      </div>
       <ResponsiveContainer width="100%" height={500}>
         <BarChart
           data={chartData}
@@ -163,12 +194,34 @@ const styles: Record<string, React.CSSProperties> = {
     boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
     border: "1px solid #e5e7eb",
   },
+  header: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "8px",
+  },
   title: {
     fontSize: "20px",
     fontWeight: "700",
-    marginBottom: "8px",
     color: "#1F2937",
-    textAlign: "center",
+    margin: 0,
+  },
+  downloadButton: {
+    backgroundColor: "#3F6B4F",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    padding: "10px 16px",
+    fontSize: "14px",
+    fontWeight: "600",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    transition: "background-color 0.2s",
+  },
+  downloadButtonHover: {
+    backgroundColor: "#2F5A3F",
   },
   noData: {
     textAlign: "center",
