@@ -133,10 +133,10 @@ export function CompaniesBarChart({
           onClick={handleDownloadExcel}
           style={styles.downloadButton}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = styles.downloadButtonHover.backgroundColor;
+            e.currentTarget.style.backgroundColor = "#2F5A3F";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = styles.downloadButton.backgroundColor;
+            e.currentTarget.style.backgroundColor = "#3F6B4F";
           }}
         >
           📊 Descargar Excel
@@ -219,9 +219,6 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     gap: "6px",
     transition: "background-color 0.2s",
-  },
-  downloadButtonHover: {
-    backgroundColor: "#2F5A3F",
   },
   noData: {
     textAlign: "center",
