@@ -7,6 +7,7 @@ import {Tabs, TabContent, TabTrigger} from "@/components/common/Tabs";
 import {TableView} from "@/components/table/TableView";
 import {MapView} from "@/components/map/MapView";
 import { WellProductionComparisonChart } from "@/components/wells/WellProductionComparisonChart";
+import { TopProductionPieCharts } from "@/components/company/TopProductionPieCharts";
 
 export default function Home() {
     return (
@@ -33,7 +34,11 @@ export default function Home() {
                 <TabContent value="Production">
                     <CompanyView/></TabContent>
                 <TabContent value="Analysis">
-                    <WellProductionComparisonChart />
+                    <div style={styles.analysisContainer}>
+                        <TopProductionPieCharts />
+                        <div style={styles.divider} />
+                        <WellProductionComparisonChart />
+                    </div>
                 </TabContent>
             </Tabs>
         </>

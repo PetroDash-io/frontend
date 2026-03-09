@@ -108,5 +108,85 @@ export const MONTHS = [
   { value: 12, label: "Diciembre" },
 ];
 
+// Paleta de colores para pie charts (tonos tierra alineados con la estética)
+export const PIE_CHART_COLORS = [
+  "#3F6B4F", // Verde oscuro principal
+  "#D6A23A", // Dorado/Oro
+  "#4B2A1A", // Marrón oscuro
+  "#D97A00", // Naranja tierra
+  "#2F3E34", // Verde muy oscuro
+  "#3A7CA5", // Azul petróleo
+  "#8B6914", // Dorado oscuro
+  "#5D7C5E", // Verde medio
+  "#8B4513", // Marrón tierra
+  "#6B8E23", // Verde oliva
+  "#CD853F", // Terracota
+  "#A0826D", // Beige oscuro
+  "#4A5D4E", // Verde grisáceo
+  "#9B7653", // Café con leche
+  "#556B2F", // Verde oliva oscuro
+  "#8B7355", // Marrón claro
+  "#6B6B47", // Verde militar
+  "#7C6A5C", // Taupe
+  "#5C7A70", // Verde azulado
+  "#8B7D6B", // Gris cálido
+];
+
+// Áreas organizadas por provincia (top áreas por cantidad de pozos)
+export const AREAS_POR_PROVINCIA: Record<string, Array<{ value: string; label: string }>> = {
+  Neuquen: [
+    { value: "PUESTO HERNANDEZ", label: "Puesto Hernández" },
+    { value: "CHIHUIDO DE LA SIERRA NEGRA", label: "Chihuido de la Sierra Negra" },
+    { value: "EL TRAPIAL ESTE", label: "El Trapial Este" },
+    { value: "LOMA LA LATA - SIERRA BARROSA", label: "Loma La Lata - Sierra Barrosa" },
+    { value: "LOMA CAMPANA", label: "Loma Campana" },
+    { value: "CENTENARIO CENTRO", label: "Centenario Centro" },
+    { value: "AL NORTE DE LA DORSAL", label: "Al Norte de la Dorsal" },
+    { value: "AGUA DEL CAJON", label: "Agua del Cajón" },
+    { value: "EL PORVENIR", label: "El Porvenir" },
+    { value: "AL SUR DE LA DORSAL", label: "Al Sur de la Dorsal" },
+  ],
+  Chubut: [
+    { value: "ANTICLINAL GRANDE - CERRO DRAGON", label: "Anticlinal Grande - Cerro Dragón" },
+    { value: "CAMPAMENTO CENTRAL - CAÑADON PERDIDO", label: "Campamento Central - Cañadón Perdido" },
+    { value: "MANANTIALES BEHR", label: "Manantiales Behr" },
+    { value: "DIADEMA", label: "Diadema" },
+    { value: "ESCALANTE - EL TREBOL", label: "Escalante - El Trébol" },
+    { value: "EL TORDILLO", label: "El Tordillo" },
+    { value: "KM. 20", label: "Km. 20" },
+    { value: "PAMPA DEL CASTILLO - LA GUITARRA", label: "Pampa del Castillo - La Guitarra" },
+    { value: "RESTINGA ALI", label: "Restinga Alí" },
+  ],
+  Mendoza: [
+    { value: "BARRANCAS", label: "Barrancas" },
+    { value: "LA VENTANA", label: "La Ventana" },
+    { value: "VALLE DEL RIO GRANDE", label: "Valle del Río Grande" },
+    { value: "JAGÜEL CASA DE PIEDRA", label: "Jagüel Casa de Piedra" },
+    { value: "CHIHUIDO DE LA SIERRA NEGRA", label: "Chihuido de la Sierra Negra" },
+    { value: "VIZCACHERAS", label: "Vizcacheras" },
+    { value: "CHACHAHUEN SUR", label: "Chachahuén Sur" },
+    { value: "CAÑADON AMARILLO", label: "Cañadón Amarillo" },
+    { value: "CERRO FORTUNOSO", label: "Cerro Fortunoso" },
+  ],
+  "La Pampa": [
+    { value: "25 DE MAYO - MEDANITO SUD ESTE LP", label: "25 de Mayo - Medanito Sud Este LP" },
+    { value: "MEDANITO", label: "Medanito" },
+    { value: "CNQ 7/A", label: "CNQ 7/A" },
+    { value: "JAGÜEL DE LOS MACHOS LP", label: "Jagüel de los Machos LP" },
+    { value: "GOBERNADOR AYALA III", label: "Gobernador Ayala III" },
+    { value: "MEDANITO SUR", label: "Medanito Sur" },
+  ],
+  "Rio Negro": [
+    { value: "EL MEDANITO", label: "El Medanito" },
+    { value: "SEÑAL PICADA - PUNTA BARDA", label: "Señal Picada - Punta Barda" },
+    { value: "ENTRE LOMAS", label: "Entre Lomas" },
+    { value: "25 DE MAYO - MEDANITO SUD ESTE RN", label: "25 de Mayo - Medanito Sud Este RN" },
+    { value: "JAGÜEL DE LOS MACHOS RN", label: "Jagüel de los Machos RN" },
+    { value: "ESTACION FERNANDEZ ORO", label: "Estación Fernández Oro" },
+    { value: "BARRANCA DE LOS LOROS", label: "Barranca de los Loros" },
+    { value: "CATRIEL OESTE", label: "Catriel Oeste" },
+  ],
+};
+
 
 

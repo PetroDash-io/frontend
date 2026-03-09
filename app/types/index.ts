@@ -122,3 +122,30 @@ export interface WellProductionComparisonFilters {
   median_by?: string[];
 }
 
+export interface TopProductionData {
+  company: string;
+  total_production: number;
+}
+
+export interface TopProductionResponse {
+  source: string;
+  tipo: "oil" | "gas" | "water";
+  provincia: string | null;
+  area: string | null;
+  start_year: number | null;
+  start_month: number | null;
+  end_year: number | null;
+  end_month: number | null;
+  data: TopProductionData[];
+}
+
+export interface TopProductionFilters {
+  tipo: "oil" | "gas" | "water";
+  provincia?: string;
+  area?: string;
+  inicio_anio?: number;
+  inicio_mes?: number;
+  fin_anio?: number;
+  fin_mes?: number;
+  limit?: number;
+}
