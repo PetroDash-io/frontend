@@ -1,9 +1,14 @@
-import React, {useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {WellsTable} from "@/components/table/WellsTable";
 import {useWells} from "@/hooks/useWells";
 import {LimitFilter} from "@/components/map/LimitFilter";
-import {WellDetail} from "@/app/types";
 import {SELECT_DEFAULT_VALUE, SelectFilter} from "@/components/common/SelectFilter";
+import {LoadingState} from "@/components/common/LoadingState";
+import {InlineMessage} from "@/components/common/InlineMessage";
+import {toast} from "react-toastify";
+// Ensure the correct path to the module
+import { WellFilters } from "@/app/types/wellFilters";
+
 
 const DEFAULT_FILTERS = {
     province: SELECT_DEFAULT_VALUE,
@@ -12,55 +17,37 @@ const DEFAULT_FILTERS = {
     limit: 100,
 }
 
-export function TableView() {
-    const [filters, setFilters] = useState(DEFAULT_FILTERS);
-    const {data: wells, loading: loading, error: error} = useWells({filters});
 
-    // Cargar todos los pozos para obtener opciones de filtro
-    const {data: allWells} = useWells({filters: {...DEFAULT_FILTERS, limit: 10000}});
 
-    const provinces = useMemo(() => {
-        if (!allWells) return [];
-        return [...new Set(allWells.map((well) => well.province))].filter(Boolean);
-    }, [allWells]);
+type TableViewProps = {
+    filters: WellFilters;
 
-    const statuses = useMemo(() => {
-        if (!allWells) return [];
-        return [...new Set(allWells.map((well) => well.status))].filter(Boolean);
-    }, [allWells]);
+};
 
-    const companies = useMemo(() => {
-        if (!allWells) return [];
-        return [...new Set(allWells.map((well) => well.company))].filter(Boolean);
-    }, [allWells]);
 
-    const updateFilters = (filterName: string, value: unknown) => {
-        setFilters((previousValues) => ({...previousValues, [filterName]: value}));
-    }
+export function TableView({filters}: TableViewProps) {
+
+    const {data: wells, loading, error} = useWells({filters});
+    const errorMessage = error || null;
+
+    useEffect(() => {
+        if (!errorMessage) return;
+        toast.error(errorMessage || "Unexpected error", {toastId: errorMessage || "Unexpected error"});
+    }, [errorMessage]);
 
     return (
         <>
-            <div style={styles.filterPanel}>
-                <SelectFilter filterName="province" value={filters.province} onSelect={updateFilters} options={provinces}
-                              defaultOptionLabel="Todas las provincias"/>
-                <SelectFilter filterName="status" value={filters.status} onSelect={updateFilters} options={statuses}
-                              defaultOptionLabel="Todos los estados"/>
-                <SelectFilter filterName="company" value={filters.company} onSelect={updateFilters} options={companies}
-                              defaultOptionLabel="Todas las empresas"/>
-                <LimitFilter filterName="limit" limit={filters.limit} onDefineLimit={updateFilters}/>
-            </div>
-
             <WellsTable data={wells || []}/>
 
-            {error && (
+            {errorMessage && (
                 <div style={styles.errorMessageContainer}>
-                    <p style={{ color: "#b91c1c" }}>Error: {error}</p>
+                    <InlineMessage message={errorMessage} variant="error"/>
                 </div>
             )}
 
             {loading && (
                 <div style={styles.loadingContainer}>
-                    <p>Cargando pozos...</p>
+                    <LoadingState/>
                 </div>
             )}
         </>

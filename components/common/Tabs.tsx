@@ -32,17 +32,24 @@ const useTabs = () => {
 interface TabTriggerProps {
   value: string;
   children: ReactNode;
+  variant?: 'button' | 'drawer';
+  onSelect?: () => void;
 }
 
-export const TabTrigger = ({ value, children }: TabTriggerProps) => {
+export const TabTrigger = ({ value, children, variant = 'button', onSelect }: TabTriggerProps) => {
   const { activeTab, setActiveTab } = useTabs();
   const isActive = activeTab === value;
 
+  const handleSelect = () => {
+    setActiveTab(value);
+    onSelect?.();
+  };
+
   return (
     <button
-      onClick={() => setActiveTab(value)}
+      onClick={handleSelect}
       className={`tab-btn ${isActive ? 'active' : ''}`}
-      style={tabButtonStyle(isActive)}
+      style={variant === 'drawer' ? tabDrawerStyle(isActive) : tabButtonStyle(isActive)}
     >
       {children}
     </button>
@@ -86,5 +93,21 @@ function tabButtonStyle(active: boolean): React.CSSProperties {
         fontWeight: 500,
         cursor: "pointer",
         transition: "all 0.2s ease",
+    };
+}
+
+function tabDrawerStyle(active: boolean): React.CSSProperties {
+    return {
+        width: '100%',
+        textAlign: 'left',
+        padding: '9px 12px',
+        borderRadius: 8,
+        border: `1px solid ${active ? '#C9D8CE' : 'transparent'}`,
+        backgroundColor: active ? '#E9F0EB' : 'transparent',
+        color: active ? '#2F3E34' : '#4B2A1A',
+        fontSize: 14,
+        fontWeight: active ? 600 : 500,
+        cursor: 'pointer',
+        transition: 'background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease',
     };
 }

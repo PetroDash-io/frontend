@@ -16,7 +16,7 @@ export const LimitFilter = ({limit, onDefineLimit, filterName} : LimitFilterProp
   }
 
   return (
-    <div>
+    <div style={styles.limitFilterContainer}>
       <label style={styles.limitLabel}>Cantidad de pozos</label>
       <input type="number" min={1} max={MAX_WELLS} value={limit} onChange={onChange} style={styles.limitInput}/>
     </div>
@@ -26,17 +26,22 @@ export const LimitFilter = ({limit, onDefineLimit, filterName} : LimitFilterProp
 const styles = {
   limitFilterContainer: {
     display: "flex",
-    flexDirection: "row"
+    flexDirection: "column",
+    gap: 6,
   } as React.CSSProperties,
   limitLabel: {
     fontSize: 14,
+    fontWeight: 500,
     color: colors.text,
   } as React.CSSProperties,
   limitInput: {
-    width: 120,
-    padding: "6px 8px",
+    width: 140,
+    minHeight: 36,
+    padding: "6px 10px",
     borderRadius: 8,
-    border: `1px solid ${colors.secondary}`,
+    border: "1px solid #cfc4b5",
     backgroundColor: "#fff",
+    color: "#2f3e34",
+    fontSize: 13,
   } as React.CSSProperties,
 } as const;
