@@ -70,4 +70,15 @@ const styles = {
         gap: 12,
         padding: "12px 24px",
     } as React.CSSProperties,
+    analysisContainer: {
+        display: "flex",
+        flexDirection: "column",
+        gap: 32,
+        padding: "0 24px",
+    } as React.CSSProperties,
+    divider: {
+        height: 1,
+        background: "linear-gradient(90deg, transparent, #3F6B4F, transparent)",
+        margin: "16px 0",
+    } as React.CSSProperties,
 } as const;
