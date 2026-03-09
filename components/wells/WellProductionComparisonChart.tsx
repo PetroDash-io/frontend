@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import {colors, MONTHS, YEARS} from "@/utils/constants";
 import {
   ResponsiveContainer,
@@ -35,6 +35,12 @@ export function WellProductionComparisonChart() {
   const [wellId, setWellId] = useState<number | null>(null);
   const [filters, setFilters] = useState<Partial<WellProductionComparisonFilters>>({median_by: []});
   const { data, loading, error } = useWellProductionComparison(wellId, filters);
+  const errorMessage = error || null;
+
+  useEffect(() => {
+    if (!errorMessage) return;
+    toast.error(errorMessage || "Unexpected error", {toastId: errorMessage || "Unexpected error"});
+  }, [errorMessage]);
 
   const handleWellIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -230,8 +236,8 @@ export function WellProductionComparisonChart() {
         </div>
       </div>
 
-      {loading && <div style={styles.message}>Cargando datos...</div>}
-      {error && <div style={styles.error}>Error: {error}</div>}
+      {loading && <LoadingState/>}
+      {errorMessage && <InlineMessage message={errorMessage || "Unexpected error"} variant="error"/>}
 
       {data && data.data && data.data.length > 0 && (
         <div style={styles.infoContainer}>
@@ -300,9 +306,7 @@ export function WellProductionComparisonChart() {
       )}
 
       {!wellId && !loading && (
-        <div style={styles.message}>
-          Ingrese un ID de pozo para ver el análisis de producción
-        </div>
+        <InlineMessage message="Ingrese un ID de pozo para ver el análisis de producción." />
       )}
     </div>
   );
