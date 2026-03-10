@@ -2,11 +2,11 @@
 
 import React, {useState} from "react";
 import "mapbox-gl/dist/mapbox-gl.css";
-import {CompanyView} from "@/components/company/CompanyView";
 import {Tabs, TabContent, TabTrigger} from "@/components/common/Tabs";
-import { WellView } from "@/components/wells/WellView"; // Update the path to match the actual file structure
+import {CompanyView} from "@/components/company/CompanyView";
+import {WellView} from "@/components/wells/WellView"; // Update the path to match the actual file structure
 import {WellProductionComparisonChart} from "@/components/wells/WellProductionComparisonChart";
-import { TopProductionPieCharts } from "@/components/company/TopProductionPieCharts";
+import {TopProductionPieCharts} from "@/components/company/TopProductionPieCharts";
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -48,8 +48,12 @@ export default function Home() {
                             <TabTrigger value="Well" variant="drawer" onSelect={closeDrawer}>Pozo</TabTrigger>
 
                             <TabTrigger value="Production" variant="drawer" onSelect={closeDrawer}>Empresas</TabTrigger>
-                            <TabTrigger value="Analysis" variant="drawer" onSelect={closeDrawer}>Análisis de
-                                Producción</TabTrigger>
+                            <TabTrigger value="Analysis" variant="drawer" onSelect={closeDrawer}>
+                                Análisis de Producción
+                            </TabTrigger>
+                            <TabTrigger value="Ranking" variant="drawer" onSelect={closeDrawer}>
+                                Ranking por empresa
+                            </TabTrigger>
                         </nav>
                     </aside>
 
@@ -62,6 +66,9 @@ export default function Home() {
                         </TabContent>
                         <TabContent value="Analysis">
                             <WellProductionComparisonChart/>
+                        </TabContent>
+                        <TabContent value="Ranking">
+                            <TopProductionPieCharts/>
                         </TabContent>
                     </div>
                 </div>

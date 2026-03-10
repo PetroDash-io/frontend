@@ -127,7 +127,7 @@ export function TopProductionPieCharts() {
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.mainTitle}>Top Producción por Empresas</h2>
+      <h2 style={styles.mainTitle}>Ranking de producción por empresas</h2>
 
       <div style={styles.filtersContainer}>
         <div style={styles.topFiltersRow}>
