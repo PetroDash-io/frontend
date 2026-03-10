@@ -14,6 +14,7 @@ interface FilterProps {
     inputLabel?: string
     defaultOptionLabel?: string;
     disabled?: boolean;
+    hasError?: boolean;
 }
 
 export const SELECT_DEFAULT_VALUE = "";
@@ -26,7 +27,8 @@ export const SelectFilter = ({
                                  options,
                                  inputLabel,
                                  defaultOptionLabel = SELECT_DEFAULT_TEXT,
-                                 disabled = false
+                                 disabled = false,
+                                 hasError = false
                              }: FilterProps) => {
     const onChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         onSelect(filterName, event.target.value);
@@ -40,6 +42,7 @@ export const SelectFilter = ({
                     value={value}
                     onChange={onChange}
                     className="select-filter"
+                    style={hasError ? styles.selectError : undefined}
                     disabled={disabled}>
                     <option value={""}>{defaultOptionLabel}</option>
                     {options.map(item => {
@@ -76,5 +79,9 @@ const styles = {
         fontSize: 14,
         color: colors.text,
         cursor: "pointer",
+    } as React.CSSProperties,
+    selectError: {
+        borderColor: "#dc2626",
+        boxShadow: "0 0 0 1px #dc2626",
     } as React.CSSProperties,
 }

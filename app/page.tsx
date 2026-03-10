@@ -31,7 +31,7 @@ export default function Home() {
                 </button>
             </header>
 
-            <Tabs defaultValue="Map">
+            <Tabs defaultValue="Well">
                 <div className={styles.dashboardLayout}>
                     <div
                         className={`${styles.drawerBackdrop} ${isDrawerOpen ? styles.drawerBackdropVisible : ""}`}

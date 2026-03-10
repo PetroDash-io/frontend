@@ -109,7 +109,7 @@ const styles = {
         borderRadius: 14,
         border: `1px solid ${colors.panelBorder}`,
         color: colors.textLight,
-        marginTop: 50,
+        marginTop: 4,
     } as React.CSSProperties,
     emptyDataMessage: {
         padding: 20,
