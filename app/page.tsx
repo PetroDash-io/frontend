@@ -6,6 +6,7 @@ import {CompanyView} from "@/components/company/CompanyView";
 import {Tabs, TabContent, TabTrigger} from "@/components/common/Tabs";
 import { WellView } from "@/components/wells/WellView"; // Update the path to match the actual file structure
 import {WellProductionComparisonChart} from "@/components/wells/WellProductionComparisonChart";
+import { TopProductionPieCharts } from "@/components/company/TopProductionPieCharts";
 import styles from "./page.module.css";
 
 export default function Home() {
