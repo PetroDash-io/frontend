@@ -25,7 +25,7 @@ export function useTopProduction(filters: Partial<TopProductionFilters>): UseTop
 
       try {
         const params = new URLSearchParams();
-        params.append("tipo", filters.tipo);
+        params.append("tipo", filters.tipo!);
 
         if (filters.provincia) {
           params.append("provincia", filters.provincia);
