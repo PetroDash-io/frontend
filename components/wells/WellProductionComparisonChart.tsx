@@ -13,9 +13,10 @@ import {
 import { useWellProductionComparison } from "@/hooks/useWellProductionComparison";
 import { WellProductionComparisonFilters } from "@/app/types";
 import {SelectFilter} from "@/components/common/SelectFilter";
-import {LoadingState} from "@/components/common/LoadingState";
-import {InlineMessage} from "@/components/common/InlineMessage";
-import {toast} from "react-toastify";
+import { exportMultipleSheetsToExcel } from "@/utils/excel";
+import { toast } from "react-toastify";
+import { LoadingState } from "@/components/common/LoadingState";
+import { InlineMessage } from "@/components/common/InlineMessage";
 
 const formatYAxis = (value: number) => {
   if (value >= 1000000) {
@@ -95,9 +96,73 @@ export function WellProductionComparisonChart() {
       ]
     : [];
 
+  const handleDownloadExcel = () => {
+    if (!data || !data.data || data.data.length === 0) return;
+
+    const dataToExport = [
+      {
+        Recurso: "Petróleo",
+        Pozo: data.data[0].oil.total,
+        Mediana: data.data[0].oil.median,
+        Unidad: "m³",
+      },
+      {
+        Recurso: "Gas",
+        Pozo: data.data[0].gas.total,
+        Mediana: data.data[0].gas.median,
+        Unidad: "Mm³",
+      },
+      {
+        Recurso: "Agua",
+        Pozo: data.data[0].water.total,
+        Mediana: data.data[0].water.median,
+        Unidad: "m³",
+      },
+    ];
+
+    const today = new Date().toISOString().split('T')[0];
+    let fileName = `pozo-${wellId}`;
+    
+    if (data.start_year && data.start_month && data.end_year && data.end_month) {
+      fileName += `-${data.start_year}-${data.start_month.toString().padStart(2, '0')}-a-${data.end_year}-${data.end_month.toString().padStart(2, '0')}`;
+    }
+    
+    if (filters.median_by && filters.median_by.length > 0) {
+      fileName += `-mediana-por-${filters.median_by.join('-')}`;
+    }
+    
+    fileName += `-${today}`;
+
+    exportMultipleSheetsToExcel(
+      [
+        {
+          data: dataToExport,
+          sheetName: "Comparación",
+        },
+      ],
+      fileName
+    );
+  };
+
   return (
     <div style={styles.container}>
-      <h2 style={styles.mainTitle}>Análisis de Producción por Pozo</h2>
+      <div style={styles.headerContainer}>
+        <h2 style={styles.mainTitle}>Análisis de Producción por Pozo</h2>
+        {data && data.data && data.data.length > 0 && (
+          <button
+            onClick={handleDownloadExcel}
+            style={styles.downloadButton}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "#2F5A3F";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "#3F6B4F";
+            }}
+          >
+            📊 Descargar Excel
+          </button>
+        )}
+      </div>
 
       <div style={styles.filtersContainer}>
         <div style={styles.filterRow}>
@@ -256,11 +321,31 @@ const styles = {
     width: "100%",
     minHeight: "calc(100vh - 200px)",
   } as React.CSSProperties,
+  headerContainer: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "24px",
+  } as React.CSSProperties,
   mainTitle: {
     fontSize: "24px",
     fontWeight: 600,
     color: colors.primary,
-    marginBottom: "24px",
+    margin: 0,
+  } as React.CSSProperties,
+  downloadButton: {
+    backgroundColor: "#3F6B4F",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    padding: "10px 16px",
+    fontSize: "14px",
+    fontWeight: 600,
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    transition: "background-color 0.2s",
   } as React.CSSProperties,
   filtersContainer: {
     backgroundColor: colors.filtersBg,

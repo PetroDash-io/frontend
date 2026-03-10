@@ -157,8 +157,20 @@ export function CompanyView() {
 
         {productionData && !loadingProduction && (
             <div style={styles.chartsContainer}>
-              <ProductionBarChart data={totalChartData} title="Producción Total" />
-              <ProductionBarChart data={avgChartData} title="Producción Promedio" />
+              <ProductionBarChart 
+                data={totalChartData} 
+                title="Producción Total" 
+                empresa={filters.empresa}
+                fechaInicio={filters.inicio_anio && filters.inicio_mes ? `${filters.inicio_anio}-${filters.inicio_mes.toString().padStart(2, '0')}` : filters.inicio_anio?.toString()}
+                fechaFin={filters.fin_anio && filters.fin_mes ? `${filters.fin_anio}-${filters.fin_mes.toString().padStart(2, '0')}` : filters.fin_anio?.toString()}
+              />
+              <ProductionBarChart 
+                data={avgChartData} 
+                title="Producción Promedio" 
+                empresa={filters.empresa}
+                fechaInicio={filters.inicio_anio && filters.inicio_mes ? `${filters.inicio_anio}-${filters.inicio_mes.toString().padStart(2, '0')}` : filters.inicio_anio?.toString()}
+                fechaFin={filters.fin_anio && filters.fin_mes ? `${filters.fin_anio}-${filters.fin_mes.toString().padStart(2, '0')}` : filters.fin_anio?.toString()}
+              />
             </div>
         )}
 
@@ -183,7 +195,12 @@ export function CompanyView() {
         )}
 
         {comparisonData && !loadingComparison && (
-            <CompanyComparisonCharts companies={comparisonData.companies} unit={unit}/>
+            <CompanyComparisonCharts 
+              companies={comparisonData.companies} 
+              unit={unit}
+              fechaInicio={comparisonFilters.inicio_anio && comparisonFilters.inicio_mes ? `${comparisonFilters.inicio_anio}-${comparisonFilters.inicio_mes.toString().padStart(2, '0')}` : comparisonFilters.inicio_anio?.toString()}
+              fechaFin={comparisonFilters.fin_anio && comparisonFilters.fin_mes ? `${comparisonFilters.fin_anio}-${comparisonFilters.fin_mes.toString().padStart(2, '0')}` : comparisonFilters.fin_anio?.toString()}
+            />
         )}
       </div>
   );

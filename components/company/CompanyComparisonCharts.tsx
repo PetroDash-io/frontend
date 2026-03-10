@@ -5,10 +5,13 @@ import {colors, COMPANY_COLORS} from "@/utils/constants";
 import {Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis, Pie, PieChart, Cell} from "recharts";
 import {CompanyProductionData} from "@/app/types";
 import {convertValueToUnit} from "@/utils/units";
+import { exportToExcel, exportMultipleSheetsToExcel } from "@/utils/excel";
 
 interface CompanyComparisonChartsProps {
   companies: CompanyProductionData[];
   unit: string;
+  fechaInicio?: string;
+  fechaFin?: string;
 }
 
 const formatYAxis = (value: number) => {
@@ -31,12 +34,27 @@ interface ComparisonChartProps {
   title: string;
   data: Record<string, string | number>[];
   companies: CompanyProductionData[];
+  onDownload: () => void;
 }
 
-function ComparisonChart({ title, data, companies }: ComparisonChartProps) {
+function ComparisonChart({ title, data, companies, onDownload }: ComparisonChartProps) {
   return (
     <div style={styles.chartWrapper}>
-      <h3 style={styles.title}>{title}</h3>
+      <div style={styles.header}>
+        <h3 style={styles.title}>{title}</h3>
+        <button
+          onClick={onDownload}
+          style={styles.downloadButton}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = "#2F5A3F";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "#3F6B4F";
+          }}
+        >
+          📊 Excel
+        </button>
+      </div>
       <div style={{ height: 350 }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
@@ -65,7 +83,20 @@ function ComparisonChart({ title, data, companies }: ComparisonChartProps) {
 export function CompanyComparisonCharts({
   companies,
   unit,
+  fechaInicio,
+  fechaFin,
 }: CompanyComparisonChartsProps) {
+
+  const generateFileName = (prefix: string) => {
+    const today = new Date().toISOString().split('T')[0];
+    const companyNames = companies.map(c => c.company.replace(/[^a-zA-Z0-9]/g, '-')).join('-vs-');
+    let fileName = `${prefix}-${companyNames}`;
+    if (fechaInicio) fileName += `-desde-${fechaInicio}`;
+    if (fechaFin) fileName += `-hasta-${fechaFin}`;
+    fileName += `-${today}`;
+    return fileName;
+  };
+
   // Transformar los datos para agrupar por tipo de recurso
   const totalChartData = useMemo(() => {
     if (companies.length === 0) return [];
@@ -112,6 +143,29 @@ export function CompanyComparisonCharts({
       return dataPoint;
     });
   }, [companies, unit]);
+
+  // Funciones de descarga
+  const handleDownloadTotal = () => {
+    const formattedData = totalChartData.map(row => {
+      const formatted: Record<string, string | number> = { Recurso: row.name };
+      companies.forEach(company => {
+        formatted[company.company] = row[company.company] as number;
+      });
+      return formatted;
+    });
+    exportToExcel(formattedData, generateFileName('produccion-total-comparacion'), 'Total');
+  };
+
+  const handleDownloadAverage = () => {
+    const formattedData = avgChartData.map(row => {
+      const formatted: Record<string, string | number> = { Recurso: row.name };
+      companies.forEach(company => {
+        formatted[company.company] = row[company.company] as number;
+      });
+      return formatted;
+    });
+    exportToExcel(formattedData, generateFileName('produccion-promedio-comparacion'), 'Promedio');
+  };
 
   // Datos para los gráficos de torta (porcentajes)
   const pieChartsData = useMemo(() => {
@@ -179,11 +233,13 @@ export function CompanyComparisonCharts({
           title="Producción Total - Comparación"
           data={totalChartData}
           companies={companies}
+          onDownload={handleDownloadTotal}
         />
         <ComparisonChart
           title="Producción Promedio - Comparación"
           data={avgChartData}
           companies={companies}
+          onDownload={handleDownloadAverage}
         />
       </div>
 
@@ -222,11 +278,31 @@ const styles = {
     padding: 24,
     backgroundColor: "#fff",
   } as React.CSSProperties,
+  header: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  } as React.CSSProperties,
   title: {
     fontSize: 18,
     fontWeight: 600,
     color: colors.text,
     margin: 0,
+  } as React.CSSProperties,
+  downloadButton: {
+    backgroundColor: "#3F6B4F",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    padding: "8px 12px",
+    fontSize: "13px",
+    fontWeight: 600,
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    transition: "background-color 0.2s",
+    whiteSpace: "nowrap",
   } as React.CSSProperties,
   sectionTitle: {
     fontSize: 20,
