@@ -11,6 +11,7 @@ import {LoadingState} from "@/components/common/LoadingState";
 import {InlineMessage} from "@/components/common/InlineMessage";
 import {toast} from "react-toastify";
 import {WellFilters} from "@/app/types/wellFilters";
+import {WellAnomaliesPanel} from "@/components/map/WellAnomaliesPanel";
 
 type MapViewProps = {
   filters: WellFilters;
@@ -64,6 +65,10 @@ export function MapView({filters}: MapViewProps) {
         loadingWellProduction={loadingWellProduction}
         errorWellProduction={errorGettingWellProduction}
         onValidatedRangeChange={setValidatedDateRange}
+      />
+
+      <WellAnomaliesPanel
+        selectedWellId={selectedWellId}
       />
 
       {errorMessage && (
