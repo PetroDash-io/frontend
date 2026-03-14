@@ -4,7 +4,7 @@ import { LegendItem } from "@/components/map/LegendItem";
 import { getWellColor } from "@/utils/helpers";
 
 import Map, {Marker, Popup, Source, Layer} from "react-map-gl/mapbox";
-import type { HeatmapLayer } from "react-map-gl/mapbox";
+import type { HeatmapLayer } from "mapbox-gl";
 import type { GeoJSON } from "geojson";
 import React, {useState} from "react";
 
@@ -42,8 +42,8 @@ export function WellsMap({ wells, selectedWellId, onSelectWell, mapMode, heatmap
                 {mapMode === "heatmap" && heatmapData && (
                     <Source id="heatmap-source" type="geojson" data={heatmapData}>
                         <Layer
-                            id="heatmap-layer"
                             {...({
+                                id: "heatmap-layer",
                                 type: "heatmap",
                                 paint: {
                                     "heatmap-weight": [
@@ -73,7 +73,7 @@ export function WellsMap({ wells, selectedWellId, onSelectWell, mapMode, heatmap
                                     ],
                                     "heatmap-opacity": 0.85,
                                 },
-                            } as HeatmapLayer)}
+                            } as unknown as HeatmapLayer)}
                         />
                     </Source>
                 )}
