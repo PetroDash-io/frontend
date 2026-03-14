@@ -42,7 +42,7 @@ export const SelectFilter = ({
                     value={value}
                     onChange={onChange}
                     className="select-filter"
-                    style={hasError ? styles.selectError : undefined}
+                    style={{ ...styles.select, ...(hasError ? styles.selectError : {}) }}
                     disabled={disabled}>
                     <option value={""}>{defaultOptionLabel}</option>
                     {options.map(item => {
@@ -62,6 +62,8 @@ const styles = {
         display: "flex",
         flexDirection: "column",
         gap: 8,
+        minWidth: 220,
+        flex: 1,
     } as React.CSSProperties,
     label: {
         fontSize: 14,
@@ -72,13 +74,14 @@ const styles = {
         gap: 6,
     } as React.CSSProperties,
     select: {
-        padding: "8px 12px",
-        borderRadius: 8,
+        padding: "10px 14px",
+        borderRadius: 12,
         border: `1px solid ${colors.secondary}`,
         backgroundColor: "#fff",
         fontSize: 14,
         color: colors.text,
         cursor: "pointer",
+        minWidth: 200,
     } as React.CSSProperties,
     selectError: {
         borderColor: "#dc2626",
