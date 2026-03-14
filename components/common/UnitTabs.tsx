@@ -29,20 +29,24 @@ export const UnitTabs = ({onChange, currentUnit}: UnitTabsProps) => {
 const style = {
     buttonsContainer: {
         display: "flex",
-        gap: 12,
-        padding: "12px 24px",
+        gap: 6,
+        padding: "4px",
+        width: "fit-content",
+        border: "1px solid #d8cdbf",
+        borderRadius: 10,
+        backgroundColor: "#faf8f3",
     } as React.CSSProperties,
     buttonStyle(isActive: boolean): React.CSSProperties {
         return {
-            padding: "8px 16px",
+            padding: "6px 12px",
                 borderRadius: 8,
-                border: "1px solid #3F6B4F",
-                backgroundColor: isActive ? "#3F6B4F" : "transparent",
-                color: isActive ? "#F3EEE6" : "#3F6B4F",
-                fontSize: 14,
-                fontWeight: 500,
+                border: `1px solid ${isActive ? "#c9d8ce" : "transparent"}`,
+                backgroundColor: isActive ? "#e9f0eb" : "transparent",
+                color: isActive ? "#2f3e34" : "#4b2a1a",
+                fontSize: 13,
+                fontWeight: isActive ? 600 : 500,
                 cursor: "pointer",
-                transition: "all 0.2s ease",
+                transition: "background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease",
         }
     }
 };

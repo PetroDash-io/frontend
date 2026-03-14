@@ -1,114 +1,99 @@
-import React, {useMemo, useState} from "react";
-import {WellDetail} from "@/app/types";
-import {toNumber} from "@/utils/helpers";
-import {TimeSeriesChart} from "@/components/map/TimeSeriesChart";
+"use client";
+
+import React, {useEffect, useState} from "react";
 import {WellInfo} from "@/components/map/WellInfo";
 import {WellsMap} from "@/components/map/WellsMap";
-import {SELECT_DEFAULT_VALUE, SelectFilter} from "@/components/common/SelectFilter";
-import {LimitFilter} from "@/components/map/LimitFilter";
+import {EMPTY_VALIDATED_RANGE, ProductionPanel, ValidatedProductionDateRange} from "@/components/map/ProductionPanel";
 import {useWells} from "@/hooks/useWells";
 import {useWell} from "@/hooks/useWell";
 import {useWellsProduction} from "@/hooks/useWellProduction";
+import {LoadingState} from "@/components/common/LoadingState";
+import {InlineMessage} from "@/components/common/InlineMessage";
+import {toast} from "react-toastify";
+import {WellFilters} from "@/app/types/wellFilters";
 
-const DEFAULT_FILTERS = {
-    province: SELECT_DEFAULT_VALUE,
-    status: SELECT_DEFAULT_VALUE,
-    company: SELECT_DEFAULT_VALUE,
-    limit: 100,
-}
+type MapViewProps = {
+  filters: WellFilters;
+};
 
-export function MapView() {
-    const [filters, setFilters] = useState(DEFAULT_FILTERS);
-    const {data: wells, loading: loadingWells, error: errorGettingWells} = useWells({filters});
-    const [selectedWellId, setSelectedWellId] = useState<string | null>(null);
-    const {data: selectedWellDetails, loading: loadingWell, error: errorGettingWellDetails} = useWell({wellId: selectedWellId});
-    const {data: wellProduction, loading: loadingWellProduction, error: errorGettingWellProduction} = useWellsProduction({wellId: selectedWellId});
+export function MapView({filters}: MapViewProps) {
+  const {data: wells, loading: loadingWells, error: errorGettingWells} = useWells({filters});
+  const [selectedWellId, setSelectedWellId] = useState<string | null>(null);
+  const [validatedDateRange, setValidatedDateRange] = useState<ValidatedProductionDateRange>(EMPTY_VALIDATED_RANGE);
 
-    // Cargar todos los pozos para obtener opciones de filtro
-    const {data: allWells} = useWells({filters: {...DEFAULT_FILTERS, limit: 10000}});
+  const handleSelectWell = (wellId: string) => {
+    setSelectedWellId(wellId);
+    setValidatedDateRange(EMPTY_VALIDATED_RANGE);
+  };
 
-    const provinceFilterOptions = useMemo(() => {
-        if (!allWells) return [];
-        return [...new Set(allWells.map((well) => well.province))].filter(Boolean);
-    }, [allWells]);
+  const {data: selectedWellDetails, loading: loadingWell, error: errorGettingWellDetails} =
+    useWell({wellId: selectedWellId});
 
-    const statusFilterOptions = useMemo(() => {
-        if (!allWells) return [];
-        return [...new Set(allWells.map((well) => well.status))].filter(Boolean);
-    }, [allWells]);
+  const {data: wellProduction, loading: loadingWellProduction, error: errorGettingWellProduction} =
+    useWellsProduction({wellId: selectedWellId, dateRange: validatedDateRange});
 
-    const companyFilterOptions = useMemo(() => {
-        if (!allWells) return [];
-        return [...new Set(allWells.map((well) => well.company))].filter(Boolean);
-    }, [allWells]);
+  const errorMessage =
+    errorGettingWells ||
+    errorGettingWellDetails ||
+    null;
 
-    const timeSeriesChartData = useMemo(() => {
-        if (!wellProduction || wellProduction.length === 0) return null;
+  useEffect(() => {
+    if (!errorMessage) return;
+    toast.error(errorMessage || "Unexpected error", {toastId: errorMessage || "Unexpected error"});
+  }, [errorMessage]);
 
-        return wellProduction
-            .slice()
-            .sort((a, b) => a.reported_period_date.localeCompare(b.reported_period_date))
-            .map((record) => ({
-                date: record.reported_period_date.slice(0, 7), // "YYYY-MM"
-                oil: toNumber(record.oil_production) ?? 0,
-                gas: toNumber(record.gas_production) ?? 0,
-                water: toNumber(record.water_production) ?? 0,
-            }));
-    }, [wellProduction]);
+  return (
+    <>
+      <div style={styles.wellDetailsContainer}>
+        <WellsMap
+          wells={wells || []}
+          selectedWellId={selectedWellId}
+          onSelectWell={handleSelectWell}
+        />
 
-    const updateFilters = (filterName: string, value: unknown) => {
-        setFilters((previousValues) => ({...previousValues, [filterName]: value}));
-    }
+        <WellInfo
+          wellInfo={selectedWellDetails}
+          loadingWell={loadingWell}
+        />
+      </div>
 
-    return (
-        <>
-            <div style={styles.filterPanel}>
-                <SelectFilter filterName="province" value={filters.province} onSelect={updateFilters} options={provinceFilterOptions}
-                              defaultOptionLabel="Todas las provincias"/>
-                <SelectFilter filterName="status" value={filters.status} onSelect={updateFilters} options={statusFilterOptions}
-                              defaultOptionLabel="Todos los estados"/>
-                <SelectFilter filterName="company" value={filters.company} onSelect={updateFilters} options={companyFilterOptions}
-                              defaultOptionLabel="Todas las empresas"/>
-                <LimitFilter filterName="limit" limit={filters.limit} onDefineLimit={updateFilters}/>
-            </div>
+      <ProductionPanel
+        key={selectedWellId ?? "none"}
+        selectedWellId={selectedWellId}
+        wellProduction={wellProduction}
+        loadingWellProduction={loadingWellProduction}
+        errorWellProduction={errorGettingWellProduction}
+        onValidatedRangeChange={setValidatedDateRange}
+      />
 
-            <div style={styles.wellDetailsContainer}>
-                <WellsMap wells={wells || []} selectedWellId={selectedWellId} onSelectWell={setSelectedWellId} />
-                <WellInfo wellInfo={selectedWellDetails} loadingWell={loadingWell}/>
-            </div>
+      {errorMessage && (
+        <div style={styles.errorMessageContainer}>
+          <InlineMessage
+            message={errorMessage || "Unexpected error"}
+            variant="error"
+          />
+        </div>
+      )}
 
-            {wellProduction && <TimeSeriesChart data={timeSeriesChartData}/>}
-
-            {errorGettingWells && (
-                <div style={styles.errorMessageContainer}>
-                    <p style={{ color: "#b91c1c" }}>Error: {errorGettingWells}</p>
-                </div>
-            )}
-
-            {loadingWells && (
-                <div style={styles.loadingContainer}>
-                    <p>Cargando pozos...</p>
-                </div>
-            )}
-        </>
-    )
+      {loadingWells && (
+        <div style={styles.loadingContainer}>
+          <LoadingState/>
+        </div>
+      )}
+    </>
+  );
 }
 
 const styles = {
-    filterPanel: {
-        display: "flex",
-        gap: 12,
-        padding: "12px 24px",
-    } as React.CSSProperties,
-    errorMessageContainer: {
-        display: "flex"
-    } as React.CSSProperties,
-    loadingContainer: {
-        display: "flex"
-    } as React.CSSProperties,
-    wellDetailsContainer: {
-        display: "flex",
-        flexDirection: "row",
-        height: 560
-    } as React.CSSProperties,
+  errorMessageContainer: {
+    display: "flex"
+  } as React.CSSProperties,
+  loadingContainer: {
+    display: "flex"
+  } as React.CSSProperties,
+  wellDetailsContainer: {
+    display: "flex",
+    flexDirection: "row",
+    height: 560
+  } as React.CSSProperties,
 } as const;
