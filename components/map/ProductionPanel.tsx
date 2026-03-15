@@ -78,21 +78,6 @@ export function ProductionPanel({
     onValidatedRangeChange(validatedDateRange);
   }, [validatedDateRange, onValidatedRangeChange]);
 
-  const hasValidatedRange = Boolean(
-    validatedDateRange.startYear ||
-      validatedDateRange.startMonth ||
-      validatedDateRange.endYear ||
-      validatedDateRange.endMonth
-  );
-
-  const hasNoProductionForWell =
-    Boolean(selectedWellId) &&
-    !loadingWellProduction &&
-    !errorWellProduction &&
-    !hasValidatedRange &&
-    Array.isArray(wellProduction) &&
-    wellProduction.length === 0;
-
   const timeSeriesChartData = useMemo(() => {
     if (!wellProduction || wellProduction.length === 0) return null;
 
@@ -138,7 +123,7 @@ export function ProductionPanel({
 
   return (
     <div style={styles.productionPanel}>
-      <h3 style={styles.productionPanelTitle}>Produccion mensual del pozo seleccionado</h3>
+      <h3 style={styles.productionPanelTitle}>Producción mensual del pozo {selectedWellId}</h3>
 
       {!selectedWellId && <InlineMessage message="Selecciona un pozo en el mapa para ver su serie de produccion." />}
 
@@ -149,7 +134,8 @@ export function ProductionPanel({
               value={chartDateInputs.startYear}
               onSelect={updateChartDateRange}
               filterName="startYear"
-              inputLabel="Ano inicio"
+              inputLabel="Año inicio"
+              defaultOptionLabel="Todos"
               options={YEARS}
               hasError={isStartRangeIncomplete}
             />
@@ -169,7 +155,8 @@ export function ProductionPanel({
               value={chartDateInputs.endYear}
               onSelect={updateChartDateRange}
               filterName="endYear"
-              inputLabel="Ano fin"
+              defaultOptionLabel="Todos"
+              inputLabel="Año fin"
               options={YEARS}
               hasError={isEndRangeIncomplete}
             />
@@ -209,11 +196,7 @@ export function ProductionPanel({
               <InlineMessage variant="error" message={errorWellProduction} />
             )}
 
-            {hasNoProductionForWell && (
-              <InlineMessage message="Este pozo no tiene produccion mensual registrada." />
-            )}
-
-            {!loadingWellProduction && !errorWellProduction && !hasNoProductionForWell && wellProduction && (
+            {!loadingWellProduction && !errorWellProduction && wellProduction && (
               <TimeSeriesChart data={timeSeriesChartData} />
             )}
           </div>

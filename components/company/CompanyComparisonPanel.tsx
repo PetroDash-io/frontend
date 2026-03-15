@@ -44,6 +44,7 @@ export function CompanyComparisonPanel({
           <SelectFilter value={filters.inicio_anio || ""}
                         onSelect={updateFilters}
                         filterName="inicio_anio"
+                        defaultOptionLabel="Todos"
                         inputLabel="Año de inicio"
                         options={YEARS}/>
 
@@ -58,6 +59,7 @@ export function CompanyComparisonPanel({
           <SelectFilter value={filters.fin_anio || ""}
                         onSelect={updateFilters}
                         filterName="fin_anio"
+                        defaultOptionLabel="Todos"
                         inputLabel="Año de fin"
                         options={YEARS}/>
 

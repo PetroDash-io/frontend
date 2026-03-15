@@ -18,7 +18,6 @@ interface FilterProps {
 }
 
 export const SELECT_DEFAULT_VALUE = "";
-const SELECT_DEFAULT_TEXT = "Seleccionar";
 
 export const SelectFilter = ({
                                  value,
@@ -26,7 +25,7 @@ export const SelectFilter = ({
                                  filterName,
                                  options,
                                  inputLabel,
-                                 defaultOptionLabel = SELECT_DEFAULT_TEXT,
+                                 defaultOptionLabel,
                                  disabled = false,
                                  hasError = false
                              }: FilterProps) => {
@@ -44,7 +43,7 @@ export const SelectFilter = ({
                     className="select-filter"
                     style={hasError ? styles.selectError : undefined}
                     disabled={disabled}>
-                    <option value={""}>{defaultOptionLabel}</option>
+                    {defaultOptionLabel ? <option value={""}>{defaultOptionLabel}</option> : null}
                     {options.map(item => {
                         if (typeof item === "object") {
                             return <option key={item.value} value={item.value}>{item.label}</option>

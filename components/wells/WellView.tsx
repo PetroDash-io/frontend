@@ -7,10 +7,12 @@ import {TableView} from "@/components/table/TableView";
 import {LimitFilter} from "@/components/map/LimitFilter";
 import {WellFilters} from "@/app/types/wellFilters";
 import {SELECT_DEFAULT_VALUE, SelectFilter} from "@/components/common/SelectFilter";
+import {WATERSHED_OPTIONS} from "@/utils/constants";
 import {useWells} from "@/hooks/useWells";
 
 
 const DEFAULT_FILTERS = {
+    watershed: "NEUQUINA",
     province: SELECT_DEFAULT_VALUE,
     status: SELECT_DEFAULT_VALUE,
     company: SELECT_DEFAULT_VALUE,
@@ -19,20 +21,13 @@ const DEFAULT_FILTERS = {
 
 
 export function WellView() {
-
-
-    const [filters, setFilters] = useState<WellFilters>({
-        province: "",
-        status: "",
-        company: "",
-        limit: 100
-    });
+    const [filters, setFilters] = useState<WellFilters>(DEFAULT_FILTERS);
   
     const updateFilters = (filterName: string, value: unknown) => {
         setFilters(prev => ({ ...prev, [filterName]: value }));
     };
 
-    const {data: allWells} = useWells({filters: {...DEFAULT_FILTERS, limit: 10000}});
+    const {data: allWells} = useWells({filters});
 
     const provinceFilterOptions = useMemo(() => {
         if (!allWells) return [];
@@ -54,6 +49,11 @@ export function WellView() {
       <div>
   
         <div style={{display:"flex", gap:12, padding:"12px 24px"}}>
+          <SelectFilter
+            filterName="watershed"
+            value={filters.watershed}
+            onSelect={updateFilters}
+            options={WATERSHED_OPTIONS}/>
           <SelectFilter
             filterName="province"
             value={filters.province}

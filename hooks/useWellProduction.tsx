@@ -70,7 +70,7 @@ export function useWellsProduction({wellId, dateRange}: useWellProductionParams)
                 );
 
                 if (!response.ok) {
-                    throw new Error(`Error al cargar los datos de production del pozo ${wellId}`);
+                    throw new Error(`No se pudieron cargar los datos de production del pozo ${wellId}`);
                 }
 
                 const json = await response.json();
