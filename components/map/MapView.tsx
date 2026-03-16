@@ -1,10 +1,9 @@
 "use client";
 
-import React, {useEffect, useMemo, useState} from "react";
-import {toNumber} from "@/utils/helpers";
-import {TimeSeriesChart} from "@/components/map/TimeSeriesChart";
+import React, {useEffect, useState} from "react";
 import {WellInfo} from "@/components/map/WellInfo";
 import {WellsMap} from "@/components/map/WellsMap";
+import {EMPTY_VALIDATED_RANGE, ProductionPanel, ValidatedProductionDateRange} from "@/components/map/ProductionPanel";
 import {useWells} from "@/hooks/useWells";
 import {useWell} from "@/hooks/useWell";
 import {useWellsProduction} from "@/hooks/useWellProduction";
@@ -14,6 +13,7 @@ import {LoadingState} from "@/components/common/LoadingState";
 import {InlineMessage} from "@/components/common/InlineMessage";
 import {toast} from "react-toastify";
 import {WellFilters} from "@/app/types/wellFilters";
+import {WellAnomaliesPanel} from "@/components/map/anomalies/WellAnomaliesPanel";
 import {colors} from "@/utils/constants";
 
 export type MapViewMode = "pozos" | "heatmap";
@@ -30,38 +30,28 @@ export function MapView({filters, mode, heatmapResource, onSelectHeatmapResource
 
   const [selectedWellId, setSelectedWellId] = useState<string | null>(null);
 
+  const [validatedDateRange, setValidatedDateRange] = useState<ValidatedProductionDateRange>(EMPTY_VALIDATED_RANGE);
+
+  const handleSelectWell = (wellId: string) => {
+    setSelectedWellId(wellId);
+    setValidatedDateRange(EMPTY_VALIDATED_RANGE);
+  };
+
   const {data: selectedWellDetails, loading: loadingWell, error: errorGettingWellDetails} =
       useWell({wellId: selectedWellId});
 
   const {data: wellProduction, loading: loadingWellProduction, error: errorGettingWellProduction} =
-      useWellsProduction({wellId: selectedWellId});
+      useWellsProduction({wellId: selectedWellId, dateRange: validatedDateRange});
 
   const errorMessage =
       errorGettingWells ||
       errorGettingWellDetails ||
-      errorGettingWellProduction ||
       null;
 
   useEffect(() => {
     if (!errorMessage) return;
     toast.error(errorMessage || "Unexpected error", {toastId: errorMessage || "Unexpected error"});
   }, [errorMessage]);
-
-  const timeSeriesChartData = useMemo(() => {
-    if (!wellProduction || wellProduction.length === 0) return null;
-
-    return wellProduction
-        .slice()
-        .sort((a, b) =>
-            a.reported_period_date.localeCompare(b.reported_period_date)
-        )
-        .map((record) => ({
-          date: record.reported_period_date.slice(0, 7),
-          oil: toNumber(record.oil_production) ?? 0,
-          gas: toNumber(record.gas_production) ?? 0,
-          water: toNumber(record.water_production) ?? 0,
-        }));
-  }, [wellProduction]);
 
   const {geojsonData: heatmapData, maxValue: heatmapMaxValue} = useWellsHeatmap({
     resource: heatmapResource,
@@ -96,27 +86,29 @@ export function MapView({filters, mode, heatmapResource, onSelectHeatmapResource
           <WellsMap
               wells={wells || []}
               selectedWellId={selectedWellId}
-              onSelectWell={setSelectedWellId}
+              onSelectWell={handleSelectWell}
               mapMode={mode === "pozos" ? "markers" : "heatmap"}
               heatmapData={heatmapData}
               heatmapMaxValue={heatmapMaxValue}
           />
-
           <WellInfo
               wellInfo={selectedWellDetails}
               loadingWell={loadingWell}
           />
         </div>
 
-        {loadingWellProduction && selectedWellId && (
-            <div style={styles.loadingContainer}>
-              <LoadingState/>
-            </div>
-        )}
+        <ProductionPanel
+          key={selectedWellId ?? "none"}
+          selectedWellId={selectedWellId}
+          wellProduction={wellProduction}
+          loadingWellProduction={loadingWellProduction}
+          errorWellProduction={errorGettingWellProduction}
+          onValidatedRangeChange={setValidatedDateRange}
+        />
 
-        {wellProduction && (
-            <TimeSeriesChart data={timeSeriesChartData}/>
-        )}
+        <WellAnomaliesPanel
+          selectedWellId={selectedWellId}
+        />
 
         {errorMessage && (
             <div style={styles.errorMessageContainer}>
@@ -135,7 +127,6 @@ export function MapView({filters, mode, heatmapResource, onSelectHeatmapResource
       </>
   );
 }
-
 
 const RESOURCE_COLORS: Record<string, string> = {
     oil: colors.oil,

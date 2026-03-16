@@ -1,18 +1,20 @@
 import React, {useEffect, useMemo, useRef, useState} from "react";
-import {MONTHS, YEARS} from "@/utils/constants";
 import {toNumber} from "@/utils/helpers";
 import {ProductionMonthly} from "@/app/types";
-import {SelectFilter} from "@/components/common/SelectFilter";
 import {InlineMessage} from "@/components/common/InlineMessage";
 import {LoadingState} from "@/components/common/LoadingState";
 import {TimeSeriesChart} from "@/components/map/TimeSeriesChart";
+import {DateRangeFilters} from "@/components/map/DateRangeFilters";
+import {
+  applyDateRangeInputChange,
+  DateRangeValue,
+  EMPTY_DATE_RANGE,
+  getDateRangeCompleteness,
+  getDateRangeWarningMessage,
+  getValidatedDateRange,
+} from "@/utils/dateRange";
 
-export interface ValidatedProductionDateRange {
-  startYear: string;
-  startMonth: string;
-  endYear: string;
-  endMonth: string;
-}
+export type ValidatedProductionDateRange = DateRangeValue;
 
 interface ProductionPanelProps {
   selectedWellId: string | null;
@@ -22,26 +24,7 @@ interface ProductionPanelProps {
   onValidatedRangeChange: (range: ValidatedProductionDateRange) => void;
 }
 
-export const EMPTY_VALIDATED_RANGE: ValidatedProductionDateRange = {
-  startYear: "",
-  startMonth: "",
-  endYear: "",
-  endMonth: "",
-};
-
-const getValidatedRange = (inputs: ValidatedProductionDateRange): ValidatedProductionDateRange => {
-  const hasStartYear = Boolean(inputs.startYear);
-  const hasStartMonth = Boolean(inputs.startMonth);
-  const hasEndYear = Boolean(inputs.endYear);
-  const hasEndMonth = Boolean(inputs.endMonth);
-
-  return {
-    startYear: hasStartYear && hasStartMonth ? inputs.startYear : "",
-    startMonth: hasStartYear && hasStartMonth ? inputs.startMonth : "",
-    endYear: hasEndYear && hasEndMonth ? inputs.endYear : "",
-    endMonth: hasEndYear && hasEndMonth ? inputs.endMonth : "",
-  };
-};
+export const EMPTY_VALIDATED_RANGE: ValidatedProductionDateRange = EMPTY_DATE_RANGE;
 
 export function ProductionPanel({
   selectedWellId,
@@ -53,15 +36,12 @@ export function ProductionPanel({
   const [chartDateInputs, setChartDateInputs] = useState<ValidatedProductionDateRange>(EMPTY_VALIDATED_RANGE);
   const lastEmittedRangeRef = useRef<ValidatedProductionDateRange | null>(null);
 
-  const hasStartYear = Boolean(chartDateInputs.startYear);
-  const hasStartMonth = Boolean(chartDateInputs.startMonth);
-  const hasEndYear = Boolean(chartDateInputs.endYear);
-  const hasEndMonth = Boolean(chartDateInputs.endMonth);
+  const {isStartRangeIncomplete, isEndRangeIncomplete} = useMemo(
+    () => getDateRangeCompleteness(chartDateInputs),
+    [chartDateInputs]
+  );
 
-  const isStartRangeIncomplete = hasStartYear !== hasStartMonth;
-  const isEndRangeIncomplete = hasEndYear !== hasEndMonth;
-
-  const validatedDateRange = useMemo(() => getValidatedRange(chartDateInputs), [chartDateInputs]);
+  const validatedDateRange = useMemo(() => getValidatedDateRange(chartDateInputs), [chartDateInputs]);
 
   useEffect(() => {
     const previousRange = lastEmittedRangeRef.current;
@@ -93,32 +73,9 @@ export function ProductionPanel({
   }, [wellProduction]);
 
   const updateChartDateRange = (filterName: string, value: unknown) => {
-    const selectedValue = String(value ?? "");
-
-    setChartDateInputs((previousValues) => {
-      let nextValues: ValidatedProductionDateRange;
-
-      if (filterName === "startYear" && !selectedValue) {
-        nextValues = {
-          ...previousValues,
-          startYear: "",
-          startMonth: "",
-        };
-      } else if (filterName === "endYear" && !selectedValue) {
-        nextValues = {
-          ...previousValues,
-          endYear: "",
-          endMonth: "",
-        };
-      } else {
-        nextValues = {
-          ...previousValues,
-          [filterName]: selectedValue,
-        };
-      }
-
-      return nextValues;
-    });
+    setChartDateInputs((previousValues) =>
+      applyDateRangeInputChange(previousValues, filterName, value)
+    );
   };
 
   return (
@@ -130,58 +87,18 @@ export function ProductionPanel({
       {selectedWellId && (
         <>
           <div style={styles.chartFiltersContainer}>
-            <SelectFilter
-              value={chartDateInputs.startYear}
-              onSelect={updateChartDateRange}
-              filterName="startYear"
-              inputLabel="Año inicio"
-              defaultOptionLabel="Todos"
-              options={YEARS}
-              hasError={isStartRangeIncomplete}
-            />
-
-            <SelectFilter
-              value={chartDateInputs.startMonth}
-              onSelect={updateChartDateRange}
-              filterName="startMonth"
-              disabled={!chartDateInputs.startYear}
-              defaultOptionLabel="Todos"
-              inputLabel="Mes inicio"
-              options={MONTHS}
-              hasError={isStartRangeIncomplete}
-            />
-
-            <SelectFilter
-              value={chartDateInputs.endYear}
-              onSelect={updateChartDateRange}
-              filterName="endYear"
-              defaultOptionLabel="Todos"
-              inputLabel="Año fin"
-              options={YEARS}
-              hasError={isEndRangeIncomplete}
-            />
-
-            <SelectFilter
-              value={chartDateInputs.endMonth}
-              onSelect={updateChartDateRange}
-              filterName="endMonth"
-              disabled={!chartDateInputs.endYear}
-              defaultOptionLabel="Todos"
-              inputLabel="Mes fin"
-              options={MONTHS}
-              hasError={isEndRangeIncomplete}
+            <DateRangeFilters
+              value={chartDateInputs}
+              onChange={updateChartDateRange}
+              isStartRangeIncomplete={isStartRangeIncomplete}
+              isEndRangeIncomplete={isEndRangeIncomplete}
             />
           </div>
 
           {(isStartRangeIncomplete || isEndRangeIncomplete) && (
             <InlineMessage
               variant="warning"
-              message={[
-                isStartRangeIncomplete ? "Fecha de inicio incompleta (falta año o mes)." : "",
-                isEndRangeIncomplete ? "Fecha de fin incompleta (falta año o mes)." : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
+              message={getDateRangeWarningMessage(isStartRangeIncomplete, isEndRangeIncomplete)}
             />
           )}
 
