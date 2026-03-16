@@ -116,6 +116,7 @@ export function CompanyView() {
             <SelectFilter value={filters.inicio_anio || ""}
                           onSelect={updateProductionFilters}
                           filterName="inicio_anio"
+                          defaultOptionLabel="Todos"
                           inputLabel="Año de inicio"
                           options={YEARS}/>
 
@@ -130,6 +131,7 @@ export function CompanyView() {
             <SelectFilter value={filters.fin_anio || ""}
                           onSelect={updateProductionFilters}
                           filterName="fin_anio"
+                          defaultOptionLabel="Todos"
                           inputLabel="Año de fin"
                           options={YEARS}/>
 

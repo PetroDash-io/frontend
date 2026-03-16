@@ -6,9 +6,11 @@ import {TableView} from "@/components/table/TableView";
 import {LimitFilter} from "@/components/map/LimitFilter";
 import {WellFilters} from "@/app/types/wellFilters";
 import {SELECT_DEFAULT_VALUE, SelectFilter} from "@/components/common/SelectFilter";
+import {WATERSHED_OPTIONS} from "@/utils/constants";
 import {useWells} from "@/hooks/useWells";
 
 const DEFAULT_FILTERS = {
+    watershed: "NEUQUINA",
     province: SELECT_DEFAULT_VALUE,
     status: SELECT_DEFAULT_VALUE,
     company: SELECT_DEFAULT_VALUE,
@@ -16,21 +18,16 @@ const DEFAULT_FILTERS = {
 };
 
 export function WellView() {
-  const [filters, setFilters] = useState<WellFilters>({
-    province: "",
-    status: "",
-    company: "",
-    limit: 100,
-  });
-  const [view, setView] = useState<"map" | "table">("map");
-  const [dataMode, setDataMode] = useState<"pozos" | "heatmap">("pozos");
-  const [heatmapResource, setHeatmapResource] = useState<"oil" | "gas" | "water">("oil");
+    const [filters, setFilters] = useState<WellFilters>(DEFAULT_FILTERS);
+  
+    const updateFilters = (filterName: string, value: unknown) => {
+        setFilters(prev => ({ ...prev, [filterName]: value }));
+    };
 
-  const updateFilters = (filterName: string, value: unknown) => {
-    setFilters((prev) => ({ ...prev, [filterName]: value }));
-  };
-
-  const { data: allWells } = useWells({ filters: { ...DEFAULT_FILTERS, limit: 10000 } });
+    const [view, setView] = useState<"map" | "table">("map");
+    const [dataMode, setDataMode] = useState<"pozos" | "heatmap">("pozos");
+    const [heatmapResource, setHeatmapResource] = useState<"oil" | "gas" | "water">("oil");
+    const {data: allWells} = useWells({filters});
 
   const provinceFilterOptions = useMemo(() => {
     if (!allWells) return [];
@@ -48,52 +45,60 @@ export function WellView() {
   }, [allWells]);
 
   return (
-    <div>
+    <div style={styles.viewShell}>
       <div style={styles.filterPanel}>
         <SelectFilter
-          filterName="province"
-          value={filters.province}
+          filterName="watershed"
+          value={filters.watershed}
           onSelect={updateFilters}
-          options={provinceFilterOptions}
-          defaultOptionLabel="Todas las provincias"
-        />
+          options={WATERSHED_OPTIONS}/>
+          <SelectFilter
+            filterName="province"
+            value={filters.province}
+            onSelect={updateFilters}
+            options={provinceFilterOptions}
+            defaultOptionLabel="Todas las provincias"
+          />
 
-        <SelectFilter
-          filterName="status"
-          value={filters.status}
-          onSelect={updateFilters}
-          options={statusFilterOptions}
-          defaultOptionLabel="Todos los estados"
-        />
+          <SelectFilter
+            filterName="status"
+            value={filters.status}
+            onSelect={updateFilters}
+            options={statusFilterOptions}
+            defaultOptionLabel="Todos los estados"
+          />
 
-        <SelectFilter
-          filterName="company"
-          value={filters.company}
-          onSelect={updateFilters}
-          options={companyFilterOptions}
-          defaultOptionLabel="Todas las empresas"
-        />
+          <SelectFilter
+            filterName="company"
+            value={filters.company}
+            onSelect={updateFilters}
+            options={companyFilterOptions}
+            defaultOptionLabel="Todas las empresas"
+          />
 
-        <LimitFilter filterName="limit" limit={filters.limit} onDefineLimit={updateFilters} />
+          <LimitFilter
+            filterName="limit"
+            limit={filters.limit}
+            onDefineLimit={updateFilters}/>
       </div>
 
-      <div style={styles.tabBar}>
-        <button
-          style={styles.tabBtn(view === "map")}
-          onClick={() => setView("map")}
-        >
-          Mapa
-        </button>
-        <button
-          style={styles.tabBtn(view === "table")}
-          onClick={() => setView("table")}
-        >
-          Tabla
-        </button>
-      </div>
+      <div style={styles.controlsBar}>
+        <div style={styles.tabBar}>
+          <button
+            style={styles.tabBtn(view === "map")}
+            onClick={() => setView("map")}
+          >
+            Mapa
+          </button>
+          <button
+            style={styles.tabBtn(view === "table")}
+            onClick={() => setView("table")}
+          >
+            Tabla
+          </button>
+        </div>
 
-      {view === "map" && (
-        <>
+        {view === "map" && (
           <div style={styles.modeBar}>
             <button
               style={styles.modeBtn(dataMode === "pozos")}
@@ -108,7 +113,11 @@ export function WellView() {
               Heatmap
             </button>
           </div>
+        )}
+      </div>
 
+      {view === "map" && (
+        <>
           <MapView
             filters={filters}
             mode={dataMode}
@@ -125,22 +134,36 @@ export function WellView() {
 
 const styles = {
   filterPanel: {
-    display: "flex",
-    flexWrap: "wrap",
-    alignItems: "center",
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+    alignItems: "end",
     gap: 16,
-    padding: "16px 24px",
+    padding: "16px",
     marginBottom: 18,
     borderRadius: 14,
     border: "1px solid rgba(63, 107, 79, 0.18)",
     backgroundColor: "rgba(255,255,255,0.92)",
     boxShadow: "0 10px 22px rgba(0,0,0,0.05)",
   } as React.CSSProperties,
+  viewShell: {
+    width: "100%",
+    maxWidth: 1480,
+    margin: "0 auto",
+  } as React.CSSProperties,
   tabBar: {
     display: "flex",
+    alignItems: "center",
     gap: 18,
+    marginTop: 0,
+  } as React.CSSProperties,
+  controlsBar: {
+    display: "flex",
+    alignItems: "center",
     justifyContent: "center",
+    gap: 18,
+    flexWrap: "wrap",
     marginTop: 8,
+    marginBottom: 8,
   } as React.CSSProperties,
   tabBtn: (active: boolean) => ({
     padding: "12px 22px",
@@ -156,9 +179,9 @@ const styles = {
   }) as React.CSSProperties,
   modeBar: {
     display: "flex",
+    alignItems: "center",
     gap: 16,
-    justifyContent: "center",
-    marginTop: 16,
+    marginTop: 0,
   } as React.CSSProperties,
   modeBtn: (active: boolean) => ({
     padding: "10px 18px",

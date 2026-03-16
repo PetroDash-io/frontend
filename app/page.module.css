@@ -134,8 +134,16 @@
   min-width: 0;
   background: #f3eee6;
   min-height: calc(100vh - 64px);
-  overflow-y: auto;
   padding-top: 24px;
+  transition: margin-left 0.25s ease;
+}
+
+.contentAreaExpanded {
+  margin-left: 248px;
+}
+
+.contentAreaCollapsed {
+  margin-left: 60px;
 }
 
 .drawerBackdrop {
@@ -188,4 +196,19 @@
     transform: translateX(0);
   }
 
+  .contentAreaExpanded,
+  .contentAreaCollapsed {
+    margin-left: 0;
+  }
+
+  .contentArea {
+    padding-top: 16px;
+  }
+
+}
+
+@media (max-width: 1280px) {
+  .contentArea {
+    padding-top: 16px;
+  }
 }

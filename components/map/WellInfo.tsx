@@ -46,13 +46,13 @@ export function WellInfo({wellInfo, loadingWell}: WellInfoProps) {
 
 const styles = {
     infoContainer: {
-        flex: 1,
+        height: "100%",
         borderRadius: 14,
         border: `1px solid ${colors.panelBorder}`,
-        marginTop: 60,
         padding: 18,
         backgroundColor: colors.panel,
-        color: colors.textLight
+        color: colors.textLight,
+        overflowY: "auto",
     } as React.CSSProperties,
     sidePanelHint: {
         opacity: 0.8,
