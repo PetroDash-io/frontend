@@ -11,7 +11,12 @@ import {ProductionResource} from "@/app/types/anomalies";
 import {useWellsProduction} from "@/hooks/useWellProduction";
 import {AnomalyChartPoint, WellAnomaliesChart} from "@/components/map/WellAnomaliesChart";
 import {DateRangeFilters} from "@/components/map/DateRangeFilters";
-import {DateRangeValue, getValidatedDateRange} from "@/utils/dateRange";
+import {
+  applyDateRangeInputChange,
+  DateRangeValue,
+  getDateRangeCompleteness,
+  getValidatedDateRange,
+} from "@/utils/dateRange";
 
 interface WellAnomaliesPanelProps {
   selectedWellId: string | null;
@@ -48,13 +53,10 @@ export function WellAnomaliesPanel({
   const [chartDateInputs, setChartDateInputs] = useState<ValidatedAnomalyDateRange>(EMPTY_DATE_RANGE);
   const {unit, setUnit} = useUnit();
   const validatedDateRange = useMemo(() => getValidatedDateRange(chartDateInputs), [chartDateInputs]);
-
-  const hasStartYear = Boolean(chartDateInputs.startYear);
-  const hasStartMonth = Boolean(chartDateInputs.startMonth);
-  const hasEndYear = Boolean(chartDateInputs.endYear);
-  const hasEndMonth = Boolean(chartDateInputs.endMonth);
-  const isStartRangeIncomplete = hasStartYear !== hasStartMonth;
-  const isEndRangeIncomplete = hasEndYear !== hasEndMonth;
+  const {isStartRangeIncomplete, isEndRangeIncomplete} = useMemo(
+    () => getDateRangeCompleteness(chartDateInputs),
+    [chartDateInputs]
+  );
 
   const {
     data: anomalyProduction,
@@ -123,30 +125,9 @@ export function WellAnomaliesPanel({
   };
 
   const updateChartDateRange = (filterName: string, value: unknown) => {
-    const selectedValue = String(value ?? "");
-
-    setChartDateInputs((previousValues) => {
-      if (filterName === "startYear" && !selectedValue) {
-        return {
-          ...previousValues,
-          startYear: "",
-          startMonth: "",
-        };
-      }
-
-      if (filterName === "endYear" && !selectedValue) {
-        return {
-          ...previousValues,
-          endYear: "",
-          endMonth: "",
-        };
-      }
-
-      return {
-        ...previousValues,
-        [filterName]: selectedValue,
-      };
-    });
+    setChartDateInputs((previousValues) =>
+      applyDateRangeInputChange(previousValues, filterName, value)
+    );
   };
 
   const selectedResourceLabel = PRODUCTION_TYPES[selectedResource].label;

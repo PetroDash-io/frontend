@@ -5,7 +5,13 @@ import {InlineMessage} from "@/components/common/InlineMessage";
 import {LoadingState} from "@/components/common/LoadingState";
 import {TimeSeriesChart} from "@/components/map/TimeSeriesChart";
 import {DateRangeFilters} from "@/components/map/DateRangeFilters";
-import {DateRangeValue, EMPTY_DATE_RANGE, getValidatedDateRange} from "@/utils/dateRange";
+import {
+  applyDateRangeInputChange,
+  DateRangeValue,
+  EMPTY_DATE_RANGE,
+  getDateRangeCompleteness,
+  getValidatedDateRange,
+} from "@/utils/dateRange";
 
 export type ValidatedProductionDateRange = DateRangeValue;
 
@@ -29,13 +35,10 @@ export function ProductionPanel({
   const [chartDateInputs, setChartDateInputs] = useState<ValidatedProductionDateRange>(EMPTY_VALIDATED_RANGE);
   const lastEmittedRangeRef = useRef<ValidatedProductionDateRange | null>(null);
 
-  const hasStartYear = Boolean(chartDateInputs.startYear);
-  const hasStartMonth = Boolean(chartDateInputs.startMonth);
-  const hasEndYear = Boolean(chartDateInputs.endYear);
-  const hasEndMonth = Boolean(chartDateInputs.endMonth);
-
-  const isStartRangeIncomplete = hasStartYear !== hasStartMonth;
-  const isEndRangeIncomplete = hasEndYear !== hasEndMonth;
+  const {isStartRangeIncomplete, isEndRangeIncomplete} = useMemo(
+    () => getDateRangeCompleteness(chartDateInputs),
+    [chartDateInputs]
+  );
 
   const validatedDateRange = useMemo(() => getValidatedDateRange(chartDateInputs), [chartDateInputs]);
 
@@ -84,32 +87,9 @@ export function ProductionPanel({
   }, [wellProduction]);
 
   const updateChartDateRange = (filterName: string, value: unknown) => {
-    const selectedValue = String(value ?? "");
-
-    setChartDateInputs((previousValues) => {
-      let nextValues: ValidatedProductionDateRange;
-
-      if (filterName === "startYear" && !selectedValue) {
-        nextValues = {
-          ...previousValues,
-          startYear: "",
-          startMonth: "",
-        };
-      } else if (filterName === "endYear" && !selectedValue) {
-        nextValues = {
-          ...previousValues,
-          endYear: "",
-          endMonth: "",
-        };
-      } else {
-        nextValues = {
-          ...previousValues,
-          [filterName]: selectedValue,
-        };
-      }
-
-      return nextValues;
-    });
+    setChartDateInputs((previousValues) =>
+      applyDateRangeInputChange(previousValues, filterName, value)
+    );
   };
 
   return (

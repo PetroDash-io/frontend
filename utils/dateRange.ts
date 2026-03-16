@@ -25,3 +25,49 @@ export const getValidatedDateRange = (inputs: DateRangeValue): DateRangeValue =>
     endMonth: hasEndYear && hasEndMonth ? inputs.endMonth : "",
   };
 };
+
+export interface DateRangeCompleteness {
+  isStartRangeIncomplete: boolean;
+  isEndRangeIncomplete: boolean;
+}
+
+export const getDateRangeCompleteness = (inputs: DateRangeValue): DateRangeCompleteness => {
+  const hasStartYear = Boolean(inputs.startYear);
+  const hasStartMonth = Boolean(inputs.startMonth);
+  const hasEndYear = Boolean(inputs.endYear);
+  const hasEndMonth = Boolean(inputs.endMonth);
+
+  return {
+    isStartRangeIncomplete: hasStartYear !== hasStartMonth,
+    isEndRangeIncomplete: hasEndYear !== hasEndMonth,
+  };
+};
+
+export const applyDateRangeInputChange = (
+  previousValues: DateRangeValue,
+  filterName: string,
+  value: unknown
+): DateRangeValue => {
+  const selectedValue = String(value ?? "");
+
+  if (filterName === "startYear" && !selectedValue) {
+    return {
+      ...previousValues,
+      startYear: "",
+      startMonth: "",
+    };
+  }
+
+  if (filterName === "endYear" && !selectedValue) {
+    return {
+      ...previousValues,
+      endYear: "",
+      endMonth: "",
+    };
+  }
+
+  return {
+    ...previousValues,
+    [filterName]: selectedValue,
+  };
+};
