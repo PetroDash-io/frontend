@@ -131,8 +131,7 @@ export default function Home() {
                     </aside>
 
                     <div
-                        className={`${styles.contentArea} ${isDrawerOpen ? styles.contentAreaExpanded : styles.contentAreaCollapsed}`}
-                    >
+                        className={`${styles.contentArea} ${isDrawerOpen ? styles.contentAreaExpanded : styles.contentAreaCollapsed}`}>
                         <TabContent value="Well">
                             <WellView/>
                         </TabContent>
