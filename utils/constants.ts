@@ -188,5 +188,15 @@ export const AREAS_POR_PROVINCIA: Record<string, Array<{ value: string; label: s
   ],
 };
 
+export const WATERSHED_OPTIONS= [
+  {value: "GOLFO SAN JORGE", label: "Golfo de San Jorge"},
+  {value: "NEUQUINA", label: "Neuquina"},
+  {value: "CUYANA", label: "Cuyana"},
+  {value: "AUSTRAL", label: "Austral"},
+  {value: "NOROESTE", label: "Noroeste"},
+  {value: "NORESTE", label: "Noreste"},
+  {value: "ÑIRIHUAU", label: "Ñirihuau"},
+  {value: "CAÑADON ASFALTO", label: "Cañadón asfalto"}
+]
 
 

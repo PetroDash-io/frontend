@@ -3,16 +3,21 @@ import { ActiveWell, WellDetail } from "@/app/types";
 import { LegendItem } from "@/components/map/LegendItem";
 import { getWellColor } from "@/utils/helpers";
 
-import Map, {Marker, Popup} from "react-map-gl/mapbox";
+import Map, {Marker, Popup, Source, Layer} from "react-map-gl/mapbox";
+import type { HeatmapLayer } from "mapbox-gl";
+import type { GeoJSON } from "geojson";
 import React, {useState} from "react";
 
 interface WellsMapProps {
   wells: WellDetail[];
   selectedWellId: string | null;
   onSelectWell: (id: string) => void;
+  mapMode: "markers" | "heatmap";
+  heatmapData?: GeoJSON.FeatureCollection | null;
+  heatmapMaxValue?: number;
 }
 
-export function WellsMap({ wells, selectedWellId, onSelectWell }: WellsMapProps) {
+export function WellsMap({ wells, selectedWellId, onSelectWell, mapMode, heatmapData, heatmapMaxValue = 1 }: WellsMapProps) {
     const [focusedPozoId, setFocusedPozoId] = useState<string | null>(null);
     const [activePozo, setActivePozo] = useState<ActiveWell | null>(null);
 
@@ -32,7 +37,49 @@ export function WellsMap({ wells, selectedWellId, onSelectWell }: WellsMapProps)
                 style={styles.map}
                 mapStyle="mapbox://styles/mapbox/streets-v11"
                 mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}>
-                {wells.map((item) => {
+
+                {/* Heatmap layer */}
+                {mapMode === "heatmap" && heatmapData && (
+                    <Source id="heatmap-source" type="geojson" data={heatmapData}>
+                        <Layer
+                            {...({
+                                id: "heatmap-layer",
+                                type: "heatmap",
+                                paint: {
+                                    "heatmap-weight": [
+                                        "interpolate", ["linear"],
+                                        ["get", "value"],
+                                        0, 0,
+                                        heatmapMaxValue, 1,
+                                    ],
+                                    "heatmap-intensity": [
+                                        "interpolate", ["linear"], ["zoom"],
+                                        5, 1,
+                                        12, 4,
+                                    ],
+                                    "heatmap-color": [
+                                        "interpolate", ["linear"], ["heatmap-density"],
+                                        0,   "rgba(0,0,0,0)",
+                                        0.2, "#2c7bb6",
+                                        0.4, "#abd9e9",
+                                        0.6, "#ffffbf",
+                                        0.8, "#fdae61",
+                                        1,   "#d7191c",
+                                    ],
+                                    "heatmap-radius": [
+                                        "interpolate", ["linear"], ["zoom"],
+                                        5, 20,
+                                        12, 40,
+                                    ],
+                                    "heatmap-opacity": 0.85,
+                                },
+                            } as unknown as HeatmapLayer)}
+                        />
+                    </Source>
+                )}
+
+                {/* Markers layer */}
+                {mapMode === "markers" && wells.map((item) => {
                     if (!item.geojson) return null;
 
                     let lon: number, lat: number;
@@ -68,7 +115,7 @@ export function WellsMap({ wells, selectedWellId, onSelectWell }: WellsMapProps)
                     );
                 })}
 
-                {activePozo && (
+                {mapMode === "markers" && activePozo && (
                     <Popup
                         longitude={activePozo.lon}
                         latitude={activePozo.lat}
@@ -92,14 +139,14 @@ export function WellsMap({ wells, selectedWellId, onSelectWell }: WellsMapProps)
 
 const styles = {
     mapContainer: {
-        flex: 3,
-        minWidth: 340,
-        minHeight: 560,
+        minWidth: 0,
+        height: "100%",
         position: "relative",
     } as React.CSSProperties,
     legendBar: {
         position: "absolute",
         top: 12,
+        width: "30%",
         left: 12,
         zIndex: 10,
         display: "flex",
