@@ -26,11 +26,15 @@ interface WellAnomaliesPanelProps {
 
 type ValidatedAnomalyDateRange = DateRangeValue;
 
+const today = new Date();
+const DEFAULT_END_YEAR = String(today.getFullYear());
+const DEFAULT_END_MONTH = String(today.getMonth() + 1);
+
 const EMPTY_DATE_RANGE: ValidatedAnomalyDateRange = {
   startYear: "2023",
   startMonth: "1",
-  endYear: "2025",
-  endMonth: "6",
+  endYear: DEFAULT_END_YEAR,
+  endMonth: DEFAULT_END_MONTH,
 };
 
 export function WellAnomaliesPanel({
@@ -88,7 +92,7 @@ export function WellAnomaliesPanel({
 
   return (
     <div style={styles.panel}>
-      <h3 style={styles.title}>Anomalias de produccion del pozo seleccionado</h3>
+      <h3 style={styles.title}>Anomalias de produccion del pozo {selectedWellId} </h3>
 
       {!selectedWellId && <InlineMessage message="Selecciona un pozo para visualizar anomalias." />}
 
@@ -157,7 +161,7 @@ const styles = {
     border: `1px solid ${colors.panelBorder}`,
     borderRadius: 14,
     padding: 16,
-    backgroundColor: "#FAFAF9",
+    backgroundColor: colors.filtersBg,
     display: "flex",
     flexDirection: "column",
     gap: 12,
