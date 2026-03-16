@@ -47,9 +47,9 @@ export function WellInfo({wellInfo, loadingWell}: WellInfoProps) {
 const styles = {
     infoContainer: {
         flex: 1,
+        minWidth: 280,
         borderRadius: 14,
         border: `1px solid ${colors.panelBorder}`,
-        marginTop: 60,
         padding: 18,
         backgroundColor: colors.panel,
         color: colors.textLight

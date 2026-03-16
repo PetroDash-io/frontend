@@ -93,12 +93,13 @@ export function WellsMap({ wells, selectedWellId, onSelectWell }: WellsMapProps)
 const styles = {
     mapContainer: {
         flex: 3,
-        marginRight: 24
+        minWidth: 340,
+        minHeight: 560,
+        position: "relative",
     } as React.CSSProperties,
     legendBar: {
-        position: "relative",
-        top: "60px",
-        width: "30%",
+        position: "absolute",
+        top: 12,
         left: 12,
         zIndex: 10,
         display: "flex",
@@ -114,6 +115,7 @@ const styles = {
     } as React.CSSProperties,
     map: {
         width: "100%",
+        height: "100%",
         borderRadius: 14,
     } as React.CSSProperties,
     markerDot: (opts: {selected: boolean; status: string, focused: boolean}) => ({
