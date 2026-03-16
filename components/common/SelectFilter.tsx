@@ -14,10 +14,10 @@ interface FilterProps {
     inputLabel?: string
     defaultOptionLabel?: string;
     disabled?: boolean;
+    hasError?: boolean;
 }
 
 export const SELECT_DEFAULT_VALUE = "";
-const SELECT_DEFAULT_TEXT = "Seleccionar";
 
 export const SelectFilter = ({
                                  value,
@@ -25,8 +25,9 @@ export const SelectFilter = ({
                                  filterName,
                                  options,
                                  inputLabel,
-                                 defaultOptionLabel = SELECT_DEFAULT_TEXT,
-                                 disabled = false
+                                 defaultOptionLabel,
+                                 disabled = false,
+                                 hasError = false
                              }: FilterProps) => {
     const onChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         onSelect(filterName, event.target.value);
@@ -40,8 +41,9 @@ export const SelectFilter = ({
                     value={value}
                     onChange={onChange}
                     className="select-filter"
+                    style={{ ...styles.select, ...(hasError ? styles.selectError : {}) }}
                     disabled={disabled}>
-                    <option value={""}>{defaultOptionLabel}</option>
+                    {defaultOptionLabel ? <option value={""}>{defaultOptionLabel}</option> : null}
                     {options.map(item => {
                         if (typeof item === "object") {
                             return <option key={item.value} value={item.value}>{item.label}</option>
@@ -59,6 +61,8 @@ const styles = {
         display: "flex",
         flexDirection: "column",
         gap: 8,
+        minWidth: 220,
+        flex: 1,
     } as React.CSSProperties,
     label: {
         fontSize: 14,
@@ -69,12 +73,17 @@ const styles = {
         gap: 6,
     } as React.CSSProperties,
     select: {
-        padding: "8px 12px",
-        borderRadius: 8,
+        padding: "10px 14px",
+        borderRadius: 12,
         border: `1px solid ${colors.secondary}`,
         backgroundColor: "#fff",
         fontSize: 14,
         color: colors.text,
         cursor: "pointer",
+        minWidth: 200,
+    } as React.CSSProperties,
+    selectError: {
+        borderColor: "#dc2626",
+        boxShadow: "0 0 0 1px #dc2626",
     } as React.CSSProperties,
 }
