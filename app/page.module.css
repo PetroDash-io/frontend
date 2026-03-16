@@ -4,6 +4,10 @@
 }
 
 .header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 64px;
   display: flex;
   align-items: center;
@@ -11,6 +15,11 @@
   padding: 0 28px;
   background: #2f3e34;
   border-bottom: 1px solid #3f6b4f;
+  z-index: 50;
+}
+
+.pageShell {
+  padding-top: 64px;
 }
 
 .logo {
@@ -27,46 +36,126 @@
 }
 
 .menuButton {
-  display: none;
+  display: inline-flex;
   margin-left: auto;
-  border: 1px solid rgba(243, 238, 230, 0.4);
-  background: rgba(243, 238, 230, 0.08);
+  border: 1px solid rgba(243, 238, 230, 0.6);
+  background: rgba(243, 238, 230, 0.12);
   color: #f3eee6;
   border-radius: 6px;
   padding: 7px 12px;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
 .dashboardLayout {
-  position: relative;
   min-height: calc(100vh - 64px);
-  display: flex;
 }
 
 .drawer {
-  width: 248px;
-  flex-shrink: 0;
+  position: fixed;
+  top: 64px;
+  left: 0;
+  bottom: 0;
+  width: 60px;
   border-right: 1px solid #ddd2c2;
   background: #f7f3ec;
-  padding: 16px 12px;
+  padding: 16px 8px;
+  transition: width 0.25s ease;
+  z-index: 40;
+  box-shadow: 4px 0 18px rgba(20, 25, 19, 0.08);
+  overflow: hidden;
+}
+
+.drawerOpen {
+  width: 248px;
+}
+
+.drawerHeader {
+  display: flex;
+  justify-content: flex-end;
+  padding-bottom: 10px;
+}
+
+.drawerToggle {
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(47, 62, 52, 0.9);
+  color: #FFFFFF;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  transition: background 0.15s, transform 0.15s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+}
+
+.drawerToggle:hover {
+  background: rgba(47, 62, 52, 0.32);
+  transform: translateY(-1px);
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .drawerNav {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  margin-top: 10px;
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .contentArea {
-  flex: 1;
   min-width: 0;
   background: #f3eee6;
+  min-height: calc(100vh - 64px);
+  overflow-y: auto;
+  padding-top: 24px;
 }
 
 .drawerBackdrop {
   display: none;
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(18, 21, 15, 0.24);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  z-index: 30;
+}
+
+.drawerBackdropVisible {
+  display: block;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 @media (max-width: 1023px) {
@@ -86,7 +175,7 @@
 
   .drawer {
     position: fixed;
-    top: 64px;
+    top: 0;
     left: 0;
     bottom: 0;
     z-index: 40;
@@ -99,22 +188,4 @@
     transform: translateX(0);
   }
 
-  .drawerBackdrop {
-    display: block;
-    position: fixed;
-    top: 64px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(18, 21, 15, 0.24);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease;
-    z-index: 30;
-  }
-
-  .drawerBackdropVisible {
-    opacity: 1;
-    pointer-events: auto;
-  }
 }
