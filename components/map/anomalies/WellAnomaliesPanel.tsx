@@ -10,10 +10,13 @@ import {WellAnomaliesChart} from "@/components/map/anomalies/WellAnomaliesChart"
 import {DateRangeFilters} from "@/components/map/DateRangeFilters";
 import {ResourceSelector} from "@/components/map/anomalies/ResourceSelector";
 import {buildAnomalyChartData, getAnomalyDateSet} from "@/components/map/anomalies/data";
+import {getRangeLabel, getRequestedRangeWindow, getXAxisDomain} from "@/components/map/anomalies/range";
+import {AnomaliesSummaryChips} from "@/components/map/anomalies/AnomaliesSummaryChips";
 import {
   applyDateRangeInputChange,
   DateRangeValue,
   getDateRangeCompleteness,
+  getDateRangeWarningMessage,
   getValidatedDateRange,
 } from "@/utils/dateRange";
 
@@ -23,21 +26,12 @@ interface WellAnomaliesPanelProps {
 
 type ValidatedAnomalyDateRange = DateRangeValue;
 
-interface RangeWindow {
-  start: string;
-  end: string;
-}
-
 const EMPTY_DATE_RANGE: ValidatedAnomalyDateRange = {
   startYear: "2023",
   startMonth: "1",
   endYear: "2025",
   endMonth: "6",
 };
-
-const formatYearMonth = (year: string, month: string) => `${year}-${month.padStart(2, "0")}`;
-
-const toMonthTimestamp = (year: string, month: string) => new Date(Number(year), Number(month) - 1, 1).getTime();
 
 export function WellAnomaliesPanel({
   selectedWellId,
@@ -88,32 +82,9 @@ export function WellAnomaliesPanel({
 
   const selectedResourceLabel = PRODUCTION_TYPES[selectedResource].label;
   const selectedColor = PRODUCTION_TYPES[selectedResource].defaultColor;
-  const requestedRange = useMemo<RangeWindow | null>(() => {
-    const hasStart = Boolean(validatedDateRange.startYear && validatedDateRange.startMonth);
-    const hasEnd = Boolean(validatedDateRange.endYear && validatedDateRange.endMonth);
-
-    if (!hasStart || !hasEnd) return null;
-
-    return {
-      start: formatYearMonth(validatedDateRange.startYear, validatedDateRange.startMonth),
-      end: formatYearMonth(validatedDateRange.endYear, validatedDateRange.endMonth),
-    };
-  }, [validatedDateRange]);
-
-  const xAxisDomain = useMemo<[number | "dataMin", number | "dataMax"]>(() => {
-    if (!requestedRange) {
-      return ["dataMin", "dataMax"];
-    }
-
-    return [
-      toMonthTimestamp(validatedDateRange.startYear, validatedDateRange.startMonth),
-      toMonthTimestamp(validatedDateRange.endYear, validatedDateRange.endMonth),
-    ];
-  }, [requestedRange, validatedDateRange]);
-
-  const rangeLabel = requestedRange
-    ? `${requestedRange.start} - ${requestedRange.end}`
-    : "Rango completo";
+  const requestedRange = useMemo(() => getRequestedRangeWindow(validatedDateRange), [validatedDateRange]);
+  const xAxisDomain = useMemo(() => getXAxisDomain(validatedDateRange, requestedRange), [validatedDateRange, requestedRange]);
+  const rangeLabel = getRangeLabel(requestedRange);
 
   return (
     <div style={styles.panel}>
@@ -135,12 +106,7 @@ export function WellAnomaliesPanel({
           {(isStartRangeIncomplete || isEndRangeIncomplete) && (
             <InlineMessage
               variant="warning"
-              message={[
-                isStartRangeIncomplete ? "Fecha de inicio incompleta (falta ano o mes)." : "",
-                isEndRangeIncomplete ? "Fecha de fin incompleta (falta ano o mes)." : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
+              message={getDateRangeWarningMessage(isStartRangeIncomplete, isEndRangeIncomplete)}
             />
           )}
 
@@ -153,11 +119,7 @@ export function WellAnomaliesPanel({
             />
           </div>
 
-          <div style={styles.metaRow}>
-            <span style={styles.metaChip}>Serie: {chartData.length}</span>
-            <span style={styles.metaChip}>Ventana: {rangeLabel}</span>
-            <span style={styles.metaChipAlert}>Anomalias detectadas: {anomalyCount}</span>
-          </div>
+          <AnomaliesSummaryChips seriesCount={chartData.length} rangeLabel={rangeLabel} anomalyCount={anomalyCount} />
 
           <div style={styles.chartArea}>
             {loading && (
@@ -212,31 +174,6 @@ const styles = {
   } as React.CSSProperties,
   filtersRow: {
     display: "block",
-  } as React.CSSProperties,
-  metaRow: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: 8,
-  } as React.CSSProperties,
-  metaChip: {
-    display: "inline-flex",
-    alignItems: "center",
-    borderRadius: 999,
-    border: "1px solid #d8cdbf",
-    backgroundColor: "#f7f3ec",
-    color: "#4b2a1a",
-    fontSize: 12,
-    padding: "4px 10px",
-  } as React.CSSProperties,
-  metaChipAlert: {
-    display: "inline-flex",
-    alignItems: "center",
-    borderRadius: 999,
-    border: "1px solid #f0b6a8",
-    backgroundColor: "#fff3ee",
-    color: "#9f2f1f",
-    fontSize: 12,
-    padding: "4px 10px",
   } as React.CSSProperties,
   chartArea: {
     minHeight: 360,

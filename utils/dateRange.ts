@@ -71,3 +71,15 @@ export const applyDateRangeInputChange = (
     [filterName]: selectedValue,
   };
 };
+
+export const getDateRangeWarningMessage = (
+  isStartRangeIncomplete: boolean,
+  isEndRangeIncomplete: boolean
+) => {
+  return [
+    isStartRangeIncomplete ? "Fecha de inicio incompleta (falta ano o mes)." : "",
+    isEndRangeIncomplete ? "Fecha de fin incompleta (falta ano o mes)." : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+};

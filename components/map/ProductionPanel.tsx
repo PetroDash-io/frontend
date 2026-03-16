@@ -10,6 +10,7 @@ import {
   DateRangeValue,
   EMPTY_DATE_RANGE,
   getDateRangeCompleteness,
+  getDateRangeWarningMessage,
   getValidatedDateRange,
 } from "@/utils/dateRange";
 
@@ -112,12 +113,7 @@ export function ProductionPanel({
           {(isStartRangeIncomplete || isEndRangeIncomplete) && (
             <InlineMessage
               variant="warning"
-              message={[
-                isStartRangeIncomplete ? "Fecha de inicio incompleta (falta año o mes)." : "",
-                isEndRangeIncomplete ? "Fecha de fin incompleta (falta año o mes)." : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
+              message={getDateRangeWarningMessage(isStartRangeIncomplete, isEndRangeIncomplete)}
             />
           )}
 
