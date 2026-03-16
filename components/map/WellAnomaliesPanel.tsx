@@ -2,7 +2,7 @@ import React, {useMemo, useState} from "react";
 import {SelectFilter, SelectFilterOption} from "@/components/common/SelectFilter";
 import {InlineMessage} from "@/components/common/InlineMessage";
 import {LoadingState} from "@/components/common/LoadingState";
-import {colors, MONTHS, PRODUCTION_TYPES, YEARS} from "@/utils/constants";
+import {colors, PRODUCTION_TYPES} from "@/utils/constants";
 import {convertValueToUnit, UNITS} from "@/utils/units";
 import {useUnit} from "@/hooks/useUnit";
 import {useWellAnomalies} from "@/hooks/useWellAnomalies";
@@ -10,17 +10,14 @@ import {ProductionMonthly} from "@/app/types";
 import {ProductionResource} from "@/app/types/anomalies";
 import {useWellsProduction} from "@/hooks/useWellProduction";
 import {AnomalyChartPoint, WellAnomaliesChart} from "@/components/map/WellAnomaliesChart";
+import {DateRangeFilters} from "@/components/map/DateRangeFilters";
+import {DateRangeValue, getValidatedDateRange} from "@/utils/dateRange";
 
 interface WellAnomaliesPanelProps {
   selectedWellId: string | null;
 }
 
-interface ValidatedAnomalyDateRange {
-  startYear: string;
-  startMonth: string;
-  endYear: string;
-  endMonth: string;
-}
+type ValidatedAnomalyDateRange = DateRangeValue;
 
 interface RangeWindow {
   start: string;
@@ -40,20 +37,6 @@ const EMPTY_DATE_RANGE: ValidatedAnomalyDateRange = {
   endMonth: "6",
 };
 
-const getValidatedRange = (inputs: ValidatedAnomalyDateRange): ValidatedAnomalyDateRange => {
-  const hasStartYear = Boolean(inputs.startYear);
-  const hasStartMonth = Boolean(inputs.startMonth);
-  const hasEndYear = Boolean(inputs.endYear);
-  const hasEndMonth = Boolean(inputs.endMonth);
-
-  return {
-    startYear: hasStartYear && hasStartMonth ? inputs.startYear : "",
-    startMonth: hasStartYear && hasStartMonth ? inputs.startMonth : "",
-    endYear: hasEndYear && hasEndMonth ? inputs.endYear : "",
-    endMonth: hasEndYear && hasEndMonth ? inputs.endMonth : "",
-  };
-};
-
 const formatYearMonth = (year: string, month: string) => `${year}-${month.padStart(2, "0")}`;
 
 const toMonthTimestamp = (year: string, month: string) => new Date(Number(year), Number(month) - 1, 1).getTime();
@@ -64,7 +47,7 @@ export function WellAnomaliesPanel({
   const [selectedResource, setSelectedResource] = useState<ProductionResource>("oil");
   const [chartDateInputs, setChartDateInputs] = useState<ValidatedAnomalyDateRange>(EMPTY_DATE_RANGE);
   const {unit, setUnit} = useUnit();
-  const validatedDateRange = useMemo(() => getValidatedRange(chartDateInputs), [chartDateInputs]);
+  const validatedDateRange = useMemo(() => getValidatedDateRange(chartDateInputs), [chartDateInputs]);
 
   const hasStartYear = Boolean(chartDateInputs.startYear);
   const hasStartMonth = Boolean(chartDateInputs.startMonth);
@@ -204,44 +187,11 @@ export function WellAnomaliesPanel({
       {selectedWellId && (
         <>
           <div style={styles.dateFiltersContainer}>
-            <SelectFilter
-              value={chartDateInputs.startYear}
-              onSelect={updateChartDateRange}
-              filterName="startYear"
-              inputLabel="Ano inicio"
-              options={YEARS}
-              hasError={isStartRangeIncomplete}
-            />
-
-            <SelectFilter
-              value={chartDateInputs.startMonth}
-              onSelect={updateChartDateRange}
-              filterName="startMonth"
-              disabled={!chartDateInputs.startYear}
-              defaultOptionLabel="Todos"
-              inputLabel="Mes inicio"
-              options={MONTHS}
-              hasError={isStartRangeIncomplete}
-            />
-
-            <SelectFilter
-              value={chartDateInputs.endYear}
-              onSelect={updateChartDateRange}
-              filterName="endYear"
-              inputLabel="Ano fin"
-              options={YEARS}
-              hasError={isEndRangeIncomplete}
-            />
-
-            <SelectFilter
-              value={chartDateInputs.endMonth}
-              onSelect={updateChartDateRange}
-              filterName="endMonth"
-              disabled={!chartDateInputs.endYear}
-              defaultOptionLabel="Todos"
-              inputLabel="Mes fin"
-              options={MONTHS}
-              hasError={isEndRangeIncomplete}
+            <DateRangeFilters
+              value={chartDateInputs}
+              onChange={updateChartDateRange}
+              isStartRangeIncomplete={isStartRangeIncomplete}
+              isEndRangeIncomplete={isEndRangeIncomplete}
             />
           </div>
 

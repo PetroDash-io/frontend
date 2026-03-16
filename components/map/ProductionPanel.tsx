@@ -1,18 +1,13 @@
 import React, {useEffect, useMemo, useRef, useState} from "react";
-import {MONTHS, YEARS} from "@/utils/constants";
 import {toNumber} from "@/utils/helpers";
 import {ProductionMonthly} from "@/app/types";
-import {SelectFilter} from "@/components/common/SelectFilter";
 import {InlineMessage} from "@/components/common/InlineMessage";
 import {LoadingState} from "@/components/common/LoadingState";
 import {TimeSeriesChart} from "@/components/map/TimeSeriesChart";
+import {DateRangeFilters} from "@/components/map/DateRangeFilters";
+import {DateRangeValue, EMPTY_DATE_RANGE, getValidatedDateRange} from "@/utils/dateRange";
 
-export interface ValidatedProductionDateRange {
-  startYear: string;
-  startMonth: string;
-  endYear: string;
-  endMonth: string;
-}
+export type ValidatedProductionDateRange = DateRangeValue;
 
 interface ProductionPanelProps {
   selectedWellId: string | null;
@@ -22,26 +17,7 @@ interface ProductionPanelProps {
   onValidatedRangeChange: (range: ValidatedProductionDateRange) => void;
 }
 
-export const EMPTY_VALIDATED_RANGE: ValidatedProductionDateRange = {
-  startYear: "",
-  startMonth: "",
-  endYear: "",
-  endMonth: "",
-};
-
-const getValidatedRange = (inputs: ValidatedProductionDateRange): ValidatedProductionDateRange => {
-  const hasStartYear = Boolean(inputs.startYear);
-  const hasStartMonth = Boolean(inputs.startMonth);
-  const hasEndYear = Boolean(inputs.endYear);
-  const hasEndMonth = Boolean(inputs.endMonth);
-
-  return {
-    startYear: hasStartYear && hasStartMonth ? inputs.startYear : "",
-    startMonth: hasStartYear && hasStartMonth ? inputs.startMonth : "",
-    endYear: hasEndYear && hasEndMonth ? inputs.endYear : "",
-    endMonth: hasEndYear && hasEndMonth ? inputs.endMonth : "",
-  };
-};
+export const EMPTY_VALIDATED_RANGE: ValidatedProductionDateRange = EMPTY_DATE_RANGE;
 
 export function ProductionPanel({
   selectedWellId,
@@ -61,7 +37,7 @@ export function ProductionPanel({
   const isStartRangeIncomplete = hasStartYear !== hasStartMonth;
   const isEndRangeIncomplete = hasEndYear !== hasEndMonth;
 
-  const validatedDateRange = useMemo(() => getValidatedRange(chartDateInputs), [chartDateInputs]);
+  const validatedDateRange = useMemo(() => getValidatedDateRange(chartDateInputs), [chartDateInputs]);
 
   useEffect(() => {
     const previousRange = lastEmittedRangeRef.current;
@@ -145,44 +121,11 @@ export function ProductionPanel({
       {selectedWellId && (
         <>
           <div style={styles.chartFiltersContainer}>
-            <SelectFilter
-              value={chartDateInputs.startYear}
-              onSelect={updateChartDateRange}
-              filterName="startYear"
-              inputLabel="Ano inicio"
-              options={YEARS}
-              hasError={isStartRangeIncomplete}
-            />
-
-            <SelectFilter
-              value={chartDateInputs.startMonth}
-              onSelect={updateChartDateRange}
-              filterName="startMonth"
-              disabled={!chartDateInputs.startYear}
-              defaultOptionLabel="Todos"
-              inputLabel="Mes inicio"
-              options={MONTHS}
-              hasError={isStartRangeIncomplete}
-            />
-
-            <SelectFilter
-              value={chartDateInputs.endYear}
-              onSelect={updateChartDateRange}
-              filterName="endYear"
-              inputLabel="Ano fin"
-              options={YEARS}
-              hasError={isEndRangeIncomplete}
-            />
-
-            <SelectFilter
-              value={chartDateInputs.endMonth}
-              onSelect={updateChartDateRange}
-              filterName="endMonth"
-              disabled={!chartDateInputs.endYear}
-              defaultOptionLabel="Todos"
-              inputLabel="Mes fin"
-              options={MONTHS}
-              hasError={isEndRangeIncomplete}
+            <DateRangeFilters
+              value={chartDateInputs}
+              onChange={updateChartDateRange}
+              isStartRangeIncomplete={isStartRangeIncomplete}
+              isEndRangeIncomplete={isEndRangeIncomplete}
             />
           </div>
 
