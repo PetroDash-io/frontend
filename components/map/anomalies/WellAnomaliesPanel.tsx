@@ -1,16 +1,15 @@
 import React, {useMemo, useState} from "react";
-import {SelectFilter, SelectFilterOption} from "@/components/common/SelectFilter";
 import {InlineMessage} from "@/components/common/InlineMessage";
 import {LoadingState} from "@/components/common/LoadingState";
 import {colors, PRODUCTION_TYPES} from "@/utils/constants";
-import {convertValueToUnit, UNITS} from "@/utils/units";
 import {useUnit} from "@/hooks/useUnit";
 import {useWellAnomalies} from "@/hooks/useWellAnomalies";
-import {ProductionMonthly} from "@/app/types";
-import {ProductionResource} from "@/app/types/anomalies";
+import {ProductionResource} from "@/components/map/anomalies/types";
 import {useWellsProduction} from "@/hooks/useWellProduction";
-import {AnomalyChartPoint, WellAnomaliesChart} from "@/components/map/WellAnomaliesChart";
+import {WellAnomaliesChart} from "@/components/map/anomalies/WellAnomaliesChart";
 import {DateRangeFilters} from "@/components/map/DateRangeFilters";
+import {ResourceSelector} from "@/components/map/anomalies/ResourceSelector";
+import {buildAnomalyChartData, getAnomalyDateSet} from "@/components/map/anomalies/data";
 import {
   applyDateRangeInputChange,
   DateRangeValue,
@@ -28,12 +27,6 @@ interface RangeWindow {
   start: string;
   end: string;
 }
-
-const resourceOptions: SelectFilterOption[] = [
-  {value: "oil", label: "Petroleo"},
-  {value: "gas", label: "Gas"},
-  {value: "water", label: "Agua"},
-];
 
 const EMPTY_DATE_RANGE: ValidatedAnomalyDateRange = {
   startYear: "2023",
@@ -76,53 +69,16 @@ export function WellAnomaliesPanel({
   const loading = loadingAnomalyProduction || loadingAnomalies;
   const error = errorAnomalyProduction || errorAnomalies;
 
-  const anomalyDateSet = useMemo(() => {
-    if (!anomalyPeriods || anomalyPeriods.length === 0) {
-      return new Set<string>();
-    }
+  const anomalyDateSet = useMemo(() => getAnomalyDateSet(anomalyPeriods), [anomalyPeriods]);
 
-    const filteredPeriods = anomalyPeriods.filter((period) => period.anomaly?.is_anomaly === true);
-
-    return new Set(filteredPeriods.map((period) => period.reported_period_date.slice(0, 7)));
-  }, [anomalyPeriods]);
-
-  const chartData = useMemo<AnomalyChartPoint[]>(() => {
-    if (!anomalyProduction || anomalyProduction.length === 0) return [];
-
-    const resourceFieldByName: Record<ProductionResource, keyof ProductionMonthly> = {
-      oil: "oil_production",
-      gas: "gas_production",
-      water: "water_production",
-    };
-
-    const selectedResourceField = resourceFieldByName[selectedResource];
-
-    return anomalyProduction
-      .slice()
-      .sort((a, b) => a.reported_period_date.localeCompare(b.reported_period_date))
-      .map((period) => {
-        const rawValue = Number(period[selectedResourceField] || 0);
-        const convertedValue =
-          selectedResource === "gas" ? rawValue : convertValueToUnit(rawValue, unit);
-        const date = period.reported_period_date.slice(0, 7);
-
-        return {
-          date,
-          dateTs: new Date(period.reported_period_date).getTime(),
-          resourceProduction: convertedValue,
-          anomalyMarker: anomalyDateSet.has(date) ? convertedValue : null,
-        };
-      });
+  const chartData = useMemo(() => {
+    return buildAnomalyChartData(anomalyProduction, selectedResource, unit, anomalyDateSet);
   }, [anomalyProduction, selectedResource, unit, anomalyDateSet]);
 
   const anomalyCount = useMemo(() => {
     if (!anomalyPeriods || anomalyPeriods.length === 0) return 0;
     return anomalyPeriods.filter((period) => period.anomaly?.is_anomaly === true).length;
   }, [anomalyPeriods]);
-
-  const onSelectResource = (_filterName: string, value: string) => {
-    setSelectedResource(value as ProductionResource);
-  };
 
   const updateChartDateRange = (filterName: string, value: unknown) => {
     setChartDateInputs((previousValues) =>
@@ -189,24 +145,12 @@ export function WellAnomaliesPanel({
           )}
 
           <div style={styles.filtersRow}>
-            <SelectFilter
-              value={selectedResource}
-              onSelect={onSelectResource}
-              filterName="resource"
-              inputLabel="Recurso"
-              options={resourceOptions}
+            <ResourceSelector
+              selectedResource={selectedResource}
+              onResourceChange={setSelectedResource}
+              unit={unit}
+              onUnitChange={setUnit}
             />
-
-            {selectedResource !== "gas" && (
-              <div role="tablist" style={styles.unitSwitchContainer}>
-                <button style={styles.unitButton(unit === UNITS.m3)} onClick={() => setUnit(UNITS.m3)}>
-                  {UNITS.m3}
-                </button>
-                <button style={styles.unitButton(unit === UNITS.bbl)} onClick={() => setUnit(UNITS.bbl)}>
-                  {UNITS.bbl}
-                </button>
-              </div>
-            )}
           </div>
 
           <div style={styles.metaRow}>
@@ -267,11 +211,7 @@ const styles = {
     gap: 12,
   } as React.CSSProperties,
   filtersRow: {
-    display: "flex",
-    alignItems: "end",
-    justifyContent: "space-between",
-    gap: 12,
-    flexWrap: "wrap",
+    display: "block",
   } as React.CSSProperties,
   metaRow: {
     display: "flex",
@@ -309,24 +249,4 @@ const styles = {
     justifyContent: "center",
     minHeight: 320,
   } as React.CSSProperties,
-  unitSwitchContainer: {
-    display: "flex",
-    gap: 6,
-    padding: "4px",
-    width: "fit-content",
-    border: "1px solid #d8cdbf",
-    borderRadius: 10,
-    backgroundColor: "#faf8f3",
-  } as React.CSSProperties,
-  unitButton: (isActive: boolean): React.CSSProperties => ({
-    padding: "6px 12px",
-    borderRadius: 8,
-    border: `1px solid ${isActive ? "#c9d8ce" : "transparent"}`,
-    backgroundColor: isActive ? "#e9f0eb" : "transparent",
-    color: isActive ? "#2f3e34" : "#4b2a1a",
-    fontSize: 13,
-    fontWeight: isActive ? 600 : 500,
-    cursor: "pointer",
-    transition: "background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease",
-  }),
 } as const;

@@ -11,7 +11,7 @@ import {LoadingState} from "@/components/common/LoadingState";
 import {InlineMessage} from "@/components/common/InlineMessage";
 import {toast} from "react-toastify";
 import {WellFilters} from "@/app/types/wellFilters";
-import {WellAnomaliesPanel} from "@/components/map/WellAnomaliesPanel";
+import {WellAnomaliesPanel} from "@/components/map/anomalies/WellAnomaliesPanel";
 
 type MapViewProps = {
   filters: WellFilters;

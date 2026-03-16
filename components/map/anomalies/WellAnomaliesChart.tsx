@@ -1,15 +1,8 @@
 import React from "react";
-import {ProductionResource} from "@/app/types/anomalies";
+import {ProductionResource, AnomalyChartPoint} from "@/components/map/anomalies/types";
 import {UNITS} from "@/utils/units";
 import {CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
 import {colors} from "@/utils/constants";
-
-export interface AnomalyChartPoint {
-  date: string;
-  dateTs: number;
-  resourceProduction: number;
-  anomalyMarker: number | null;
-}
 
 interface WellAnomaliesChartProps {
   data: AnomalyChartPoint[];
