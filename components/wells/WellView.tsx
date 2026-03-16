@@ -45,13 +45,13 @@ export function WellView() {
   }, [allWells]);
 
   return (
-    <div>
+    <div style={styles.viewShell}>
       <div style={styles.filterPanel}>
         <SelectFilter
           filterName="watershed"
-            value={filters.watershed}
-            onSelect={updateFilters}
-            options={WATERSHED_OPTIONS}/>
+          value={filters.watershed}
+          onSelect={updateFilters}
+          options={WATERSHED_OPTIONS}/>
           <SelectFilter
             filterName="province"
             value={filters.province}
@@ -82,23 +82,23 @@ export function WellView() {
             onDefineLimit={updateFilters}/>
       </div>
 
-      <div style={styles.tabBar}>
-        <button
-          style={styles.tabBtn(view === "map")}
-          onClick={() => setView("map")}
-        >
-          Mapa
-        </button>
-        <button
-          style={styles.tabBtn(view === "table")}
-          onClick={() => setView("table")}
-        >
-          Tabla
-        </button>
-      </div>
+      <div style={styles.controlsBar}>
+        <div style={styles.tabBar}>
+          <button
+            style={styles.tabBtn(view === "map")}
+            onClick={() => setView("map")}
+          >
+            Mapa
+          </button>
+          <button
+            style={styles.tabBtn(view === "table")}
+            onClick={() => setView("table")}
+          >
+            Tabla
+          </button>
+        </div>
 
-      {view === "map" && (
-        <>
+        {view === "map" && (
           <div style={styles.modeBar}>
             <button
               style={styles.modeBtn(dataMode === "pozos")}
@@ -113,7 +113,11 @@ export function WellView() {
               Heatmap
             </button>
           </div>
+        )}
+      </div>
 
+      {view === "map" && (
+        <>
           <MapView
             filters={filters}
             mode={dataMode}
@@ -130,22 +134,36 @@ export function WellView() {
 
 const styles = {
   filterPanel: {
-    display: "flex",
-    flexWrap: "wrap",
-    alignItems: "center",
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+    alignItems: "end",
     gap: 16,
-    padding: "16px 24px",
+    padding: "16px",
     marginBottom: 18,
     borderRadius: 14,
     border: "1px solid rgba(63, 107, 79, 0.18)",
     backgroundColor: "rgba(255,255,255,0.92)",
     boxShadow: "0 10px 22px rgba(0,0,0,0.05)",
   } as React.CSSProperties,
+  viewShell: {
+    width: "100%",
+    maxWidth: 1480,
+    margin: "0 auto",
+  } as React.CSSProperties,
   tabBar: {
     display: "flex",
+    alignItems: "center",
     gap: 18,
+    marginTop: 0,
+  } as React.CSSProperties,
+  controlsBar: {
+    display: "flex",
+    alignItems: "center",
     justifyContent: "center",
+    gap: 18,
+    flexWrap: "wrap",
     marginTop: 8,
+    marginBottom: 8,
   } as React.CSSProperties,
   tabBtn: (active: boolean) => ({
     padding: "12px 22px",
@@ -161,9 +179,9 @@ const styles = {
   }) as React.CSSProperties,
   modeBar: {
     display: "flex",
+    alignItems: "center",
     gap: 16,
-    justifyContent: "center",
-    marginTop: 16,
+    marginTop: 0,
   } as React.CSSProperties,
   modeBtn: (active: boolean) => ({
     padding: "10px 18px",

@@ -74,13 +74,7 @@ export const TabContent = ({ value, children }: TabContentProps) => {
 
 const styles = {
     wrapper: {
-        display: "flex",
-        gap: 8,
-        padding: 8,
-        borderRadius: 12,
-        border: `1px solid ${colors.panelBorder}`,
-        backgroundColor: "rgba(243, 238, 230, 0.9)",
-        alignItems: "center",
+        width: "100%",
     } as React.CSSProperties,
     main: {
         display: "flex",

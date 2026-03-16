@@ -197,8 +197,11 @@ const styles = {
         display: "flex"
     } as React.CSSProperties,
     wellDetailsContainer: {
-        display: "flex",
-        flexDirection: "row",
-        height: 560
+        display: "grid",
+        gridTemplateColumns: "minmax(0, 1fr) minmax(320px, 420px)",
+        alignItems: "stretch",
+        gap: 16,
+        minHeight: 560,
+        height: "min(70vh, 700px)",
     } as React.CSSProperties,
 } as const;

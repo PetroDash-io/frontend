@@ -59,13 +59,11 @@ function TrophyIcon() {
 }
 
 export default function Home() {
-    const [isDrawerOpen, setIsDrawerOpen] = useState(true);
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
     const closeDrawer = () => {
         setIsDrawerOpen(false);
     };
-
-    const drawerWidth = isDrawerOpen ? 248 : 60;
 
     return (
         <div className={styles.pageShell}>
@@ -132,7 +130,9 @@ export default function Home() {
                         </nav>
                     </aside>
 
-                    <div className={styles.contentArea} style={{ marginLeft: drawerWidth }}>
+                    <div
+                        className={`${styles.contentArea} ${isDrawerOpen ? styles.contentAreaExpanded : styles.contentAreaCollapsed}`}
+                    >
                         <TabContent value="Well">
                             <WellView/>
                         </TabContent>
