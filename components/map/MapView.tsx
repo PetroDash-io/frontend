@@ -99,6 +99,9 @@ const styles = {
   wellDetailsContainer: {
     display: "flex",
     flexDirection: "row",
-    height: 560
+    flexWrap: "wrap",
+    alignItems: "stretch",
+    gap: 16,
+    minHeight: 560,
   } as React.CSSProperties,
 } as const;
