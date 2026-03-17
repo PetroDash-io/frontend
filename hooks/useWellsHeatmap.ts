@@ -1,5 +1,4 @@
 import { useEffect, useState, useMemo } from "react";
-import type { GeoJSON } from "geojson";
 
 export type HeatmapResource = "oil" | "gas" | "water";
 
@@ -9,6 +8,7 @@ interface HeatmapFilters {
   start_month?: number;
   end_year?: number;
   end_month?: number;
+  enabled?: boolean;
 }
 
 interface WellHeatmapItem {
@@ -25,6 +25,13 @@ export function useWellsHeatmap(filters: HeatmapFilters) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (filters.enabled === false) {
+      setRawData(null);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
     const fetchHeatmap = async () => {
       setLoading(true);
       setError(null);
@@ -56,7 +63,7 @@ export function useWellsHeatmap(filters: HeatmapFilters) {
     };
 
     fetchHeatmap();
-  }, [filters.resource, filters.start_year, filters.start_month, filters.end_year, filters.end_month]);
+  }, [filters.enabled, filters.resource, filters.start_year, filters.start_month, filters.end_year, filters.end_month]);
 
   const geojsonData = useMemo<GeoJSON.FeatureCollection | null>(() => {
     if (!rawData) return null;
