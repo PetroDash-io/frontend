@@ -1,7 +1,7 @@
 "use client";
 
 import React, {useEffect, useMemo, useState} from "react";
-import {colors, MONTHS, YEARS} from "@/utils/constants";
+import {colors} from "@/utils/constants";
 import {useCompanies} from "@/hooks/useCompanies";
 import {useProductionAggregates} from "@/hooks/useProductionAggregates";
 import {useCompanyComparison} from "@/hooks/useCompanyComparison";
@@ -17,6 +17,7 @@ import {convertValueToUnit} from "@/utils/units";
 import {LoadingState} from "@/components/common/LoadingState";
 import {InlineMessage} from "@/components/common/InlineMessage";
 import {toast} from "react-toastify";
+import {YearMonthRangeFilters} from "@/components/common/YearMonthRangeFilters";
 
 export function CompanyView() {
   const [filters, setFilters] = useState<Partial<ProductionAggregatesFilters>>({});
@@ -113,35 +114,13 @@ export function CompanyView() {
                         defaultOptionLabel="Seleccione una empresa"/>
 
           <div style={styles.dateRangeContainer}>
-            <SelectFilter value={filters.inicio_anio || ""}
-                          onSelect={updateProductionFilters}
-                          filterName="inicio_anio"
-                          defaultOptionLabel="Todos"
-                          inputLabel="Año de inicio"
-                          options={YEARS}/>
-
-            <SelectFilter value={filters.inicio_mes || ""}
-                          onSelect={updateProductionFilters}
-                          filterName="inicio_mes"
-                          disabled={!filters.inicio_anio}
-                          defaultOptionLabel="Todos"
-                          inputLabel="Mes de inicio"
-                          options={MONTHS}/>
-
-            <SelectFilter value={filters.fin_anio || ""}
-                          onSelect={updateProductionFilters}
-                          filterName="fin_anio"
-                          defaultOptionLabel="Todos"
-                          inputLabel="Año de fin"
-                          options={YEARS}/>
-
-            <SelectFilter value={filters.fin_mes || ""}
-                          onSelect={updateProductionFilters}
-                          filterName="fin_mes"
-                          disabled={!filters.fin_anio}
-                          defaultOptionLabel="Todos"
-                          inputLabel="Mes de fin"
-                          options={MONTHS}/>
+            <YearMonthRangeFilters
+              onSelect={updateProductionFilters}
+              startYearValue={filters.inicio_anio || ""}
+              startMonthValue={filters.inicio_mes || ""}
+              endYearValue={filters.fin_anio || ""}
+              endMonthValue={filters.fin_mes || ""}
+            />
           </div>
         </div>
 

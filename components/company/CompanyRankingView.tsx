@@ -4,14 +4,35 @@ import React, { useMemo, useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { TopProductionFilters } from "@/app/types";
 import { useTopProduction } from "@/hooks/useTopProduction";
-import { colors, MONTHS, YEARS, PIE_CHART_COLORS, AREAS_POR_PROVINCIA } from "@/utils/constants";
+import { colors, PIE_CHART_COLORS, AREAS_POR_PROVINCIA } from "@/utils/constants";
 import { SelectFilter } from "@/components/common/SelectFilter";
+import {YearMonthRangeFilters} from "@/components/common/YearMonthRangeFilters";
 
 interface PieChartData {
   name: string;
   value: number;
   percentage: number;
 }
+
+const PRODUCTION_OPTIONS = [
+  {value: "oil", label: "Petróleo"},
+  {value: "gas", label: "Gas"},
+  {value: "water", label: "Agua"},
+];
+
+const PROVINCE_OPTIONS = [
+  {value: "Neuquen", label: "Neuquén"},
+  {value: "Chubut", label: "Chubut"},
+  {value: "Mendoza", label: "Mendoza"},
+  {value: "La Pampa", label: "La Pampa"},
+  {value: "Rio Negro", label: "Río Negro"},
+];
+
+const PRODUCTION_TYPE_LABEL: Record<"oil" | "gas" | "water", string> = {
+  oil: "Petróleo",
+  gas: "Gas",
+  water: "Agua",
+};
 
 const formatTooltipValue = (value: number | string | undefined) => {
   if (value === undefined) {
@@ -23,7 +44,7 @@ const formatTooltipValue = (value: number | string | undefined) => {
   return value;
 };
 
-export function TopProductionPieCharts() {
+export function CompanyRankingView() {
   const [filters, setFilters] = useState<Partial<TopProductionFilters>>({
     tipo: "oil",
     limit: 10,
@@ -31,7 +52,6 @@ export function TopProductionPieCharts() {
 
   const { data, loading, error } = useTopProduction(filters);
 
-  // Obtener áreas disponibles según la provincia seleccionada
   const availableAreas = useMemo(() => {
     if (!filters.provincia) {
       return [];
@@ -41,19 +61,18 @@ export function TopProductionPieCharts() {
 
   const updateFilter = (filterName: string, value: string) => {
     if (value === "") {
-      const newFilters = { ...filters, limit: 10 };
+      const newFilters = {...filters, limit: 10};
       delete newFilters[filterName as keyof TopProductionFilters];
-      
-      // Si se limpia la provincia, también limpiar el área
+
       if (filterName === "provincia") {
         delete newFilters.area;
       }
-      
+
       setFilters(newFilters);
     } else {
       setFilters((prev) => {
-        const updatedFilters: Partial<TopProductionFilters> = { ...prev, limit: 10 };
-        
+        const updatedFilters: Partial<TopProductionFilters> = {...prev, limit: 10};
+
         if (filterName === "tipo") {
           updatedFilters.tipo = value as "oil" | "gas" | "water";
         } else if (filterName === "inicio_anio" || filterName === "fin_anio") {
@@ -62,12 +81,11 @@ export function TopProductionPieCharts() {
           updatedFilters[filterName] = parseInt(value, 10);
         } else if (filterName === "provincia") {
           updatedFilters.provincia = value;
-          // Limpiar el área cuando se cambia la provincia
           delete updatedFilters.area;
         } else if (filterName === "area") {
           updatedFilters.area = value;
         }
-        
+
         return updatedFilters;
       });
     }
@@ -137,12 +155,6 @@ export function TopProductionPieCharts() {
     );
   };
 
-  const productionTypeLabel: Record<string, string> = {
-    oil: "Petróleo",
-    gas: "Gas",
-    water: "Agua",
-  };
-
   return (
     <div style={styles.container}>
       <h2 style={styles.mainTitle}>Ranking de producción por empresas</h2>
@@ -154,11 +166,7 @@ export function TopProductionPieCharts() {
             value={filters.tipo || "oil"}
             filterName="tipo"
             onSelect={updateFilter}
-            options={[
-              { value: "oil", label: "Petróleo" },
-              { value: "gas", label: "Gas" },
-              { value: "water", label: "Agua" },
-            ]}
+            options={PRODUCTION_OPTIONS}
           />
 
           <SelectFilter
@@ -167,13 +175,7 @@ export function TopProductionPieCharts() {
             filterName="provincia"
             onSelect={updateFilter}
             defaultOptionLabel="Todas"
-            options={[
-              { value: "Neuquen", label: "Neuquén" },
-              { value: "Chubut", label: "Chubut" },
-              { value: "Mendoza", label: "Mendoza" },
-              { value: "La Pampa", label: "La Pampa" },
-              { value: "Rio Negro", label: "Río Negro" },
-            ]}
+            options={PROVINCE_OPTIONS}
           />
 
           <SelectFilter
@@ -188,40 +190,16 @@ export function TopProductionPieCharts() {
         </div>
 
         <div style={styles.dateRangeContainer}>
-          <SelectFilter
-            inputLabel="Año Inicio"
-            value={filters.inicio_anio?.toString() || ""}
-            filterName="inicio_anio"
+          <YearMonthRangeFilters
             onSelect={updateFilter}
-            defaultOptionLabel="Todos"
-            options={YEARS}
-          />
-
-          <SelectFilter
-            inputLabel="Mes Inicio"
-            value={filters.inicio_mes?.toString() || ""}
-            filterName="inicio_mes"
-            onSelect={updateFilter}
-            defaultOptionLabel="Todos"
-            options={MONTHS}
-          />
-
-          <SelectFilter
-            inputLabel="Año Fin"
-            value={filters.fin_anio?.toString() || ""}
-            filterName="fin_anio"
-            onSelect={updateFilter}
-            defaultOptionLabel="Todos"
-            options={YEARS}
-          />
-
-          <SelectFilter
-            inputLabel="Mes Fin"
-            value={filters.fin_mes?.toString() || ""}
-            filterName="fin_mes"
-            onSelect={updateFilter}
-            defaultOptionLabel="Todos"
-            options={MONTHS}
+            startYearValue={filters.inicio_anio?.toString() || ""}
+            startMonthValue={filters.inicio_mes?.toString() || ""}
+            endYearValue={filters.fin_anio?.toString() || ""}
+            endMonthValue={filters.fin_mes?.toString() || ""}
+            startYearLabel="Año Inicio"
+            startMonthLabel="Mes Inicio"
+            endYearLabel="Año Fin"
+            endMonthLabel="Mes Fin"
           />
         </div>
       </div>
@@ -237,7 +215,7 @@ export function TopProductionPieCharts() {
         <div style={styles.mainChartContainer}>
           <div style={styles.headerSection}>
             <h3 style={styles.chartTitle}>
-              Top 10 Empresas - {productionTypeLabel[filters.tipo || "oil"]}
+              Top 10 Empresas - {PRODUCTION_TYPE_LABEL[filters.tipo || "oil"]}
             </h3>
             {data && (
               <div style={styles.headerStats}>
@@ -277,7 +255,7 @@ export function TopProductionPieCharts() {
                       <Cell 
                         key={`cell-${index}`} 
                         fill={PIE_CHART_COLORS[index % PIE_CHART_COLORS.length]}
-                        style={{ filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.1))' }}
+                        style={{filter: "drop-shadow(0px 2px 4px rgba(0,0,0,0.1))"}}
                       />
                     ))}
                   </Pie>
@@ -502,32 +480,5 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 8,
     padding: 12,
     boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-  },
-  statsContainer: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-    gap: 16,
-    marginTop: 24,
-  },
-  statCard: {
-    backgroundColor: colors.filtersBg,
-    borderRadius: 8,
-    padding: 16,
-    textAlign: "center",
-  },
-  statLabel: {
-    fontSize: 14,
-    color: colors.text,
-    marginBottom: 8,
-    fontWeight: 500,
-  },
-  statValue: {
-    fontSize: 24,
-    fontWeight: 700,
-    color: colors.primary,
-  },
-  legendText: {
-    fontSize: 12,
-    color: colors.text,
   },
 };
