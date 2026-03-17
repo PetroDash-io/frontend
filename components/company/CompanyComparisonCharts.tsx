@@ -16,10 +16,42 @@ interface CompanyComparisonChartsProps {
 
 const RESOURCE_NAMES = ["Petróleo", "Gas", "Agua"] as const;
 
-function getResourceValue(resource: (typeof RESOURCE_NAMES)[number], company: CompanyProductionData, unit: string) {
-  if (resource === "Petróleo") return convertValueToUnit(company.data.oil.total, unit);
-  if (resource === "Gas") return convertValueToUnit(company.data.gas.total, unit);
-  return convertValueToUnit(company.data.water.total, unit);
+const COMPARISON_CHARTS = [
+  { title: "Producción Total - Comparación", metric: "total" as const, prefix: "produccion-total-comparacion", sheet: "Total" },
+  { title: "Producción Promedio - Comparación", metric: "avg" as const, prefix: "produccion-promedio-comparacion", sheet: "Promedio" },
+];
+
+const PIE_CHART_CONFIG = [
+  { title: "Petróleo - Distribución", key: "oil" as const },
+  { title: "Gas - Distribución",     key: "gas" as const },
+  { title: "Agua - Distribución",     key: "water" as const },
+];
+
+function getResourceValue(
+  resource: (typeof RESOURCE_NAMES)[number],
+  company: CompanyProductionData,
+  unit: string,
+  metric: "total" | "avg"
+) {
+  if (resource === "Petróleo") return convertValueToUnit(company.data.oil[metric], unit);
+  if (resource === "Gas") return convertValueToUnit(company.data.gas[metric], unit);
+  return convertValueToUnit(company.data.water[metric], unit);
+}
+
+function buildResourceChartData(
+  companies: CompanyProductionData[],
+  unit: string,
+  metric: "total" | "avg"
+) {
+  return RESOURCE_NAMES.map((resource) => {
+    const dataPoint: Record<string, string | number> = {name: resource};
+
+    companies.forEach((company) => {
+      dataPoint[company.company] = getResourceValue(resource, company, unit, metric);
+    });
+
+    return dataPoint;
+  });
 }
 
 const formatYAxis = (value: number) => {
@@ -105,22 +137,20 @@ export function CompanyComparisonCharts({
     return fileName;
   };
 
-  const resourceChartData = useMemo(() => {
-    if (companies.length === 0) return [];
-
-    return RESOURCE_NAMES.map((resource) => {
-      const dataPoint: Record<string, string | number> = { name: resource };
-
-      companies.forEach((company) => {
-        dataPoint[company.company] = getResourceValue(resource, company, unit);
-      });
-
-      return dataPoint;
-    });
+  const chartData = useMemo(() => {
+    if (companies.length === 0) return { total: [], avg: [] };
+    return {
+      total: buildResourceChartData(companies, unit, "total"),
+      avg:   buildResourceChartData(companies, unit, "avg"),
+    };
   }, [companies, unit]);
 
-  const handleDownload = (prefix: string, sheetName: string) => {
-    const formattedData = resourceChartData.map(row => {
+  const handleDownload = (
+    chartData: Record<string, string | number>[],
+    prefix: string,
+    sheetName: string
+  ) => {
+    const formattedData = chartData.map(row => {
       const formatted: Record<string, string | number> = { Recurso: row.name };
       companies.forEach(company => {
         formatted[company.company] = row[company.company] as number;
@@ -133,26 +163,13 @@ export function CompanyComparisonCharts({
   // Datos para los gráficos de torta (porcentajes)
   const pieChartsData = useMemo(() => {
     if (companies.length === 0) return { oil: [], gas: [], water: [] };
-    
-    const oilData = companies.map((company, index) => ({
-      name: company.company,
-      value: company.data.oil.percentage || 0,
-      color: COMPANY_COLORS[index % COMPANY_COLORS.length]
-    }));
-
-    const gasData = companies.map((company, index) => ({
-      name: company.company,
-      value: company.data.gas.percentage || 0,
-      color: COMPANY_COLORS[index % COMPANY_COLORS.length]
-    }));
-
-    const waterData = companies.map((company, index) => ({
-      name: company.company,
-      value: company.data.water.percentage || 0,
-      color: COMPANY_COLORS[index % COMPANY_COLORS.length]
-    }));
-
-    return { oil: oilData, gas: gasData, water: waterData };
+    const makePieData = (resource: "oil" | "gas" | "water") =>
+      companies.map((company, index) => ({
+        name: company.company,
+        value: company.data[resource].percentage || 0,
+        color: COMPANY_COLORS[index % COMPANY_COLORS.length],
+      }));
+    return { oil: makePieData("oil"), gas: makePieData("gas"), water: makePieData("water") };
   }, [companies]);
 
   const renderPieChart = (title: string, data: Array<{name: string, value: number, color: string}>) => {
@@ -192,27 +209,22 @@ export function CompanyComparisonCharts({
   return (
     <>
       <div style={styles.chartsContainer}>
-        <ComparisonChart
-          title="Producción Total - Comparación"
-          data={resourceChartData}
-          companies={companies}
-          onDownload={() => handleDownload("produccion-total-comparacion", "Total")}
-        />
-        <ComparisonChart
-          title="Producción Promedio - Comparación"
-          data={resourceChartData}
-          companies={companies}
-          onDownload={() => handleDownload("produccion-promedio-comparacion", "Promedio")}
-        />
+        {COMPARISON_CHARTS.map(({ title, metric, prefix, sheet }) => (
+          <ComparisonChart
+            key={metric}
+            title={title}
+            data={chartData[metric]}
+            companies={companies}
+            onDownload={() => handleDownload(chartData[metric], prefix, sheet)}
+          />
+        ))}
       </div>
 
       {companies.length > 0 && companies.some(c => c.data.oil.percentage !== undefined) && (
         <>
           <h3 style={styles.sectionTitle}>Distribución Porcentual</h3>
           <div style={styles.pieChartsContainer}>
-            {renderPieChart("Petróleo - Distribución", pieChartsData.oil)}
-            {renderPieChart("Gas - Distribución", pieChartsData.gas)}
-            {renderPieChart("Agua - Distribución", pieChartsData.water)}
+            {PIE_CHART_CONFIG.map(({ title, key }) => renderPieChart(title, pieChartsData[key]))}
           </div>
         </>
       )}
