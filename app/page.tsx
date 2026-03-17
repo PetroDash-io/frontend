@@ -43,7 +43,14 @@ export default function Home() {
   return (
     <div className={styles.pageShell}>
       <header className={styles.header}>
-        <Image src="/logo-no-background.png" alt="PetroDash" className={styles.logo} width={180} height={54} />
+        <Image
+          src="/logo-no-background.png"
+          alt="PetroDash"
+          className={styles.logo}
+          width={180}
+          height={54}
+          priority
+        />
         <h1 className={styles.title}>PetroDash</h1>
       </header>
 
