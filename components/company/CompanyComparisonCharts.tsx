@@ -5,7 +5,7 @@ import {colors, COMPANY_COLORS} from "@/utils/constants";
 import {Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis, Pie, PieChart, Cell} from "recharts";
 import {CompanyProductionData} from "@/app/types";
 import {convertValueToUnit} from "@/utils/units";
-import { exportToExcel, exportMultipleSheetsToExcel } from "@/utils/excel";
+import {exportToExcel} from "@/utils/excel";
 
 interface CompanyComparisonChartsProps {
   companies: CompanyProductionData[];

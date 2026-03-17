@@ -7,6 +7,16 @@ interface UseCompaniesResult {
   error: string | null;
 }
 
+type RawCompany = {
+  empresa?: string;
+  company?: string;
+  name?: string;
+  cantidad_pozos?: number;
+  wells_count?: number;
+  count?: number;
+  cantidad?: number;
+};
+
 export function useCompanies(searchQuery?: string): UseCompaniesResult {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,14 +45,29 @@ export function useCompanies(searchQuery?: string): UseCompaniesResult {
           throw new Error(`Request failed with status ${response.status}`);
         }
 
-        const json = await response.json();
-        const { data } = json;
+        const json = (await response.json()) as {data?: unknown};
+        const responseData = json.data;
 
-        const rawArray: any[] = Array.isArray(data) ? data : data ? [data] : [];
-        const normalized: Company[] = rawArray.map((item) => ({
-          empresa: item.empresa ?? item.company ?? item.name ?? "",
-          cantidad_pozos: item.cantidad_pozos ?? item.wells_count ?? item.count ?? item.cantidad ?? 0,
-        }));
+        const rawArray: unknown[] = Array.isArray(responseData)
+          ? responseData
+          : responseData != null
+          ? [responseData]
+          : [];
+
+        const normalized: Company[] = rawArray.map((item) => {
+          const candidate: RawCompany =
+            typeof item === "object" && item !== null ? (item as RawCompany) : {};
+
+          return {
+            empresa: candidate.empresa ?? candidate.company ?? candidate.name ?? "",
+            cantidad_pozos:
+              candidate.cantidad_pozos ??
+              candidate.wells_count ??
+              candidate.count ??
+              candidate.cantidad ??
+              0,
+          };
+        });
 
         setCompanies(normalized);
       } catch (err) {

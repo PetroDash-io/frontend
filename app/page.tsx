@@ -1,6 +1,7 @@
 "use client";
 
 import React, {useState} from "react";
+import Image from "next/image";
 import "mapbox-gl/dist/mapbox-gl.css";
 import {Tabs, TabContent, TabTrigger} from "@/components/common/Tabs";
 import {CompanyView} from "@/components/company/CompanyView";
@@ -68,7 +69,7 @@ export default function Home() {
     return (
         <div className={styles.pageShell}>
             <header className={styles.header}>
-                <img src="/logo-no-background.png" alt="PetroDash" className={styles.logo}/>
+                <Image src="/logo-no-background.png" alt="PetroDash" className={styles.logo} width={180} height={54}/>
                 <h1 className={styles.title}>PetroDash</h1>
             </header>
 

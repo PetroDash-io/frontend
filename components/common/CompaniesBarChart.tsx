@@ -10,7 +10,6 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
-  LabelList
 } from "recharts";
 import { Company } from "@/app/types";
 import { exportToExcel } from "@/utils/excel";
@@ -32,11 +31,6 @@ const COLORS = [
   "#8B6F47",
 ];
 
-interface BarChartData {
-  name: string;
-  pozos: number;
-}
-
 const formatTooltipValue = (value: number | string | undefined) => {
   if (value === undefined) return "";
   if (typeof value === "number") {
@@ -52,9 +46,15 @@ const formatXAxis = (value: number) => {
   return value.toString();
 };
 
-const renderBarLabel = (props: any) => {
-  const { x, y, width, height, value } = props;
+type BarLabelProps = {
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  value?: number | string;
+};
 
+const renderBarLabel = ({x, y, width, height, value}: BarLabelProps) => {
   if (
     x == null ||
     y == null ||
