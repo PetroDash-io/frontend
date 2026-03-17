@@ -14,6 +14,14 @@ interface CompanyComparisonChartsProps {
   fechaFin?: string;
 }
 
+const RESOURCE_NAMES = ["Petróleo", "Gas", "Agua"] as const;
+
+function getResourceValue(resource: (typeof RESOURCE_NAMES)[number], company: CompanyProductionData, unit: string) {
+  if (resource === "Petróleo") return convertValueToUnit(company.data.oil.total, unit);
+  if (resource === "Gas") return convertValueToUnit(company.data.gas.total, unit);
+  return convertValueToUnit(company.data.water.total, unit);
+}
+
 const formatYAxis = (value: number) => {
   if (value >= 1000000) {
     return `${(value / 1000000).toFixed(1)}M`;
@@ -97,74 +105,29 @@ export function CompanyComparisonCharts({
     return fileName;
   };
 
-  // Transformar los datos para agrupar por tipo de recurso
-  const totalChartData = useMemo(() => {
+  const resourceChartData = useMemo(() => {
     if (companies.length === 0) return [];
 
-    const resources = ["Petróleo", "Gas", "Agua"];
-    return resources.map((resource) => {
+    return RESOURCE_NAMES.map((resource) => {
       const dataPoint: Record<string, string | number> = { name: resource };
-      
+
       companies.forEach((company) => {
-        let value = 0;
-        if (resource === "Petróleo") {
-          value = convertValueToUnit(company.data.oil.total, unit);
-        } else if (resource === "Gas") {
-          value = convertValueToUnit(company.data.gas.total, unit);
-        } else if (resource === "Agua") {
-          value = convertValueToUnit(company.data.water.total, unit);
-        }
-        dataPoint[company.company] = value;
+        dataPoint[company.company] = getResourceValue(resource, company, unit);
       });
-      
+
       return dataPoint;
     });
   }, [companies, unit]);
 
-  const avgChartData = useMemo(() => {
-    if (companies.length === 0) return [];
-    
-    const resources = ["Petróleo", "Gas", "Agua"];
-    return resources.map((resource) => {
-      const dataPoint: Record<string, string | number> = { name: resource };
-      
-      companies.forEach((company) => {
-        let value = 0;
-        if (resource === "Petróleo") {
-          value = convertValueToUnit(company.data.oil.total, unit);
-        } else if (resource === "Gas") {
-          value = convertValueToUnit(company.data.gas.total, unit);
-        } else if (resource === "Agua") {
-          value = convertValueToUnit(company.data.water.total, unit);
-        }
-        dataPoint[company.company] = value;
-      });
-      
-      return dataPoint;
-    });
-  }, [companies, unit]);
-
-  // Funciones de descarga
-  const handleDownloadTotal = () => {
-    const formattedData = totalChartData.map(row => {
+  const handleDownload = (prefix: string, sheetName: string) => {
+    const formattedData = resourceChartData.map(row => {
       const formatted: Record<string, string | number> = { Recurso: row.name };
       companies.forEach(company => {
         formatted[company.company] = row[company.company] as number;
       });
       return formatted;
     });
-    exportToExcel(formattedData, generateFileName('produccion-total-comparacion'), 'Total');
-  };
-
-  const handleDownloadAverage = () => {
-    const formattedData = avgChartData.map(row => {
-      const formatted: Record<string, string | number> = { Recurso: row.name };
-      companies.forEach(company => {
-        formatted[company.company] = row[company.company] as number;
-      });
-      return formatted;
-    });
-    exportToExcel(formattedData, generateFileName('produccion-promedio-comparacion'), 'Promedio');
+    exportToExcel(formattedData, generateFileName(prefix), sheetName);
   };
 
   // Datos para los gráficos de torta (porcentajes)
@@ -231,15 +194,15 @@ export function CompanyComparisonCharts({
       <div style={styles.chartsContainer}>
         <ComparisonChart
           title="Producción Total - Comparación"
-          data={totalChartData}
+          data={resourceChartData}
           companies={companies}
-          onDownload={handleDownloadTotal}
+          onDownload={() => handleDownload("produccion-total-comparacion", "Total")}
         />
         <ComparisonChart
           title="Producción Promedio - Comparación"
-          data={avgChartData}
+          data={resourceChartData}
           companies={companies}
-          onDownload={handleDownloadAverage}
+          onDownload={() => handleDownload("produccion-promedio-comparacion", "Promedio")}
         />
       </div>
 

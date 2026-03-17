@@ -47,10 +47,10 @@ const formatXAxis = (value: number) => {
 };
 
 type BarLabelProps = {
-  x?: number;
-  y?: number;
-  width?: number;
-  height?: number;
+  x?: number | string;
+  y?: number | string;
+  width?: number | string;
+  height?: number | string;
   value?: number | string;
 };
 
@@ -65,10 +65,24 @@ const renderBarLabel = ({x, y, width, height, value}: BarLabelProps) => {
     return null;
   }
 
+  const xNumber = Number(x);
+  const yNumber = Number(y);
+  const widthNumber = Number(width);
+  const heightNumber = Number(height);
+
+  if (
+    Number.isNaN(xNumber) ||
+    Number.isNaN(yNumber) ||
+    Number.isNaN(widthNumber) ||
+    Number.isNaN(heightNumber)
+  ) {
+    return null;
+  }
+
   return (
     <text
-      x={x + width + 10}
-      y={y + height / 2}
+      x={xNumber + widthNumber + 10}
+      y={yNumber + heightNumber / 2}
       fill="#374151"
       fontSize={13}
       fontWeight={600}
