@@ -8,7 +8,7 @@ import {DateRangeFilters} from "@/components/map/DateRangeFilters";
 import {
   applyDateRangeInputChange,
   DateRangeValue,
-  EMPTY_DATE_RANGE,
+  DEFAULT_WELL_CHART_DATE_RANGE,
   getDateRangeCompleteness,
   getDateRangeWarningMessage,
   getValidatedDateRange,
@@ -24,7 +24,7 @@ interface ProductionPanelProps {
   onValidatedRangeChange: (range: ValidatedProductionDateRange) => void;
 }
 
-export const EMPTY_VALIDATED_RANGE: ValidatedProductionDateRange = EMPTY_DATE_RANGE;
+export const EMPTY_VALIDATED_RANGE: ValidatedProductionDateRange = DEFAULT_WELL_CHART_DATE_RANGE;
 
 export function ProductionPanel({
   selectedWellId,
