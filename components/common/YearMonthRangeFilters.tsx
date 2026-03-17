@@ -1,4 +1,3 @@
-import React from "react";
 import {MONTHS, YEARS} from "@/utils/constants";
 import {SelectFilter} from "@/components/common/SelectFilter";
 

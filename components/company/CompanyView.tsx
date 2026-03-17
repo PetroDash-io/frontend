@@ -292,3 +292,12 @@ const styles = {
     margin: "24px 0",
   } as React.CSSProperties,
 } as const;
+
+export function CompanyIcon({width = 18, height = 18}: {width?: number; height?: number}) {
+  return (
+    <svg width={width} height={height} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4 22V7h16v15" stroke="#2F3E34" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M9 22V12h6v10" stroke="#2F3E34" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}

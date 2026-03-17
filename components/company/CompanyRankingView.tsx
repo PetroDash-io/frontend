@@ -482,3 +482,13 @@ const styles: Record<string, React.CSSProperties> = {
     boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
   },
 };
+
+export function RankingIcon({width = 18, height = 18}: {width?: number; height?: number}) {
+  return (
+    <svg width={width} height={height} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8 2h8v4a4 4 0 01-4 4 4 4 0 01-4-4V2z" stroke="#2F3E34" strokeWidth="2" />
+      <path d="M6 6h12v3a5 5 0 01-5 5h-2a5 5 0 01-5-5V6z" stroke="#2F3E34" strokeWidth="2" />
+      <path d="M9 18h6v4H9v-4z" stroke="#2F3E34" strokeWidth="2" />
+    </svg>
+  );
+}

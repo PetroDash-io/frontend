@@ -423,3 +423,14 @@ const styles = {
     marginBottom: "20px",
   } as React.CSSProperties,
 };
+
+export function AnalysisIcon({width = 18, height = 18}: {width?: number; height?: number}) {
+  return (
+    <svg width={width} height={height} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3 3v18h18" stroke="#2F3E34" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M8 14v5" stroke="#2F3E34" strokeWidth="2" strokeLinecap="round" />
+      <path d="M12 10v9" stroke="#2F3E34" strokeWidth="2" strokeLinecap="round" />
+      <path d="M16 6v13" stroke="#2F3E34" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
