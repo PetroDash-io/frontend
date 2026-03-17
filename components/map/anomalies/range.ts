@@ -7,7 +7,7 @@ export interface RequestedRangeWindow {
 
 const formatYearMonth = (year: string, month: string) => `${year}-${month.padStart(2, "0")}`;
 
-const toMonthTimestamp = (year: string, month: string) => new Date(Number(year), Number(month) - 1, 1).getTime();
+const toMonthTimestamp = (year: string, month: string) => Date.UTC(Number(year), Number(month) - 1, 1);
 
 export const getRequestedRangeWindow = (validatedDateRange: DateRangeValue): RequestedRangeWindow | null => {
   const hasStart = Boolean(validatedDateRange.startYear && validatedDateRange.startMonth);
