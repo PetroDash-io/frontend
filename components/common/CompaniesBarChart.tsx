@@ -51,7 +51,7 @@ type BarLabelProps = {
   y?: number | string;
   width?: number | string;
   height?: number | string;
-  value?: number | string;
+  value?: number | string | boolean | null;
 };
 
 const renderBarLabel = ({x, y, width, height, value}: BarLabelProps) => {

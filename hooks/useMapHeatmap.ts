@@ -17,12 +17,16 @@ export function useMapHeatmap({mode, resource}: UseMapHeatmapParams) {
   });
 
   return useMemo(
-    () => ({
-      isHeatmapMode,
-      mapMode: isHeatmapMode ? "heatmap" : "markers" as const,
-      heatmapData: isHeatmapMode ? geojsonData : null,
-      heatmapMaxValue: isHeatmapMode ? maxValue : 1,
-    }),
+    () => {
+      const mapMode: "heatmap" | "markers" = isHeatmapMode ? "heatmap" : "markers";
+
+      return {
+        isHeatmapMode,
+        mapMode,
+        heatmapData: isHeatmapMode ? geojsonData : null,
+        heatmapMaxValue: isHeatmapMode ? maxValue : 1,
+      };
+    },
     [geojsonData, isHeatmapMode, maxValue]
   );
 }
