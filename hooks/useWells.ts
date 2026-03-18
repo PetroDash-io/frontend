@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import {WellDetail} from "@/app/types";
 
 interface useWellsParams {
-    filters: {watershed: string, province: string; status: string; company: string; limit: number};
+    filters: {watershed: string; province: string; status: string; company: string; limit: number};
 }
 
 export function useWells({filters}: useWellsParams) {
@@ -19,10 +19,7 @@ export function useWells({filters}: useWellsParams) {
                 // Construir query params incluyendo filtros
                 const params = new URLSearchParams();
                 params.append('limit', filters.limit.toString());
-
-                if (filters.watershed) {
-                    params.append('watershed', filters.watershed);
-                }
+                params.append('watershed', filters.watershed);
 
                 if (filters.company) {
                     params.append('company', filters.company);
@@ -56,7 +53,7 @@ export function useWells({filters}: useWellsParams) {
         };
 
         fetchWells();
-    }, [filters.limit, filters.watershed, filters.company, filters.province, filters.status]);
+    }, [filters.limit, filters.company, filters.province, filters.status]);
 
     return {data, loading, error};
 }

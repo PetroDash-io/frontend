@@ -55,6 +55,8 @@ export function MapView({filters, mode, heatmapResource, onSelectHeatmapResource
 
   const {geojsonData: heatmapData, maxValue: heatmapMaxValue} = useWellsHeatmap({
     resource: heatmapResource,
+    watershed: filters.watershed,
+    limit: filters.limit,
   });
 
   const RESOURCE_LABELS: Record<HeatmapResource, string> = {
