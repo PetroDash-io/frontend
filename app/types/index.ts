@@ -149,3 +149,9 @@ export interface TopProductionFilters {
   fin_mes?: number;
   limit?: number;
 }
+
+export type {
+  ProductionResource,
+  WellProductionAnomalyEvidence,
+  WellProductionAnomalyPeriod,
+} from "./anomalies";

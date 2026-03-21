@@ -18,7 +18,9 @@ export const Tabs = ({ children, defaultValue }: TabsProps) => {
 
   return (
     <TabContext.Provider value={{ activeTab, setActiveTab }}>
-      <div className="tabs-wrapper">{children}</div>
+      <div className="tabs-wrapper" style={styles.wrapper}>
+        {children}
+      </div>
     </TabContext.Provider>
   );
 }
@@ -71,6 +73,9 @@ export const TabContent = ({ value, children }: TabContentProps) => {
 };
 
 const styles = {
+    wrapper: {
+        width: "100%",
+    } as React.CSSProperties,
     main: {
         display: "flex",
         flexDirection: "column",
@@ -78,36 +83,37 @@ const styles = {
         padding: 24,
         maxWidth: "100%",
         margin: "0 auto",
-        backgroundColor: colors.bg
+        backgroundColor: colors.bg,
     } as React.CSSProperties,
 } as const;
 
 function tabButtonStyle(active: boolean): React.CSSProperties {
     return {
         padding: "8px 16px",
-        borderRadius: 8,
-        border: "1px solid #3F6B4F",
+        borderRadius: 999,
+        border: "none",
         backgroundColor: active ? "#3F6B4F" : "transparent",
         color: active ? "#F3EEE6" : "#3F6B4F",
         fontSize: 14,
-        fontWeight: 500,
+        fontWeight: 600,
         cursor: "pointer",
-        transition: "all 0.2s ease",
+        transition: "all 0.18s ease",
+        boxShadow: active ? "0 6px 14px rgba(0,0,0,0.12)" : "none",
     };
 }
 
 function tabDrawerStyle(active: boolean): React.CSSProperties {
     return {
-        width: '100%',
-        textAlign: 'left',
-        padding: '9px 12px',
+        width: "100%",
+        textAlign: "left",
+        padding: "9px 12px",
         borderRadius: 8,
-        border: `1px solid ${active ? '#C9D8CE' : 'transparent'}`,
-        backgroundColor: active ? '#E9F0EB' : 'transparent',
-        color: active ? '#2F3E34' : '#4B2A1A',
+        border: `1px solid ${active ? "#C9D8CE" : "transparent"}`,
+        backgroundColor: active ? "#E9F0EB" : "transparent",
+        color: active ? "#2F3E34" : "#4B2A1A",
         fontSize: 14,
         fontWeight: active ? 600 : 500,
-        cursor: 'pointer',
-        transition: 'background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease',
+        cursor: "pointer",
+        transition: "background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease",
     };
 }
