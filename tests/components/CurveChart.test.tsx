@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { CurveChart } from "./CurveChart";
+import { CurveChart } from "../../components/CurveChart";
 
 const mockData = [
   { date: "2024-01", oil: 10, gas: 5, water: 2 }
