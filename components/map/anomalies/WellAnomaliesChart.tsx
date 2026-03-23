@@ -35,13 +35,13 @@ export function WellAnomaliesChart({
 
   const xAxisTickFormatter = (value: number) => {
     const date = new Date(value);
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
   };
 
   const tooltipLabelFormatter = (label: unknown) => {
     if (typeof label !== "number") return String(label ?? "");
     const date = new Date(label);
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
   };
 
   return (

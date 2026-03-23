@@ -2,6 +2,11 @@ import {ProductionMonthly} from "@/app/types";
 import {ProductionResource, WellProductionAnomalyPeriod, AnomalyChartPoint} from "@/components/map/anomalies/types";
 import {convertValueToUnit} from "@/utils/units";
 
+const reportedPeriodToUtcTimestamp = (reportedPeriodDate: string): number => {
+  const [year, month] = reportedPeriodDate.split("-").map((part) => Number(part));
+  return Date.UTC(year, month - 1, 1);
+};
+
 export const getAnomalyDateSet = (anomalyPeriods: WellProductionAnomalyPeriod[] | null): Set<string> => {
   if (!anomalyPeriods || anomalyPeriods.length === 0) {
     return new Set<string>();
@@ -38,7 +43,7 @@ export const buildAnomalyChartData = (
 
       return {
         date,
-        dateTs: new Date(period.reported_period_date).getTime(),
+        dateTs: reportedPeriodToUtcTimestamp(period.reported_period_date),
         resourceProduction: convertedValue,
         anomalyMarker: anomalyDateSet.has(date) ? convertedValue : null,
       };

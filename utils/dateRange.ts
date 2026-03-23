@@ -12,6 +12,15 @@ export const EMPTY_DATE_RANGE: DateRangeValue = {
   endMonth: "",
 };
 
+const today = new Date();
+
+export const DEFAULT_WELL_CHART_DATE_RANGE: DateRangeValue = {
+  startYear: "2023",
+  startMonth: "1",
+  endYear: String(today.getFullYear()),
+  endMonth: String(today.getMonth() + 1),
+};
+
 export const getValidatedDateRange = (inputs: DateRangeValue): DateRangeValue => {
   const hasStartYear = Boolean(inputs.startYear);
   const hasStartMonth = Boolean(inputs.startMonth);
@@ -38,8 +47,9 @@ export const getDateRangeCompleteness = (inputs: DateRangeValue): DateRangeCompl
   const hasEndMonth = Boolean(inputs.endMonth);
 
   return {
-    isStartRangeIncomplete: hasStartYear !== hasStartMonth,
-    isEndRangeIncomplete: hasEndYear !== hasEndMonth,
+    // "Todos" month intentionally leaves month empty; treat that as valid.
+    isStartRangeIncomplete: hasStartMonth && !hasStartYear,
+    isEndRangeIncomplete: hasEndMonth && !hasEndYear,
   };
 };
 

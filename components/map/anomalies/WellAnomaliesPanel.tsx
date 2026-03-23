@@ -12,8 +12,10 @@ import {ResourceSelector} from "@/components/map/anomalies/ResourceSelector";
 import {buildAnomalyChartData, getAnomalyDateSet} from "@/components/map/anomalies/data";
 import {getRangeLabel, getRequestedRangeWindow, getXAxisDomain} from "@/components/map/anomalies/range";
 import {AnomaliesSummaryChips} from "@/components/map/anomalies/AnomaliesSummaryChips";
+import {AnomalyMethodInfoButton} from "@/components/map/anomalies/AnomalyMethodInfoButton";
 import {
   applyDateRangeInputChange,
+  DEFAULT_WELL_CHART_DATE_RANGE,
   DateRangeValue,
   getDateRangeCompleteness,
   getDateRangeWarningMessage,
@@ -26,22 +28,11 @@ interface WellAnomaliesPanelProps {
 
 type ValidatedAnomalyDateRange = DateRangeValue;
 
-const today = new Date();
-const DEFAULT_END_YEAR = String(today.getFullYear());
-const DEFAULT_END_MONTH = String(today.getMonth() + 1);
-
-const EMPTY_DATE_RANGE: ValidatedAnomalyDateRange = {
-  startYear: "2023",
-  startMonth: "1",
-  endYear: DEFAULT_END_YEAR,
-  endMonth: DEFAULT_END_MONTH,
-};
-
 export function WellAnomaliesPanel({
   selectedWellId,
 }: WellAnomaliesPanelProps) {
   const [selectedResource, setSelectedResource] = useState<ProductionResource>("oil");
-  const [chartDateInputs, setChartDateInputs] = useState<ValidatedAnomalyDateRange>(EMPTY_DATE_RANGE);
+  const [chartDateInputs, setChartDateInputs] = useState<ValidatedAnomalyDateRange>(DEFAULT_WELL_CHART_DATE_RANGE);
   const {unit, setUnit} = useUnit();
   const validatedDateRange = useMemo(() => getValidatedDateRange(chartDateInputs), [chartDateInputs]);
   const {isStartRangeIncomplete, isEndRangeIncomplete} = useMemo(
@@ -92,7 +83,10 @@ export function WellAnomaliesPanel({
 
   return (
     <div style={styles.panel}>
-      <h3 style={styles.title}>Anomalias de produccion del pozo {selectedWellId} </h3>
+      <div style={styles.titleRow}>
+        <h3 style={styles.title}>Anomalias de produccion del pozo {selectedWellId} </h3>
+        <AnomalyMethodInfoButton />
+      </div>
 
       {!selectedWellId && <InlineMessage message="Selecciona un pozo para visualizar anomalias." />}
 
@@ -170,6 +164,12 @@ const styles = {
     margin: 0,
     fontSize: 18,
     fontWeight: 600,
+  } as React.CSSProperties,
+  titleRow: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
   } as React.CSSProperties,
   dateFiltersContainer: {
     display: "grid",
