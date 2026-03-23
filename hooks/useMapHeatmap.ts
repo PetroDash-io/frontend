@@ -1,19 +1,22 @@
 import {useMemo} from "react";
 import {useWellsHeatmap, type HeatmapResource} from "@/hooks/useWellsHeatmap";
+import { WellFilters } from "@/app/types/wellFilters";
 
 type MapHeatmapMode = "pozos" | "heatmap";
 
 type UseMapHeatmapParams = {
   mode: MapHeatmapMode;
   resource: HeatmapResource;
+  filters: WellFilters;
 };
 
-export function useMapHeatmap({mode, resource}: UseMapHeatmapParams) {
+export function useMapHeatmap({mode, resource, filters}: UseMapHeatmapParams) {
   const isHeatmapMode = mode === "heatmap";
 
   const {geojsonData, maxValue} = useWellsHeatmap({
     resource,
-    enabled: isHeatmapMode,
+    watershed: filters.watershed,
+    limit: filters.limit
   });
 
   return useMemo(

@@ -53,7 +53,7 @@ export function useWells({filters}: useWellsParams) {
         };
 
         fetchWells();
-    }, [filters.limit, filters.company, filters.province, filters.status]);
+    }, [filters.limit, filters.watershed, filters.company, filters.province, filters.status]);
 
     return {data, loading, error};
 }
