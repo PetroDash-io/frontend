@@ -10,7 +10,6 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
-  LabelList
 } from "recharts";
 import { Company } from "@/app/types";
 import { exportToExcel } from "@/utils/excel";
@@ -32,11 +31,6 @@ const COLORS = [
   "#8B6F47",
 ];
 
-interface BarChartData {
-  name: string;
-  pozos: number;
-}
-
 const formatTooltipValue = (value: number | string | undefined) => {
   if (value === undefined) return "";
   if (typeof value === "number") {
@@ -52,9 +46,15 @@ const formatXAxis = (value: number) => {
   return value.toString();
 };
 
-const renderBarLabel = (props: any) => {
-  const { x, y, width, height, value } = props;
+type BarLabelProps = {
+  x?: number | string;
+  y?: number | string;
+  width?: number | string;
+  height?: number | string;
+  value?: number | string | boolean | null;
+};
 
+const renderBarLabel = ({x, y, width, height, value}: BarLabelProps) => {
   if (
     x == null ||
     y == null ||
@@ -65,10 +65,24 @@ const renderBarLabel = (props: any) => {
     return null;
   }
 
+  const xNumber = Number(x);
+  const yNumber = Number(y);
+  const widthNumber = Number(width);
+  const heightNumber = Number(height);
+
+  if (
+    Number.isNaN(xNumber) ||
+    Number.isNaN(yNumber) ||
+    Number.isNaN(widthNumber) ||
+    Number.isNaN(heightNumber)
+  ) {
+    return null;
+  }
+
   return (
     <text
-      x={x + width + 10}
-      y={y + height / 2}
+      x={xNumber + widthNumber + 10}
+      y={yNumber + heightNumber / 2}
       fill="#374151"
       fontSize={13}
       fontWeight={600}

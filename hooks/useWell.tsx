@@ -44,6 +44,6 @@ export function useWell({wellId}: useWellParams) {
         };
 
         fetchWell();
-    }, [wellId]);
+    }, [wellId, url]);
     return {data, loading, error};
 }
