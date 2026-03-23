@@ -56,21 +56,41 @@ test("permite ingresar ID de pozo", () => {
     expect(screen.getByText(/Neuquén/i)).toBeInTheDocument();
   });
 
-  test("muestra botón de descarga solo con datos", () => {
-    mockHook({
-      loading: false,
-      error: null,
-      data: {
-        well_id: 1,
-        data: [{
-          oil: { total: 1, median: 1 },
-          gas: { total: 1, median: 1 },
-          water: { total: 1, median: 1 },
-        }]
-      }
-    });
-  
-    render(<WellProductionComparisonChart />);
-  
-    expect(screen.getByText(/Descargar Excel/i)).toBeInTheDocument();
+test("muestra botón de descarga solo con datos", () => {
+  mockHook({
+    loading: false,
+    error: null,
+    data: {
+      well_id: 1,
+      data: [{
+        oil: { total: 1, median: 1 },
+        gas: { total: 1, median: 1 },
+        water: { total: 1, median: 1 },
+      }]
+    }
   });
+
+  render(<WellProductionComparisonChart />);
+
+  expect(screen.getByText(/Descargar Excel/i)).toBeInTheDocument();
+});
+
+
+test("muestra botón de descarga solo con datos", () => {
+  mockHook({
+    loading: false,
+    error: null,
+    data: {
+      well_id: 1,
+      data: [{
+        oil: { total: 1, median: 1 },
+        gas: { total: 1, median: 1 },
+        water: { total: 1, median: 1 },
+      }]
+    }
+  });
+
+  render(<WellProductionComparisonChart />);
+
+  expect(screen.getByText(/Descargar Excel/i)).toBeInTheDocument();
+});
