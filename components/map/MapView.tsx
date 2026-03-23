@@ -56,6 +56,8 @@ export function MapView({filters, mode, heatmapResource, onSelectHeatmapResource
   const {isHeatmapMode, mapMode, heatmapData, heatmapMaxValue} = useMapHeatmap({
     mode,
     resource: heatmapResource,
+    watershed: filters.watershed,
+    limit: filters.limit,
   });
 
   return (
