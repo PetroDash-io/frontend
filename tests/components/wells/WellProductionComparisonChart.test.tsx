@@ -31,3 +31,46 @@ test("permite ingresar ID de pozo", () => {
   
     expect(input).toHaveValue(123);
   });
+
+
+  test("muestra info del pozo cuando hay data", () => {
+    mockHook({
+      loading: false,
+      error: null,
+      data: {
+        well_id: 123,
+        company: "YPF",
+        area: "Vaca Muerta",
+        province: "Neuquén",
+        data: [{
+          oil: { total: 100, median: 80 },
+          gas: { total: 200, median: 150 },
+          water: { total: 50, median: 40 },
+        }]
+      }
+    });
+  
+    render(<WellProductionComparisonChart />);
+  
+    expect(screen.getByText(/YPF/i)).toBeInTheDocument();
+    expect(screen.getByText(/Neuquén/i)).toBeInTheDocument();
+  });
+
+  test("muestra botón de descarga solo con datos", () => {
+    mockHook({
+      loading: false,
+      error: null,
+      data: {
+        well_id: 1,
+        data: [{
+          oil: { total: 1, median: 1 },
+          gas: { total: 1, median: 1 },
+          water: { total: 1, median: 1 },
+        }]
+      }
+    });
+  
+    render(<WellProductionComparisonChart />);
+  
+    expect(screen.getByText(/Descargar Excel/i)).toBeInTheDocument();
+  });
