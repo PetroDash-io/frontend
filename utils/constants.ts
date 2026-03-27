@@ -16,7 +16,22 @@ export const PRODUCTION_TYPES = {
     name: "water",
     label: "Agua",
     defaultColor: "#3A7CA5"
-  }
+  },
+  water_inyection: {
+    name: "water_inyection",
+    label: "Inyección Agua",
+    defaultColor: "#5EC1E6"
+  },
+  gas_inyection: {
+    name: "gas_inyection",
+    label: "Inyección Gas",
+    defaultColor: "#FDAE10"
+  },
+  co2_inyection: {
+    name: "co2_inyection",
+    label: "Inyección CO2",
+    defaultColor: "#7D3C98"
+  },
 };
 
 export const colors = {

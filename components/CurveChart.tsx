@@ -26,6 +26,9 @@ interface CurveDataPoint {
   oil: number | null;
   gas: number | null;
   water: number | null;
+  water_inyection?: number | null;
+  gas_inyection?: number | null;
+  co2_inyection?: number | null;
 }
 
 
@@ -51,7 +54,15 @@ export function CurveChart({ data }: CurveChartProps) {
           : unit === "bbl"
           ? d.water * M3_TO_BBL
           : d.water,
+      water_inyection:
+        d.water_inyection == null
+          ? null
+          : unit === "bbl"
+          ? d.water_inyection * M3_TO_BBL
+          : d.water_inyection,
       gas: d.gas, // gas queda en miles de m³
+      gas_inyection: d.gas_inyection,
+      co2_inyection: d.co2_inyection,
     }));
 
     return (
@@ -128,6 +139,30 @@ export function CurveChart({ data }: CurveChartProps) {
                             dataKey="water"
                             name={`Agua (${unit === "bbl" ? "BBL" : "m³"})`}
                             stroke={SERIES_COLORS.water}
+                            dot={false}
+                            />
+
+                        <Line
+                            type="monotone"
+                            dataKey="water_inyection"
+                            name={`Inyección Agua (${unit === "bbl" ? "BBL" : "m³"})`}
+                            stroke="#5EC1E6"
+                            dot={false}
+                            />
+
+                        <Line
+                            type="monotone"
+                            dataKey="gas_inyection"
+                            name="Inyección Gas (Mm³)"
+                            stroke="#FDAE10"
+                            dot={false}
+                            />
+
+                        <Line
+                            type="monotone"
+                            dataKey="co2_inyection"
+                            name="Inyección CO2 (Mm³)"
+                            stroke="#7D3C98"
                             dot={false}
                             />
 

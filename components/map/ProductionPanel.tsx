@@ -69,6 +69,9 @@ export function ProductionPanel({
         oil: toNumber(record.oil_production) ?? 0,
         gas: toNumber(record.gas_production) ?? 0,
         water: toNumber(record.water_production) ?? 0,
+        water_inyection: toNumber(record.water_inyection) ?? 0,
+        gas_inyection: toNumber(record.gas_inyection) ?? 0,
+        co2_inyection: toNumber(record.co2_inyection) ?? 0,
       }));
   }, [wellProduction]);
 
