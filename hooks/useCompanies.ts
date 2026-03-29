@@ -17,7 +17,7 @@ type RawCompany = {
   cantidad?: number;
 };
 
-export function useCompanies(searchQuery?: string): UseCompaniesResult {
+export function useCompanies(searchQuery?: string, watershed = "NEUQUINA"): UseCompaniesResult {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -29,6 +29,7 @@ export function useCompanies(searchQuery?: string): UseCompaniesResult {
 
       try {
         const params = new URLSearchParams();
+        params.append("watershed", watershed);
         if (searchQuery) {
           params.append("q", searchQuery);
         }
@@ -78,7 +79,7 @@ export function useCompanies(searchQuery?: string): UseCompaniesResult {
     };
 
     fetchCompanies();
-  }, [searchQuery]);
+  }, [searchQuery, watershed]);
 
   return { companies, loading, error };
 }

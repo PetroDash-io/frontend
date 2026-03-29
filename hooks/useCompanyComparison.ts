@@ -43,6 +43,9 @@ export function useCompanyComparison(
         if (filters.empresa_2) {
           params.append("empresa_2", filters.empresa_2);
         }
+        if (filters.watershed) {
+          params.append("cuenca", filters.watershed);
+        }
 
         if (filters.inicio_anio !== undefined) {
           params.append("inicio_anio", filters.inicio_anio.toString());
@@ -83,6 +86,7 @@ export function useCompanyComparison(
   }, [
     filters.empresa_1,
     filters.empresa_2,
+    filters.watershed,
     filters.inicio_anio,
     filters.inicio_mes,
     filters.fin_anio,

@@ -1,7 +1,7 @@
 "use client";
 
 import React, {useEffect, useMemo, useState} from "react";
-import {colors} from "@/utils/constants";
+import {colors, WATERSHED_OPTIONS} from "@/utils/constants";
 import {useCompanies} from "@/hooks/useCompanies";
 import {useProductionAggregates} from "@/hooks/useProductionAggregates";
 import {useCompanyComparison} from "@/hooks/useCompanyComparison";
@@ -11,7 +11,7 @@ import {CompanyComparisonCharts} from "@/components/company/CompanyComparisonCha
 import {CompaniesBarChart} from "@/components/common/CompaniesBarChart";
 import {ComparisonFilters, ProductionAggregatesFilters} from "@/app/types";
 import {UnitTabs} from "@/components/common/UnitTabs";
-import {SelectFilterOption, SelectFilter} from "@/components/common/SelectFilter";
+import {SelectFilter, SelectFilterOption} from "@/components/common/SelectFilter";
 import {useUnit} from "@/hooks/useUnit";
 import {convertValueToUnit} from "@/utils/units";
 import {LoadingState} from "@/components/common/LoadingState";
@@ -20,13 +20,14 @@ import {toast} from "react-toastify";
 import {YearMonthRangeFilters} from "@/components/common/YearMonthRangeFilters";
 
 export function CompanyView() {
+  const [watershed, setWatershed] = useState<string>("NEUQUINA");
   const [filters, setFilters] = useState<Partial<ProductionAggregatesFilters>>({});
   const [comparisonFilters, setComparisonFilters] = useState<Partial<ComparisonFilters>>({});
   const [maxCompanies, setMaxCompanies] = useState<number>(7);
 
-  const { companies, loading: loadingCompanies, error: errorCompanies } = useCompanies();
-  const { data: productionData, loading: loadingProduction, error: errorProduction } = useProductionAggregates(filters);
-  const { data: comparisonData, loading: loadingComparison, error: errorComparison } = useCompanyComparison(comparisonFilters);
+  const { companies, loading: loadingCompanies, error: errorCompanies } = useCompanies(undefined, watershed);
+  const { data: productionData, loading: loadingProduction, error: errorProduction } = useProductionAggregates({...filters, watershed});
+  const { data: comparisonData, loading: loadingComparison, error: errorComparison } = useCompanyComparison({...comparisonFilters, watershed});
 
   const {unit, setUnit} = useUnit();
   const errorMessage = errorCompanies || errorProduction || errorComparison || null;
@@ -56,6 +57,10 @@ export function CompanyView() {
     }];
   }, [productionData, unit]);
 
+  const updateWatershedFilter = (filterName: string, value: unknown) => {
+    setWatershed(String(value))
+  }
+
   const updateProductionFilters = (filterName: string, value: unknown) => {
     setFilters((previousValues) => ({...previousValues, [filterName]: value}));
   }
@@ -78,7 +83,13 @@ export function CompanyView() {
   return (
       <div style={styles.container}>
         <h2 style={styles.heading}>Análisis de Empresas y Producción</h2>
-
+        <div style={styles.filtersContainer}>
+          <SelectFilter value={watershed}
+                        onSelect={updateWatershedFilter}
+                        filterName="watershed"
+                        options={WATERSHED_OPTIONS}
+                        inputLabel="Cuenca"/>
+        </div>
         {/* Bar Chart Section */}
         <div style={styles.pieChartSection}>
           <div style={styles.chartControls}>

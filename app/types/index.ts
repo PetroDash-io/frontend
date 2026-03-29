@@ -57,6 +57,7 @@ export interface ProductionAggregates {
 
 export interface ProductionAggregatesFilters {
   empresa: string;
+  watershed?: string;
   inicio_anio: number;
   inicio_mes: number;
   fin_anio: number;
@@ -80,6 +81,7 @@ export interface CompanyComparisonResponse {
 export interface ComparisonFilters {
   empresa_1: string;
   empresa_2: string;
+  watershed?: string;
   inicio_anio?: number;
   inicio_mes?: number;
   fin_anio?: number;
@@ -141,6 +143,7 @@ export interface TopProductionResponse {
 
 export interface TopProductionFilters {
   tipo: "oil" | "gas" | "water";
+  watershed?: string;
   provincia?: string;
   area?: string;
   inicio_anio?: number;
