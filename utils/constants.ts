@@ -32,6 +32,22 @@ export const PRODUCTION_TYPES = {
     label: "Inyección CO2",
     defaultColor: "#7D3C98"
   },
+  // Misspelled aliases for backward compatibility in code references.
+  water_inyection: {
+    name: "water_injection",
+    label: "Inyección Agua",
+    defaultColor: "#5EC1E6"
+  },
+  gas_inyection: {
+    name: "gas_injection",
+    label: "Inyección Gas",
+    defaultColor: "#FDAE10"
+  },
+  co2_inyection: {
+    name: "co2_injection",
+    label: "Inyección CO2",
+    defaultColor: "#7D3C98"
+  },
 };
 
 // Backwards compatibility for previously misspelled production type keys.

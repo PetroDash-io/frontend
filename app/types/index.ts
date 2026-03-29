@@ -33,6 +33,11 @@ export interface ProductionMonthly {
   water_injection?: number;
   gas_injection?: number;
   co2_injection?: number;
+
+  // Backend currently returns the misspelled fields as inyection, keep both for safety.
+  water_inyection?: number;
+  gas_inyection?: number;
+  co2_inyection?: number;
 }
 
 export interface Company {

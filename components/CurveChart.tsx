@@ -26,6 +26,11 @@ interface CurveDataPoint {
   oil: number | null;
   gas: number | null;
   water: number | null;
+  water_injection?: number | null;
+  gas_injection?: number | null;
+  co2_injection?: number | null;
+
+  // Backward compatibility for old payload key names.
   water_inyection?: number | null;
   gas_inyection?: number | null;
   co2_inyection?: number | null;
@@ -54,15 +59,19 @@ export function CurveChart({ data }: CurveChartProps) {
           : unit === "bbl"
           ? d.water * M3_TO_BBL
           : d.water,
-      water_inyection:
-        d.water_inyection == null
-          ? null
-          : unit === "bbl"
-          ? d.water_inyection * M3_TO_BBL
-          : d.water_inyection,
+      water_injection:
+        d.water_injection != null
+          ? unit === "bbl"
+            ? d.water_injection * M3_TO_BBL
+            : d.water_injection
+          : d.water_inyection != null
+            ? unit === "bbl"
+              ? d.water_inyection * M3_TO_BBL
+              : d.water_inyection
+            : null,
       gas: d.gas, // gas queda en miles de m³
-      gas_inyection: d.gas_inyection,
-      co2_inyection: d.co2_inyection,
+      gas_injection: d.gas_injection ?? d.gas_inyection,
+      co2_injection: d.co2_injection ?? d.co2_inyection,
     }));
 
     return (
@@ -144,7 +153,7 @@ export function CurveChart({ data }: CurveChartProps) {
 
                         <Line
                             type="monotone"
-                            dataKey="water_inyection"
+                            dataKey="water_injection"
                             name={`Inyección Agua (${unit === "bbl" ? "BBL" : "m³"})`}
                             stroke="#5EC1E6"
                             dot={false}
@@ -152,17 +161,15 @@ export function CurveChart({ data }: CurveChartProps) {
 
                         <Line
                             type="monotone"
-                            dataKey="gas_inyection"
+                            dataKey="gas_injection"
                             name="Inyección Gas (Mm³)"
                             stroke="#FDAE10"
                             dot={false}
-                            />
+                        />
 
                         <Line
                             type="monotone"
-                            dataKey="co2_inyection"
-                            name="Inyección CO2 (Mm³)"
-                            stroke="#7D3C98"
+                            dataKey="co2_injection"
                             dot={false}
                             />
 

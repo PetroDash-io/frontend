@@ -13,9 +13,9 @@ interface CurveDataPoint {
   oil: number | null;
   gas: number | null;
   water: number | null;
-  water_inyection?: number | null;
-  gas_inyection?: number | null;
-  co2_inyection?: number | null;
+  water_injection?: number | null;
+  gas_injection?: number | null;
+  co2_injection?: number | null;
 }
 
 
@@ -34,9 +34,9 @@ export function TimeSeriesChart({data}: CurveChartProps) {
             oil: row.oil != null ? convertValueToUnit(row.oil, unit) : null,
             water: row.water != null ? convertValueToUnit(row.water, unit) : null,
             gas: row.gas ?? null,
-            water_inyection: row.water_inyection != null ? convertValueToUnit(row.water_inyection, unit) : null,
-            gas_inyection: row.gas_inyection ?? null,
-            co2_inyection: row.co2_inyection ?? null,
+            water_injection: row.water_injection != null ? convertValueToUnit(row.water_injection, unit) : null,
+            gas_injection: row.gas_injection ?? null,
+            co2_injection: row.co2_injection ?? null,
         }));
     }, [data, unit]);
 
@@ -139,25 +139,25 @@ export function TimeSeriesChart({data}: CurveChartProps) {
 
                         <Line
                             type="monotone"
-                            dataKey={PRODUCTION_TYPES.water_inyection.name}
-                            name={`${PRODUCTION_TYPES.water_inyection.label} (${unit})`}
-                            stroke={PRODUCTION_TYPES.water_inyection.defaultColor}
+                            dataKey={PRODUCTION_TYPES.water_injection.name}
+                            name={`${PRODUCTION_TYPES.water_injection.label} (${unit})`}
+                            stroke={PRODUCTION_TYPES.water_injection.defaultColor}
                             dot
                         />
 
                         <Line
                             type="monotone"
-                            dataKey={PRODUCTION_TYPES.gas_inyection.name}
-                            name={`${PRODUCTION_TYPES.gas_inyection.label} (${UNITS.mm3})`}
-                            stroke={PRODUCTION_TYPES.gas_inyection.defaultColor}
+                            dataKey={PRODUCTION_TYPES.gas_injection.name}
+                            name={`${PRODUCTION_TYPES.gas_injection.label} (${UNITS.mm3})`}
+                            stroke={PRODUCTION_TYPES.gas_injection.defaultColor}
                             dot
                         />
 
                         <Line
                             type="monotone"
-                            dataKey={PRODUCTION_TYPES.co2_inyection.name}
-                            name={`${PRODUCTION_TYPES.co2_inyection.label} (${UNITS.mm3})`}
-                            stroke={PRODUCTION_TYPES.co2_inyection.defaultColor}
+                            dataKey={PRODUCTION_TYPES.co2_injection.name}
+                            name={`${PRODUCTION_TYPES.co2_injection.label} (${UNITS.mm3})`}
+                            stroke={PRODUCTION_TYPES.co2_injection.defaultColor}
                             dot
                         />
                     </LineChart>

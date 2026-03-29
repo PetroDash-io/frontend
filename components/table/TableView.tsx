@@ -1,10 +1,24 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {WellsTable} from "@/components/table/WellsTable";
 import {useWells} from "@/hooks/useWells";
+import {LimitFilter} from "@/components/map/LimitFilter";
+import {SELECT_DEFAULT_VALUE, SelectFilter} from "@/components/common/SelectFilter";
 import {LoadingState} from "@/components/common/LoadingState";
 import {InlineMessage} from "@/components/common/InlineMessage";
 import {toast} from "react-toastify";
+// Ensure the correct path to the module
 import { WellFilters } from "@/app/types/wellFilters";
+
+
+const DEFAULT_FILTERS = {
+    province: SELECT_DEFAULT_VALUE,
+    status: SELECT_DEFAULT_VALUE,
+    company: SELECT_DEFAULT_VALUE,
+    limit: 100,
+}
+
+
+
 type TableViewProps = {
     filters: WellFilters;
 
