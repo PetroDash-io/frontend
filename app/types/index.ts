@@ -30,9 +30,9 @@ export interface ProductionMonthly {
   oil_production: number;
   gas_production: number;
   water_production: number;
-  water_inyection?: number;
-  gas_inyection?: number;
-  co2_inyection?: number;
+  water_injection?: number;
+  gas_injection?: number;
+  co2_injection?: number;
 }
 
 export interface Company {
