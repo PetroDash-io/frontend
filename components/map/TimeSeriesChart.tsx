@@ -1,6 +1,6 @@
 import {colors, PRODUCTION_TYPES} from "@/utils/constants";
 
-import {CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Scatter, Tooltip, XAxis, YAxis,} from "recharts";
+import {CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis,} from "recharts";
 
 import {convertValueToUnit, UNITS} from "@/utils/units";
 import {useUnit} from "@/hooks/useUnit";
