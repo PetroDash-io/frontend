@@ -30,6 +30,9 @@ export function useProductionAggregates(filters: Partial<ProductionAggregatesFil
         if (filters.empresa) {
           params.append("empresa", filters.empresa);
         }
+        if (filters.watershed) {
+          params.append("cuenca", filters.watershed);
+        }
 
         if (filters.inicio_anio) {
           params.append("inicio_anio", filters.inicio_anio.toString());
@@ -66,7 +69,7 @@ export function useProductionAggregates(filters: Partial<ProductionAggregatesFil
     };
 
     fetchProduction();
-  }, [filters.empresa, filters.inicio_anio, filters.inicio_mes, filters.fin_anio, filters.fin_mes]);
+  }, [filters.empresa, filters.watershed, filters.inicio_anio, filters.inicio_mes, filters.fin_anio, filters.fin_mes]);
 
   return { data, loading, error };
 }
