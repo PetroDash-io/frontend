@@ -17,23 +17,28 @@ export const PRODUCTION_TYPES = {
     label: "Agua",
     defaultColor: "#3A7CA5"
   },
-  water_inyection: {
-    name: "water_inyection",
+  water_injection: {
+    name: "water_injection",
     label: "Inyección Agua",
     defaultColor: "#5EC1E6"
   },
-  gas_inyection: {
-    name: "gas_inyection",
+  gas_injection: {
+    name: "gas_injection",
     label: "Inyección Gas",
     defaultColor: "#FDAE10"
   },
-  co2_inyection: {
-    name: "co2_inyection",
+  co2_injection: {
+    name: "co2_injection",
     label: "Inyección CO2",
     defaultColor: "#7D3C98"
   },
 };
 
+// Backwards compatibility for previously misspelled production type keys.
+// TODO: Migrate all usages from `*_inyection` to `*_injection` and then remove these aliases.
+(PRODUCTION_TYPES as any).water_inyection = PRODUCTION_TYPES.water_injection;
+(PRODUCTION_TYPES as any).gas_inyection = PRODUCTION_TYPES.gas_injection;
+(PRODUCTION_TYPES as any).co2_inyection = PRODUCTION_TYPES.co2_injection;
 export const colors = {
   bg: "#F3EEE6",
   panel: "#2F3E34",
