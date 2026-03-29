@@ -48,45 +48,9 @@ export function TimeSeriesChart({data}: CurveChartProps) {
         );
     }
 
-    const injectionMarkerData = useMemo(() => {
-    if (!convertedData || convertedData.length === 0) return {
-      water: [],
-      gas: [],
-      co2: [],
-    };
 
-    const result = {
-      water: [] as Array<{date: string; value: number}>,
-      gas: [] as Array<{date: string; value: number}>,
-      co2: [] as Array<{date: string; value: number}>,
-    };
 
-    convertedData.forEach((row, index) => {
-      const prev = index > 0 ? convertedData[index - 1] : null;
-
-      const currentWater = row.water_inyection ?? 0;
-      const prevWater = prev?.water_inyection ?? 0;
-      if (currentWater !== 0 && currentWater !== prevWater) {
-        result.water.push({date: row.date, value: currentWater});
-      }
-
-      const currentGas = row.gas_inyection ?? 0;
-      const prevGas = prev?.gas_inyection ?? 0;
-      if (currentGas !== 0 && currentGas !== prevGas) {
-        result.gas.push({date: row.date, value: currentGas});
-      }
-
-      const currentCo2 = row.co2_inyection ?? 0;
-      const prevCo2 = prev?.co2_inyection ?? 0;
-      if (currentCo2 !== 0 && currentCo2 !== prevCo2) {
-        result.co2.push({date: row.date, value: currentCo2});
-      }
-    });
-
-    return result;
-  }, [convertedData]);
-
-  const yAxisTickFormatter = (value: number) => {
+    const yAxisTickFormatter = (value: number) => {
         return unit === UNITS.bbl ? value.toFixed(0) : value.toFixed(1)
     }
 
