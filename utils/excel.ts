@@ -1,5 +1,7 @@
 import * as XLSX from 'xlsx';
 
+type ExcelRow = Record<string, unknown>;
+
 /**
  * Exporta datos a un archivo Excel (.xlsx)
  * @param data - Array de objetos con los datos a exportar
@@ -7,7 +9,7 @@ import * as XLSX from 'xlsx';
  * @param sheetName - Nombre de la hoja (opcional, por defecto "Datos")
  */
 export const exportToExcel = (
-  data: any[],
+  data: ExcelRow[],
   fileName: string,
   sheetName: string = 'Datos'
 ): void => {
@@ -53,7 +55,7 @@ export const exportToExcel = (
  * @param fileName - Nombre del archivo (sin extensión)
  */
 export const exportMultipleSheetsToExcel = (
-  dataSheets: { data: any[]; sheetName: string }[],
+  dataSheets: { data: ExcelRow[]; sheetName: string }[],
   fileName: string
 ): void => {
   if (!dataSheets || dataSheets.length === 0) {

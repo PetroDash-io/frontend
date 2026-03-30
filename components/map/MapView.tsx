@@ -7,14 +7,14 @@ import {EMPTY_VALIDATED_RANGE, ProductionPanel, ValidatedProductionDateRange} fr
 import {useWells} from "@/hooks/useWells";
 import {useWell} from "@/hooks/useWell";
 import {useWellsProduction} from "@/hooks/useWellProduction";
-import {useWellsHeatmap} from "@/hooks/useWellsHeatmap";
 import type {HeatmapResource} from "@/hooks/useWellsHeatmap";
+import {useMapHeatmap} from "@/hooks/useMapHeatmap";
 import {LoadingState} from "@/components/common/LoadingState";
 import {InlineMessage} from "@/components/common/InlineMessage";
 import {toast} from "react-toastify";
 import {WellFilters} from "@/app/types/wellFilters";
 import {WellAnomaliesPanel} from "@/components/map/anomalies/WellAnomaliesPanel";
-import {colors} from "@/utils/constants";
+import {MapHeatmapControls} from "@/components/map/MapHeatmapControls";
 
 export type MapViewMode = "pozos" | "heatmap";
 
@@ -53,33 +53,19 @@ export function MapView({filters, mode, heatmapResource, onSelectHeatmapResource
     toast.error(errorMessage || "Unexpected error", {toastId: errorMessage || "Unexpected error"});
   }, [errorMessage]);
 
-  const {geojsonData: heatmapData, maxValue: heatmapMaxValue} = useWellsHeatmap({
+  const {isHeatmapMode, mapMode, heatmapData, heatmapMaxValue} = useMapHeatmap({
+    mode,
     resource: heatmapResource,
+    filters
   });
-
-  const RESOURCE_LABELS: Record<HeatmapResource, string> = {
-    oil: "Petróleo",
-    gas: "Gas",
-    water: "Agua",
-  };
 
   return (
       <>
-        {mode === "heatmap" && (
-          <div style={styles.toggleBar}>
-            <div style={styles.toggleLabel}>Recurso:</div>
-            <div style={styles.resourceButtons}>
-              {(["oil", "gas", "water"] as HeatmapResource[]).map((resource) => (
-                <button
-                  key={resource}
-                  style={styles.resourceBtn(heatmapResource === resource, resource)}
-                  onClick={() => onSelectHeatmapResource(resource)}
-                >
-                  {RESOURCE_LABELS[resource]}
-                </button>
-              ))}
-            </div>
-          </div>
+        {isHeatmapMode && (
+          <MapHeatmapControls
+            selectedResource={heatmapResource}
+            onSelectResource={onSelectHeatmapResource}
+          />
         )}
 
         <div style={styles.wellDetailsContainer}>
@@ -87,7 +73,7 @@ export function MapView({filters, mode, heatmapResource, onSelectHeatmapResource
               wells={wells || []}
               selectedWellId={selectedWellId}
               onSelectWell={handleSelectWell}
-              mapMode={mode === "pozos" ? "markers" : "heatmap"}
+                mapMode={mapMode}
               heatmapData={heatmapData}
               heatmapMaxValue={heatmapMaxValue}
           />
@@ -128,59 +114,7 @@ export function MapView({filters, mode, heatmapResource, onSelectHeatmapResource
   );
 }
 
-const RESOURCE_COLORS: Record<string, string> = {
-    oil: colors.oil,
-    gas: colors.gas,
-    water: colors.water,
-};
-
 const styles = {
-    toggleBar: {
-        display: "flex",
-        flexWrap: "wrap",
-        gap: 10,
-        alignItems: "center",
-        padding: "12px 16px",
-        borderRadius: 14,
-        border: `1px solid ${colors.panelBorder}`,
-        backgroundColor: "rgba(255,255,255,0.95)",
-        boxShadow: "0 10px 22px rgba(0,0,0,0.14)",
-        marginBottom: 12,
-    } as React.CSSProperties,
-    toggleLabel: {
-        fontWeight: 600,
-        color: colors.text,
-        marginRight: 10,
-        minWidth: 72,
-    } as React.CSSProperties,
-    toggleBtn: (active: boolean) => ({
-        padding: "8px 18px",
-        borderRadius: 999,
-        border: `1px solid ${active ? colors.accent : colors.panelBorder}`,
-        backgroundColor: active ? colors.accent : "transparent",
-        color: active ? "#fff" : colors.text,
-        fontWeight: 600,
-        cursor: "pointer",
-        fontSize: 13,
-        transition: "all 0.18s ease",
-        boxShadow: active ? "0 6px 12px rgba(0,0,0,0.12)" : "none",
-    }) as React.CSSProperties,
-    resourceButtons: {
-        display: "flex",
-        gap: 6,
-        marginLeft: "auto",
-    } as React.CSSProperties,
-    resourceBtn: (active: boolean, resource: string) => ({
-        padding: "6px 12px",
-        borderRadius: 999,
-        border: `1px solid ${RESOURCE_COLORS[resource] || colors.accent}`,
-        backgroundColor: active ? (RESOURCE_COLORS[resource] || colors.accent) : "transparent",
-        color: active ? "#fff" : colors.text,
-        fontWeight: active ? 600 : 500,
-        cursor: "pointer",
-        fontSize: 12,
-        transition: "all 0.18s ease",
-    }) as React.CSSProperties,
     errorMessageContainer: {
         display: "flex"
     } as React.CSSProperties,

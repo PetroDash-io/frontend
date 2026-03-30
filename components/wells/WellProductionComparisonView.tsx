@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {colors, MONTHS, YEARS} from "@/utils/constants";
+import {colors} from "@/utils/constants";
 import {
   ResponsiveContainer,
   BarChart,
@@ -12,11 +12,11 @@ import {
 } from "recharts";
 import { useWellProductionComparison } from "@/hooks/useWellProductionComparison";
 import { WellProductionComparisonFilters } from "@/app/types";
-import {SelectFilter} from "@/components/common/SelectFilter";
 import { exportMultipleSheetsToExcel } from "@/utils/excel";
 import { toast } from "react-toastify";
 import { LoadingState } from "@/components/common/LoadingState";
 import { InlineMessage } from "@/components/common/InlineMessage";
+import {YearMonthRangeFilters} from "@/components/common/YearMonthRangeFilters";
 
 const formatYAxis = (value: number) => {
   if (value >= 1000000) {
@@ -34,7 +34,7 @@ const formatTooltip = (value: number | string | undefined) => {
   return value;
 };
 
-export function WellProductionComparisonChart() {
+export function WellProductionComparisonView() {
   const [wellId, setWellId] = useState<number | null>(null);
   const [filters, setFilters] = useState<Partial<WellProductionComparisonFilters>>({median_by: []});
   const { data, loading, error } = useWellProductionComparison(wellId, filters);
@@ -179,35 +179,13 @@ export function WellProductionComparisonChart() {
         </div>
 
         <div style={styles.filterRow}>
-          <SelectFilter value={filters.inicio_anio || ""}
-                        onSelect={updateFilters}
-                        filterName="inicio_anio"
-                        defaultOptionLabel="Todos"
-                        inputLabel="Año de inicio"
-                        options={YEARS}/>
-
-          <SelectFilter value={filters.inicio_mes || ""}
-                        onSelect={updateFilters}
-                        filterName="inicio_mes"
-                        disabled={!filters.inicio_anio}
-                        defaultOptionLabel="Todos"
-                        inputLabel="Mes de inicio"
-                        options={MONTHS}/>
-
-          <SelectFilter value={filters.fin_anio || ""}
-                        onSelect={updateFilters}
-                        filterName="fin_anio"
-                        defaultOptionLabel="Todos"
-                        inputLabel="Año de fin"
-                        options={YEARS}/>
-
-          <SelectFilter value={filters.fin_mes || ""}
-                        onSelect={updateFilters}
-                        filterName="fin_mes"
-                        disabled={!filters.fin_anio}
-                        defaultOptionLabel="Todos"
-                        inputLabel="Mes de fin"
-                        options={MONTHS}/>
+          <YearMonthRangeFilters
+            onSelect={updateFilters}
+            startYearValue={filters.inicio_anio || ""}
+            startMonthValue={filters.inicio_mes || ""}
+            endYearValue={filters.fin_anio || ""}
+            endMonthValue={filters.fin_mes || ""}
+          />
         </div>
 
         <div style={styles.filterRow}>
@@ -445,3 +423,14 @@ const styles = {
     marginBottom: "20px",
   } as React.CSSProperties,
 };
+
+export function AnalysisIcon({width = 18, height = 18}: {width?: number; height?: number}) {
+  return (
+    <svg width={width} height={height} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3 3v18h18" stroke="#2F3E34" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M8 14v5" stroke="#2F3E34" strokeWidth="2" strokeLinecap="round" />
+      <path d="M12 10v9" stroke="#2F3E34" strokeWidth="2" strokeLinecap="round" />
+      <path d="M16 6v13" stroke="#2F3E34" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}

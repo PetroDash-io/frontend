@@ -1,9 +1,10 @@
 "use client";
 
 import React from "react";
-import {colors, MONTHS, YEARS} from "@/utils/constants";
+import {colors} from "@/utils/constants";
 import {ComparisonFilters} from "@/app/types";
 import {SelectFilter, SelectFilterOption} from "@/components/common/SelectFilter";
+import {YearMonthRangeFilters} from "@/components/common/YearMonthRangeFilters";
 
 interface CompanyComparisonPanelProps {
   companies: SelectFilterOption[];
@@ -41,35 +42,13 @@ export function CompanyComparisonPanel({
         </div>
 
         <div style={styles.dateRangeContainer}>
-          <SelectFilter value={filters.inicio_anio || ""}
-                        onSelect={updateFilters}
-                        filterName="inicio_anio"
-                        defaultOptionLabel="Todos"
-                        inputLabel="Año de inicio"
-                        options={YEARS}/>
-
-          <SelectFilter value={filters.inicio_mes || ""}
-                        onSelect={updateFilters}
-                        filterName="inicio_mes"
-                        disabled={!filters.inicio_anio}
-                        defaultOptionLabel="Todos"
-                        inputLabel="Mes de inicio"
-                        options={MONTHS}/>
-
-          <SelectFilter value={filters.fin_anio || ""}
-                        onSelect={updateFilters}
-                        filterName="fin_anio"
-                        defaultOptionLabel="Todos"
-                        inputLabel="Año de fin"
-                        options={YEARS}/>
-
-          <SelectFilter value={filters.fin_mes || ""}
-                        onSelect={updateFilters}
-                        filterName="fin_mes"
-                        disabled={!filters.fin_anio}
-                        defaultOptionLabel="Todos"
-                        inputLabel="Mes de fin"
-                        options={MONTHS}/>
+          <YearMonthRangeFilters
+            onSelect={updateFilters}
+            startYearValue={filters.inicio_anio || ""}
+            startMonthValue={filters.inicio_mes || ""}
+            endYearValue={filters.fin_anio || ""}
+            endMonthValue={filters.fin_mes || ""}
+          />
         </div>
       </div>
     </div>

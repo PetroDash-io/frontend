@@ -1,6 +1,6 @@
 "use client";
 
-import {useState, useMemo} from "react";
+import React, {useState, useMemo} from "react";
 import {MapView} from "@/components/map/MapView";
 import {TableView} from "@/components/table/TableView";
 import {LimitFilter} from "@/components/map/LimitFilter";
@@ -19,9 +19,11 @@ const DEFAULT_FILTERS = {
 
 export function WellView() {
     const [filters, setFilters] = useState<WellFilters>(DEFAULT_FILTERS);
+    const [tablePage, setTablePage] = useState(0);
   
     const updateFilters = (filterName: string, value: unknown) => {
         setFilters(prev => ({ ...prev, [filterName]: value }));
+        setTablePage(0);
     };
 
     const [view, setView] = useState<"map" | "table">("map");
@@ -127,7 +129,13 @@ export function WellView() {
         </>
       )}
 
-      {view === "table" && <TableView filters={filters} />}
+      {view === "table" && (
+        <TableView
+          filters={filters}
+          currentPage={tablePage}
+          onChangePage={setTablePage}
+        />
+      )}
     </div>
   );
 }
@@ -196,3 +204,12 @@ const styles = {
     boxShadow: active ? "0 8px 16px rgba(214, 162, 58, 0.25)" : "none",
   }) as React.CSSProperties,
 } as const;
+
+export function WellIcon({width = 18, height = 18}: {width?: number; height?: number}) {
+  return (
+    <svg width={width} height={height} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M18 5.5v13a2 2 0 01-2 2H8a2 2 0 01-2-2v-13" stroke="#2F3E34" strokeWidth="2" strokeLinejoin="round" />
+      <path d="M6 8h12M6 12h12M6 16h12" stroke="#2F3E34" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}

@@ -1,14 +1,16 @@
 import { useEffect, useState, useMemo } from "react";
-import type { GeoJSON } from "geojson";
 
 export type HeatmapResource = "oil" | "gas" | "water";
 
 interface HeatmapFilters {
   resource: HeatmapResource;
+  watershed?: string;
   start_year?: number;
   start_month?: number;
   end_year?: number;
   end_month?: number;
+  limit?: number;
+  offset?: number;
 }
 
 interface WellHeatmapItem {
@@ -32,6 +34,9 @@ export function useWellsHeatmap(filters: HeatmapFilters) {
       try {
         const params = new URLSearchParams();
         params.append("resource", filters.resource);
+        if (filters.watershed) params.append("watershed", filters.watershed);
+        if (filters.limit) params.append("limit", filters.limit.toString());
+        if (filters.offset) params.append("offset", filters.offset.toString());
         if (filters.start_year) params.append("start_year", filters.start_year.toString());
         if (filters.start_month) params.append("start_month", filters.start_month.toString());
         if (filters.end_year) params.append("end_year", filters.end_year.toString());
@@ -56,7 +61,16 @@ export function useWellsHeatmap(filters: HeatmapFilters) {
     };
 
     fetchHeatmap();
-  }, [filters.resource, filters.start_year, filters.start_month, filters.end_year, filters.end_month]);
+  }, [
+    filters.resource,
+    filters.watershed,
+    filters.limit,
+    filters.offset,
+    filters.start_year,
+    filters.start_month,
+    filters.end_year,
+    filters.end_month,
+  ]);
 
   const geojsonData = useMemo<GeoJSON.FeatureCollection | null>(() => {
     if (!rawData) return null;

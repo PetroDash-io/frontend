@@ -1,7 +1,7 @@
 "use client";
 
 import React, {useEffect, useMemo, useState} from "react";
-import {colors, MONTHS, YEARS} from "@/utils/constants";
+import {colors, WATERSHED_OPTIONS} from "@/utils/constants";
 import {useCompanies} from "@/hooks/useCompanies";
 import {useProductionAggregates} from "@/hooks/useProductionAggregates";
 import {useCompanyComparison} from "@/hooks/useCompanyComparison";
@@ -11,21 +11,23 @@ import {CompanyComparisonCharts} from "@/components/company/CompanyComparisonCha
 import {CompaniesBarChart} from "@/components/common/CompaniesBarChart";
 import {ComparisonFilters, ProductionAggregatesFilters} from "@/app/types";
 import {UnitTabs} from "@/components/common/UnitTabs";
-import {SelectFilterOption, SelectFilter} from "@/components/common/SelectFilter";
+import {SelectFilter, SelectFilterOption} from "@/components/common/SelectFilter";
 import {useUnit} from "@/hooks/useUnit";
 import {convertValueToUnit} from "@/utils/units";
 import {LoadingState} from "@/components/common/LoadingState";
 import {InlineMessage} from "@/components/common/InlineMessage";
 import {toast} from "react-toastify";
+import {YearMonthRangeFilters} from "@/components/common/YearMonthRangeFilters";
 
 export function CompanyView() {
+  const [watershed, setWatershed] = useState<string>("NEUQUINA");
   const [filters, setFilters] = useState<Partial<ProductionAggregatesFilters>>({});
   const [comparisonFilters, setComparisonFilters] = useState<Partial<ComparisonFilters>>({});
   const [maxCompanies, setMaxCompanies] = useState<number>(7);
 
-  const { companies, loading: loadingCompanies, error: errorCompanies } = useCompanies();
-  const { data: productionData, loading: loadingProduction, error: errorProduction } = useProductionAggregates(filters);
-  const { data: comparisonData, loading: loadingComparison, error: errorComparison } = useCompanyComparison(comparisonFilters);
+  const { companies, loading: loadingCompanies, error: errorCompanies } = useCompanies(undefined, watershed);
+  const { data: productionData, loading: loadingProduction, error: errorProduction } = useProductionAggregates({...filters, watershed});
+  const { data: comparisonData, loading: loadingComparison, error: errorComparison } = useCompanyComparison({...comparisonFilters, watershed});
 
   const {unit, setUnit} = useUnit();
   const errorMessage = errorCompanies || errorProduction || errorComparison || null;
@@ -55,6 +57,10 @@ export function CompanyView() {
     }];
   }, [productionData, unit]);
 
+  const updateWatershedFilter = (filterName: string, value: unknown) => {
+    setWatershed(String(value))
+  }
+
   const updateProductionFilters = (filterName: string, value: unknown) => {
     setFilters((previousValues) => ({...previousValues, [filterName]: value}));
   }
@@ -77,7 +83,13 @@ export function CompanyView() {
   return (
       <div style={styles.container}>
         <h2 style={styles.heading}>Análisis de Empresas y Producción</h2>
-
+        <div style={styles.filtersContainer}>
+          <SelectFilter value={watershed}
+                        onSelect={updateWatershedFilter}
+                        filterName="watershed"
+                        options={WATERSHED_OPTIONS}
+                        inputLabel="Cuenca"/>
+        </div>
         {/* Bar Chart Section */}
         <div style={styles.pieChartSection}>
           <div style={styles.chartControls}>
@@ -113,35 +125,13 @@ export function CompanyView() {
                         defaultOptionLabel="Seleccione una empresa"/>
 
           <div style={styles.dateRangeContainer}>
-            <SelectFilter value={filters.inicio_anio || ""}
-                          onSelect={updateProductionFilters}
-                          filterName="inicio_anio"
-                          defaultOptionLabel="Todos"
-                          inputLabel="Año de inicio"
-                          options={YEARS}/>
-
-            <SelectFilter value={filters.inicio_mes || ""}
-                          onSelect={updateProductionFilters}
-                          filterName="inicio_mes"
-                          disabled={!filters.inicio_anio}
-                          defaultOptionLabel="Todos"
-                          inputLabel="Mes de inicio"
-                          options={MONTHS}/>
-
-            <SelectFilter value={filters.fin_anio || ""}
-                          onSelect={updateProductionFilters}
-                          filterName="fin_anio"
-                          defaultOptionLabel="Todos"
-                          inputLabel="Año de fin"
-                          options={YEARS}/>
-
-            <SelectFilter value={filters.fin_mes || ""}
-                          onSelect={updateProductionFilters}
-                          filterName="fin_mes"
-                          disabled={!filters.fin_anio}
-                          defaultOptionLabel="Todos"
-                          inputLabel="Mes de fin"
-                          options={MONTHS}/>
+            <YearMonthRangeFilters
+              onSelect={updateProductionFilters}
+              startYearValue={filters.inicio_anio || ""}
+              startMonthValue={filters.inicio_mes || ""}
+              endYearValue={filters.fin_anio || ""}
+              endMonthValue={filters.fin_mes || ""}
+            />
           </div>
         </div>
 
@@ -313,3 +303,12 @@ const styles = {
     margin: "24px 0",
   } as React.CSSProperties,
 } as const;
+
+export function CompanyIcon({width = 18, height = 18}: {width?: number; height?: number}) {
+  return (
+    <svg width={width} height={height} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4 22V7h16v15" stroke="#2F3E34" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M9 22V12h6v10" stroke="#2F3E34" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
