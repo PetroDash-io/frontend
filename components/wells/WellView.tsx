@@ -19,9 +19,11 @@ const DEFAULT_FILTERS = {
 
 export function WellView() {
     const [filters, setFilters] = useState<WellFilters>(DEFAULT_FILTERS);
+    const [tablePage, setTablePage] = useState(0);
   
     const updateFilters = (filterName: string, value: unknown) => {
         setFilters(prev => ({ ...prev, [filterName]: value }));
+        setTablePage(0);
     };
 
     const [view, setView] = useState<"map" | "table">("map");
@@ -127,7 +129,13 @@ export function WellView() {
         </>
       )}
 
-      {view === "table" && <TableView filters={filters} />}
+      {view === "table" && (
+        <TableView
+          filters={filters}
+          currentPage={tablePage}
+          onChangePage={setTablePage}
+        />
+      )}
     </div>
   );
 }
