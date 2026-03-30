@@ -4,7 +4,7 @@ import React, { useMemo, useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { TopProductionFilters } from "@/app/types";
 import { useTopProduction } from "@/hooks/useTopProduction";
-import { colors, PIE_CHART_COLORS, AREAS_POR_PROVINCIA } from "@/utils/constants";
+import { colors, PIE_CHART_COLORS, AREAS_POR_PROVINCIA, WATERSHED_OPTIONS } from "@/utils/constants";
 import { SelectFilter } from "@/components/common/SelectFilter";
 import {YearMonthRangeFilters} from "@/components/common/YearMonthRangeFilters";
 
@@ -48,6 +48,7 @@ export function CompanyRankingView() {
   const [filters, setFilters] = useState<Partial<TopProductionFilters>>({
     tipo: "oil",
     limit: 10,
+    watershed: "NEUQUINA",
   });
 
   const { data, loading, error } = useTopProduction(filters);
@@ -75,6 +76,10 @@ export function CompanyRankingView() {
 
         if (filterName === "tipo") {
           updatedFilters.tipo = value as "oil" | "gas" | "water";
+        } else if (filterName === "watershed") {
+          updatedFilters.watershed = value;
+          delete updatedFilters.provincia;
+          delete updatedFilters.area;
         } else if (filterName === "inicio_anio" || filterName === "fin_anio") {
           updatedFilters[filterName] = parseInt(value, 10);
         } else if (filterName === "inicio_mes" || filterName === "fin_mes") {
@@ -161,6 +166,14 @@ export function CompanyRankingView() {
 
       <div style={styles.filtersContainer}>
         <div style={styles.topFiltersRow}>
+          <SelectFilter
+            inputLabel="Cuenca"
+            value={filters.watershed || "NEUQUINA"}
+            filterName="watershed"
+            onSelect={updateFilter}
+            options={WATERSHED_OPTIONS}
+          />
+
           <SelectFilter
             inputLabel="Tipo de Producción"
             value={filters.tipo || "oil"}

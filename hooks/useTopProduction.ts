@@ -27,6 +27,10 @@ export function useTopProduction(filters: Partial<TopProductionFilters>): UseTop
         const params = new URLSearchParams();
         params.append("tipo", filters.tipo!);
 
+        if (filters.watershed) {
+          params.append("cuenca", filters.watershed);
+        }
+
         if (filters.provincia) {
           params.append("provincia", filters.provincia);
         }
@@ -77,6 +81,7 @@ export function useTopProduction(filters: Partial<TopProductionFilters>): UseTop
     fetchTopProduction();
   }, [
     filters.tipo,
+    filters.watershed,
     filters.provincia,
     filters.area,
     filters.inicio_anio,
