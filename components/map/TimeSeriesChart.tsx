@@ -13,6 +13,9 @@ interface CurveDataPoint {
   oil: number | null;
   gas: number | null;
   water: number | null;
+  water_injection?: number | null;
+  gas_injection?: number | null;
+  co2_injection?: number | null;
 }
 
 
@@ -28,9 +31,12 @@ export function TimeSeriesChart({data}: CurveChartProps) {
 
         return data.map(row => ({
             ...row,
-            oil: convertValueToUnit(row.oil, unit),
-            water: convertValueToUnit(row.water, unit),
-            gas: row.gas, // Gas queda en miles de m³
+            oil: row.oil != null ? convertValueToUnit(row.oil, unit) : null,
+            water: row.water != null ? convertValueToUnit(row.water, unit) : null,
+            gas: row.gas ?? null,
+            water_injection: row.water_injection != null ? convertValueToUnit(row.water_injection, unit) : null,
+            gas_injection: row.gas_injection ?? null,
+            co2_injection: row.co2_injection ?? null,
         }));
     }, [data, unit]);
 
@@ -41,6 +47,8 @@ export function TimeSeriesChart({data}: CurveChartProps) {
             </div>
         );
     }
+
+
 
     const yAxisTickFormatter = (value: number) => {
         return unit === UNITS.bbl ? value.toFixed(0) : value.toFixed(1)
@@ -59,6 +67,18 @@ export function TimeSeriesChart({data}: CurveChartProps) {
             return [`${Number(value).toFixed(2)} ${unit}`, PRODUCTION_TYPES.water.label];
         }
 
+        if (name === "Inyección Agua") {
+            return [`${Number(value).toFixed(2)} ${unit}`, "Inyección Agua"];
+        }
+
+        if (name === "Inyección Gas") {
+            return [`${Number(value).toFixed(2)} ${UNITS.mm3}`, "Inyección Gas"];
+        }
+
+        if (name === "Inyección CO2") {
+            return [`${Number(value).toFixed(2)} ${UNITS.mm3}`, "Inyección CO2"];
+        }
+
         return value;
     }
 
@@ -66,14 +86,19 @@ export function TimeSeriesChart({data}: CurveChartProps) {
         <div style={styles.curveChartWrapper}>
            <UnitTabs onChange={setUnit} currentUnit={unit}/>
 
-            <div style={{ height: 320 }}>
+            <div style={{ height: 340 }}>
                 <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={convertedData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
+                    <LineChart data={convertedData} margin={{ top: 40, right: 20, left: 0, bottom: 40 }}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="date" minTickGap={18} />
                         <YAxis tickFormatter={yAxisTickFormatter}/>
                         <Tooltip formatter={tooltipTextFormatter}/>
-                        <Legend />
+                        <Legend
+                            verticalAlign="top"
+                            align="right"
+                            iconType="circle"
+                            wrapperStyle={{ color: colors.textLight, fontSize: 12, top: -14 }}
+                        />
                         <Line
                             type="monotone"
                             dataKey={PRODUCTION_TYPES.oil.name}
@@ -93,7 +118,48 @@ export function TimeSeriesChart({data}: CurveChartProps) {
                             name={`${PRODUCTION_TYPES.water.label} (${unit})`}
                             stroke={PRODUCTION_TYPES.water.defaultColor}
                             dot={false}/>
+                    </LineChart>
+                </ResponsiveContainer>
+            </div>
 
+            <div style={{ height: 340 }}>
+                <h4 style={{ margin: "16px 0 8px", color: "#F3EEE6" }}>Progresión de inyecciones</h4>
+                <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={convertedData} margin={{ top: 40, right: 20, left: 0, bottom: 40 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="date" minTickGap={18} />
+                        <YAxis tickFormatter={yAxisTickFormatter}/>
+                        <Tooltip formatter={tooltipTextFormatter}/>
+                        <Legend
+                            verticalAlign="top"
+                            align="right"
+                            iconType="circle"
+                            wrapperStyle={{ color: colors.textLight, fontSize: 12, top: -14 }}
+                        />
+
+                        <Line
+                            type="monotone"
+                            dataKey={PRODUCTION_TYPES.water_injection.name}
+                            name={`${PRODUCTION_TYPES.water_injection.label} (${unit})`}
+                            stroke={PRODUCTION_TYPES.water_injection.defaultColor}
+                            dot
+                        />
+
+                        <Line
+                            type="monotone"
+                            dataKey={PRODUCTION_TYPES.gas_injection.name}
+                            name={`${PRODUCTION_TYPES.gas_injection.label} (${UNITS.mm3})`}
+                            stroke={PRODUCTION_TYPES.gas_injection.defaultColor}
+                            dot
+                        />
+
+                        <Line
+                            type="monotone"
+                            dataKey={PRODUCTION_TYPES.co2_injection.name}
+                            name={`${PRODUCTION_TYPES.co2_injection.label} (${UNITS.mm3})`}
+                            stroke={PRODUCTION_TYPES.co2_injection.defaultColor}
+                            dot
+                        />
                     </LineChart>
                 </ResponsiveContainer>
             </div>
@@ -110,6 +176,8 @@ const styles = {
         border: `1px solid ${colors.panelBorder}`,
         color: colors.textLight,
         marginTop: 4,
+        padding: 8,
+        overflow: "visible",
     } as React.CSSProperties,
     emptyDataMessage: {
         padding: 20,
