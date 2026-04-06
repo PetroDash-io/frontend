@@ -20,6 +20,7 @@ interface WellsMapProps {
 export function WellsMap({ wells, selectedWellId, onSelectWell, mapMode, heatmapData, heatmapMaxValue = 1 }: WellsMapProps) {
     const [focusedPozoId, setFocusedPozoId] = useState<string | null>(null);
     const [activePozo, setActivePozo] = useState<ActiveWell | null>(null);
+    const safeHeatmapMaxValue = Number.isFinite(heatmapMaxValue) && heatmapMaxValue > 0 ? heatmapMaxValue : 1;
 
     return (
         <div style={styles.mapContainer}>
@@ -50,7 +51,7 @@ export function WellsMap({ wells, selectedWellId, onSelectWell, mapMode, heatmap
                                         "interpolate", ["linear"],
                                         ["get", "value"],
                                         0, 0,
-                                        heatmapMaxValue, 1,
+                                        safeHeatmapMaxValue, 1,
                                     ],
                                     "heatmap-intensity": [
                                         "interpolate", ["linear"], ["zoom"],
