@@ -260,7 +260,7 @@ export function CompanyRankingView() {
                     label={renderCustomLabel}
                     outerRadius={140}
                     innerRadius={60}
-                    fill="#8884d8"
+                    fill="var(--color-cat-9)"
                     dataKey="value"
                     paddingAngle={2}
                   >
@@ -373,7 +373,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   headerStatLabel: {
     fontSize: 12,
-    color: "#64748b",
+    color: "var(--color-text-muted)",
     marginBottom: 4,
     fontWeight: 500,
     textTransform: "uppercase",
@@ -395,7 +395,7 @@ const styles: Record<string, React.CSSProperties> = {
     height: 450,
   },
   rankingContainer: {
-    backgroundColor: "#f8fafc",
+    backgroundColor: "var(--color-bg-surface)",
     borderRadius: 12,
     padding: 20,
     height: 450,
@@ -420,7 +420,7 @@ const styles: Record<string, React.CSSProperties> = {
     padding: 12,
     backgroundColor: "white",
     borderRadius: 8,
-    border: "1px solid #e2e8f0",
+    border: "1px solid var(--color-border-subtle)",
     transition: "all 0.2s ease",
     cursor: "pointer",
   },
@@ -458,11 +458,11 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 13,
   },
   productionValue: {
-    color: "#64748b",
+    color: "var(--color-text-secondary)",
     fontWeight: 500,
   },
   productionPercentage: {
-    color: "#94a3b8",
+    color: "var(--color-text-muted)",
     fontSize: 12,
   },
   message: {
@@ -475,21 +475,21 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: "center",
     padding: 40,
     fontSize: 16,
-    color: "#d32f2f",
-    backgroundColor: "#ffebee",
+    color: "var(--color-error)",
+    backgroundColor: "rgba(192, 57, 43, 0.08)",
     borderRadius: 8,
   },
   noData: {
     textAlign: "center",
     padding: 60,
-    color: "#999",
+    color: "var(--color-text-muted)",
     fontSize: 16,
     backgroundColor: "white",
     borderRadius: 12,
   },
   tooltip: {
     backgroundColor: "white",
-    border: "1px solid #e2e8f0",
+    border: "1px solid var(--color-border-subtle)",
     borderRadius: 8,
     padding: 12,
     boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
@@ -499,9 +499,9 @@ const styles: Record<string, React.CSSProperties> = {
 export function RankingIcon({width = 18, height = 18}: {width?: number; height?: number}) {
   return (
     <svg width={width} height={height} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M8 2h8v4a4 4 0 01-4 4 4 4 0 01-4-4V2z" stroke="#2F3E34" strokeWidth="2" />
-      <path d="M6 6h12v3a5 5 0 01-5 5h-2a5 5 0 01-5-5V6z" stroke="#2F3E34" strokeWidth="2" />
-      <path d="M9 18h6v4H9v-4z" stroke="#2F3E34" strokeWidth="2" />
+      <path d="M8 2h8v4a4 4 0 01-4 4 4 4 0 01-4-4V2z" stroke="currentColor" strokeWidth="2" />
+      <path d="M6 6h12v3a5 5 0 01-5 5h-2a5 5 0 01-5-5V6z" stroke="currentColor" strokeWidth="2" />
+      <path d="M9 18h6v4H9v-4z" stroke="currentColor" strokeWidth="2" />
     </svg>
   );
 }

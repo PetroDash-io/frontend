@@ -123,7 +123,7 @@ export function TimeSeriesChart({data}: CurveChartProps) {
             </div>
 
             <div style={{ height: 340 }}>
-                <h4 style={{ margin: "16px 0 8px", color: "#F3EEE6" }}>Progresión de inyecciones</h4>
+                <h4 style={{ margin: "16px 0 8px", color: "var(--color-text-primary)" }}>Progresión de inyecciones</h4>
                 <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={convertedData} margin={{ top: 40, right: 20, left: 0, bottom: 40 }}>
                         <CartesianGrid strokeDasharray="3 3" />

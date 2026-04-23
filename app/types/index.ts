@@ -2,24 +2,30 @@ export interface ActiveWell {
   id: string;
   lon: number;
   lat: number;
-  company: string;
-  resource_type: string;
+  company: string | null;
+  resource_type: string | null;
+}
+
+export interface WellGeoPoint {
+  type: "Point";
+  coordinates: [number, number];
 }
 
 export interface WellDetail {
-  well_id: string;
+  well_id: string | number;
   watershed: string;
   province: string;
   area: string;
-  company: string;
+  company: string | null;
   field: string;
   formation: string;
   classification: string;
-  resource_type: string;
-  type: string;
+  resource_type: string | null;
+  well_type: string;
+  extraction_type: string;
   status: string;
   depth: number;
-  geojson?: string;
+  geojson?: string | WellGeoPoint;
 }
 
 export interface ProductionMonthly {

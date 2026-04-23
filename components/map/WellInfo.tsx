@@ -27,7 +27,7 @@ export function WellInfo({wellInfo, loadingWell}: WellInfoProps) {
                             ["Formación", wellInfo.formation],
                             ["Clasificación", wellInfo.classification],
                             ["Tipo recurso", wellInfo.resource_type],
-                            ["Tipo pozo", wellInfo.type],
+                            ["Tipo pozo", wellInfo.well_type],
                             ["Estado", wellInfo.status],
                             ["Profundidad", `${wellInfo.depth} metros`],
                         ].map(([label, value]) => (

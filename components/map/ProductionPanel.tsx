@@ -129,10 +129,10 @@ export function ProductionPanel({
 const styles = {
   productionPanel: {
     marginTop: 24,
-    border: "1px solid #3F6B4F",
+    border: "1px solid var(--color-border-subtle)",
     borderRadius: 14,
     padding: 16,
-    backgroundColor: "#FAFAF9",
+    backgroundColor: "var(--color-bg-surface)",
     display: "flex",
     flexDirection: "column",
     gap: 12,

@@ -68,7 +68,7 @@ export function WellAnomaliesChart({
             name={`${selectedResourceLabel} (${unitLabel})`}
             stroke={selectedColor}
             strokeWidth={2}
-            dot={{r: 3, strokeWidth: 1, fill: "#ffffff"}}
+            dot={{r: 3, strokeWidth: 1, fill: "var(--color-bg-surface)"}}
             activeDot={{r: 4}}
           />
 
@@ -78,8 +78,8 @@ export function WellAnomaliesChart({
             name="Anomalia"
             stroke="transparent"
             connectNulls={false}
-            dot={{r: 6, fill: "#dc2626", stroke: "#ffffff", strokeWidth: 2}}
-            activeDot={{r: 7, fill: "#dc2626", stroke: "#ffffff", strokeWidth: 2}}
+            dot={{r: 6, fill: "var(--color-anomaly)", stroke: "var(--color-bg-surface)", strokeWidth: 2}}
+            activeDot={{r: 7, fill: "var(--color-anomaly)", stroke: "var(--color-bg-surface)", strokeWidth: 2}}
             isAnimationActive={false}
           />
         </LineChart>
@@ -93,6 +93,6 @@ const styles = {
     height: 320,
     borderRadius: 14,
     border: `1px solid ${colors.panelBorder}`,
-    backgroundColor: "#fff",
+    backgroundColor: "var(--color-bg-surface)",
   } as React.CSSProperties,
 } as const;

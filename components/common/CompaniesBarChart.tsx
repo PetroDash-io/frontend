@@ -22,13 +22,13 @@ interface CompaniesBarChartProps {
 
 // Paleta de colores alineada con PetroDash
 const COLORS = [
-  "#3F6B4F",
-  "#D6A23A",
-  "#4B2A1A",
-  "#D97A00",
-  "#3A7CA5",
-  "#2F3E34",
-  "#8B6F47",
+  "var(--color-cat-1)",
+  "var(--color-cat-2)",
+  "var(--color-cat-3)",
+  "var(--color-cat-4)",
+  "var(--color-cat-5)",
+  "var(--color-cat-6)",
+  "var(--color-cat-7)",
 ];
 
 const formatTooltipValue = (value: number | string | undefined) => {
@@ -83,7 +83,7 @@ const renderBarLabel = ({x, y, width, height, value}: BarLabelProps) => {
     <text
       x={xNumber + widthNumber + 10}
       y={yNumber + heightNumber / 2}
-      fill="#374151"
+      fill="var(--color-text-secondary)"
       fontSize={13}
       fontWeight={600}
       textAnchor="start"
@@ -147,10 +147,10 @@ export function CompaniesBarChart({
           onClick={handleDownloadExcel}
           style={styles.downloadButton}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = "#2F5A3F";
+            e.currentTarget.style.backgroundColor = "var(--color-brand-dark)";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = "#3F6B4F";
+            e.currentTarget.style.backgroundColor = "var(--color-brand-mid)";
           }}
         >
           📊 Descargar Excel
@@ -162,20 +162,20 @@ export function CompaniesBarChart({
           layout="vertical"   
           margin={{ top: 20, right: 130, left: 20, bottom: 50 }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-subtle)" />
 
           {/* Eje X ahora es numérico (horizontal) */}
           <XAxis
             type="number"
             tickFormatter={formatXAxis}
-            tick={{ fill: "#374151", fontSize: 12 }}
+            tick={{ fill: "var(--color-text-secondary)", fontSize: 12 }}
           />
 
           <YAxis
             type="category"
             dataKey="name"
             width={280}
-            tick={{ fill: "#374151", fontSize: 12 }}
+            tick={{ fill: "var(--color-text-secondary)", fontSize: 12 }}
           />
 
           <Tooltip formatter={formatTooltipValue} contentStyle={styles.tooltip} />
@@ -202,11 +202,11 @@ export function CompaniesBarChart({
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
-    backgroundColor: "white",
+    backgroundColor: "var(--color-bg-surface)",
     borderRadius: "12px",
     padding: "24px",
     boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-    border: "1px solid #e5e7eb",
+    border: "1px solid var(--color-border-subtle)",
   },
   header: {
     display: "flex",
@@ -217,12 +217,12 @@ const styles: Record<string, React.CSSProperties> = {
   title: {
     fontSize: "20px",
     fontWeight: "700",
-    color: "#1F2937",
+    color: "var(--color-text-primary)",
     margin: 0,
   },
   downloadButton: {
-    backgroundColor: "#3F6B4F",
-    color: "white",
+    backgroundColor: "var(--color-brand-mid)",
+    color: "var(--color-text-inverse)",
     border: "none",
     borderRadius: "8px",
     padding: "10px 16px",
@@ -237,12 +237,12 @@ const styles: Record<string, React.CSSProperties> = {
   noData: {
     textAlign: "center",
     padding: "80px 20px",
-    color: "#9CA3AF",
+    color: "var(--color-text-muted)",
     fontSize: "15px",
   },
   tooltip: {
-    backgroundColor: "white",
-    border: "1px solid #d1d5db",
+    backgroundColor: "var(--color-bg-surface)",
+    border: "1px solid var(--color-border-subtle)",
     borderRadius: "8px",
     padding: "12px",
     boxShadow: "0 4px 6px rgba(0,0,0,0.1)",

@@ -23,25 +23,25 @@ function messageStyle(variant: MessageVariant): React.CSSProperties {
     if (variant === "error") {
         return {
             ...base,
-            color: "#b91c1c",
-            background: "#fee2e2",
-            borderColor: "#fecaca",
+            color: "var(--color-error)",
+            background: "rgba(192, 57, 43, 0.08)",
+            borderColor: "var(--color-error)",
         };
     }
 
     if (variant === "warning") {
         return {
             ...base,
-            color: "#92400e",
-            background: "#fef3c7",
-            borderColor: "#fde68a",
+            color: "var(--color-warning)",
+            background: "rgba(232, 160, 48, 0.08)",
+            borderColor: "var(--color-warning)",
         };
     }
 
     return {
         ...base,
-        color: "#2f3e34",
-        background: "#f7f3ec",
-        borderColor: "#ddd2c2",
+        color: "var(--color-text-secondary)",
+        background: "var(--color-bg-surface)",
+        borderColor: "var(--color-border-subtle)",
     };
 }

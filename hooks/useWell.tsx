@@ -35,7 +35,11 @@ export function useWell({wellId}: useWellParams) {
                 const json = await response.json();
                 const data = json.data;
                 console.log("Received well details response:", data);
-                setData(Array.isArray(data) && data.length > 0 ? data[0] : null);
+                if (Array.isArray(data)) {
+                    setData(data.length > 0 ? data[0] : null);
+                } else {
+                    setData(data ?? null);
+                }
             } catch (err) {
                 setError(err instanceof Error ? err.message : "Unexpected error");
             } finally {

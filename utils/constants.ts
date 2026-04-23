@@ -5,48 +5,48 @@ export const PRODUCTION_TYPES = {
   oil: {
     name: "oil",
     label: "Petróleo",
-    defaultColor: "#3F6B4F"
+    defaultColor: "var(--color-petroleum)"
   },
   gas: {
     name: "gas",
     label: "Gas",
-    defaultColor: "#D97A00"
+    defaultColor: "var(--color-gas)"
   },
   water: {
     name: "water",
     label: "Agua",
-    defaultColor: "#3A7CA5"
+    defaultColor: "var(--color-water)"
   },
   water_injection: {
     name: "water_injection",
     label: "Inyección Agua",
-    defaultColor: "#5EC1E6"
+    defaultColor: "var(--color-inj-water)"
   },
   gas_injection: {
     name: "gas_injection",
     label: "Inyección Gas",
-    defaultColor: "#FDAE10"
+    defaultColor: "var(--color-inj-gas)"
   },
   co2_injection: {
     name: "co2_injection",
     label: "Inyección CO2",
-    defaultColor: "#7D3C98"
+    defaultColor: "var(--color-inj-co2)"
   },
   // Misspelled aliases for backward compatibility in code references.
   water_inyection: {
     name: "water_injection",
     label: "Inyección Agua",
-    defaultColor: "#5EC1E6"
+    defaultColor: "var(--color-inj-water)"
   },
   gas_inyection: {
     name: "gas_injection",
     label: "Inyección Gas",
-    defaultColor: "#FDAE10"
+    defaultColor: "var(--color-inj-gas)"
   },
   co2_inyection: {
     name: "co2_injection",
     label: "Inyección CO2",
-    defaultColor: "#7D3C98"
+    defaultColor: "var(--color-inj-co2)"
   },
 };
 
@@ -56,39 +56,44 @@ export const PRODUCTION_TYPES = {
 (PRODUCTION_TYPES as any).gas_inyection = PRODUCTION_TYPES.gas_injection;
 (PRODUCTION_TYPES as any).co2_inyection = PRODUCTION_TYPES.co2_injection;
 export const colors = {
-  bg: "#F3EEE6",
-  panel: "#2F3E34",
-  panelBorder: "#3F6B4F",
-  text: "#1F2937",
-  textLight: "#F3EEE6",
-  accent: "#D6A23A",
-  primary: "#4B2A1A",
-  secondary: "#3F6B4F",
-  selectedWell: "#0641f2",
-  activeWell: "#22C55E",
-  stoppedWell: "#FACC15",
-  inactiveWell: "#EF4444",
-  notInformedWell: "#9CA3AF",
-  unknownWell: "#6B7280",
+  bg: "var(--color-bg-base)",
+  panel: "var(--color-bg-overlay)",
+  panelBorder: "var(--color-border-subtle)",
+  text: "var(--color-text-primary)",
+  textLight: "var(--color-text-inverse)",
+  accent: "var(--color-brand-light)",
+  primary: "var(--color-brand-primary)",
+  secondary: "var(--color-brand-mid)",
+  selectedWell: "var(--color-brand-light)",
+  activeWell: "var(--color-status-active)",
+  stoppedWell: "var(--color-status-stopped)",
+  inactiveWell: "var(--color-status-inactive)",
+  notInformedWell: "var(--color-status-unknown)",
+  unknownWell: "var(--color-status-unknown)",
   // Production colors
-  oil: "#3F6B4F",
-  gas: "#D97A00",
-  water: "#3A7CA5",
-  filtersBg: "#FAFAF9",
+  oil: "var(--color-petroleum)",
+  gas: "var(--color-gas)",
+  water: "var(--color-water)",
+  filtersBg: "var(--color-bg-surface)",
   // Company comparison colors
-  company1: "#3F6B4F",
-  company2: "#D6A23A",
-  company3: "#4B2A1A",
-  company4: "#2F3E34",
-  company5: "#6B7280",
+  company1: "var(--color-cat-1)",
+  company2: "var(--color-cat-2)",
+  company3: "var(--color-cat-3)",
+  company4: "var(--color-cat-4)",
+  company5: "var(--color-cat-5)",
 };
 
 export const COMPANY_COLORS = [
-  "#3F6B4F", // Verde oscuro (secondary)
-  "#D6A23A", // Dorado (accent/oil)
-  "#4B2A1A", // Marrón oscuro (primary)
-  "#2F3E34", // Verde muy oscuro (panel)
-  "#6B7280", // Gris (water)
+  "var(--color-cat-1)",
+  "var(--color-cat-2)",
+  "var(--color-cat-3)",
+  "var(--color-cat-4)",
+  "var(--color-cat-5)",
+  "var(--color-cat-6)",
+  "var(--color-cat-7)",
+  "var(--color-cat-8)",
+  "var(--color-cat-9)",
+  "var(--color-cat-10)",
 ];
 
 export const ESTADOS_POZO = {
@@ -146,26 +151,16 @@ export const MONTHS = [
 
 // Paleta de colores para pie charts (tonos tierra alineados con la estética)
 export const PIE_CHART_COLORS = [
-  "#3F6B4F", // Verde oscuro principal
-  "#D6A23A", // Dorado/Oro
-  "#4B2A1A", // Marrón oscuro
-  "#D97A00", // Naranja tierra
-  "#2F3E34", // Verde muy oscuro
-  "#3A7CA5", // Azul petróleo
-  "#8B6914", // Dorado oscuro
-  "#5D7C5E", // Verde medio
-  "#8B4513", // Marrón tierra
-  "#6B8E23", // Verde oliva
-  "#CD853F", // Terracota
-  "#A0826D", // Beige oscuro
-  "#4A5D4E", // Verde grisáceo
-  "#9B7653", // Café con leche
-  "#556B2F", // Verde oliva oscuro
-  "#8B7355", // Marrón claro
-  "#6B6B47", // Verde militar
-  "#7C6A5C", // Taupe
-  "#5C7A70", // Verde azulado
-  "#8B7D6B", // Gris cálido
+  "var(--color-cat-1)",
+  "var(--color-cat-2)",
+  "var(--color-cat-3)",
+  "var(--color-cat-4)",
+  "var(--color-cat-5)",
+  "var(--color-cat-6)",
+  "var(--color-cat-7)",
+  "var(--color-cat-8)",
+  "var(--color-cat-9)",
+  "var(--color-cat-10)",
 ];
 
 // Áreas organizadas por provincia (top áreas por cantidad de pozos)
@@ -234,5 +229,4 @@ export const WATERSHED_OPTIONS= [
   {value: "ÑIRIHUAU", label: "Ñirihuau"},
   {value: "CAÑADON ASFALTO", label: "Cañadón asfalto"}
 ]
-
 

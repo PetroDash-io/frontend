@@ -86,10 +86,10 @@ function ComparisonChart({ title, data, companies, onDownload }: ComparisonChart
           onClick={onDownload}
           style={styles.downloadButton}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = "#2F5A3F";
+            e.currentTarget.style.backgroundColor = "var(--color-brand-dark)";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = "#3F6B4F";
+            e.currentTarget.style.backgroundColor = "var(--color-brand-mid)";
           }}
         >
           📊 Excel
@@ -190,7 +190,7 @@ export function CompanyComparisonCharts({
                 labelLine={false}
                 label={(entry) => `${entry.value.toFixed(1)}%`}
                 outerRadius={110}
-                fill="#8884d8"
+                fill="var(--color-cat-9)"
                 dataKey="value"
               >
                 {data.map((entry, index) => (
@@ -251,7 +251,7 @@ const styles = {
     borderRadius: 14,
     border: `1px solid ${colors.panelBorder}`,
     padding: 24,
-    backgroundColor: "#fff",
+    backgroundColor: "var(--color-bg-surface)",
   } as React.CSSProperties,
   header: {
     display: "flex",
@@ -265,8 +265,8 @@ const styles = {
     margin: 0,
   } as React.CSSProperties,
   downloadButton: {
-    backgroundColor: "#3F6B4F",
-    color: "white",
+    backgroundColor: "var(--color-brand-mid)",
+    color: "var(--color-text-inverse)",
     border: "none",
     borderRadius: "8px",
     padding: "8px 12px",

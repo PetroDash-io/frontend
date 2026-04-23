@@ -9,7 +9,7 @@ interface WellsTableProps {
 
 export function WellsTable({data}: WellsTableProps) {
     const onMouseEnter = (event: React.MouseEvent<HTMLTableRowElement>) => {
-        event.currentTarget.style.background = "#f6f6f6";
+        event.currentTarget.style.background = "var(--color-bg-sunken)";
     };
 
     const onMouseLeave = (event: React.MouseEvent<HTMLTableRowElement>) => {
@@ -47,7 +47,7 @@ export function WellsTable({data}: WellsTableProps) {
                 <td style={styles.cell}>{pozo.field}</td>
                 <td style={styles.cell}>{pozo.status}</td>
                 <td style={styles.cell}>{pozo.resource_type}</td>
-                <td style={styles.cell}>{pozo.type}</td>
+                <td style={styles.cell}>{pozo.well_type}</td>
                 <td style={styles.cell}>{pozo.depth}</td>
                 <td style={styles.cell}>{pozo.formation}</td>
                 <td style={styles.cell}>{pozo.classification}</td>
@@ -63,10 +63,10 @@ const styles = {
     cell: {
         padding: "8px",
         whiteSpace: "nowrap",
-        color: "#222",
+        color: "var(--color-text-primary)",
     } as React.CSSProperties,
     tableContainer: {
-        background: "#fff",
+        background: "var(--color-bg-surface)",
         borderRadius: 12,
         padding: 16,
         border: `1px solid ${colors.panelBorder}`,
@@ -86,6 +86,6 @@ const styles = {
     } as React.CSSProperties,
     row: {
         cursor: "pointer",
-        borderBottom: "1px solid #eee",
+        borderBottom: "1px solid var(--color-border-subtle)",
     } as React.CSSProperties,
 };

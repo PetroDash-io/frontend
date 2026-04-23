@@ -153,10 +153,10 @@ export function WellProductionComparisonView() {
             onClick={handleDownloadExcel}
             style={styles.downloadButton}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "#2F5A3F";
+              e.currentTarget.style.backgroundColor = "var(--color-brand-dark)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "#3F6B4F";
+              e.currentTarget.style.backgroundColor = "var(--color-brand-mid)";
             }}
           >
             📊 Descargar Excel
@@ -314,8 +314,8 @@ const styles = {
     margin: 0,
   } as React.CSSProperties,
   downloadButton: {
-    backgroundColor: "#3F6B4F",
-    color: "white",
+    backgroundColor: "var(--color-brand-mid)",
+    color: "var(--color-text-inverse)",
     border: "none",
     borderRadius: "8px",
     padding: "10px 16px",
@@ -417,8 +417,8 @@ const styles = {
     textAlign: "center",
     padding: "20px",
     fontSize: "16px",
-    color: "#b91c1c",
-    backgroundColor: "#fee2e2",
+    color: "var(--color-error)",
+    backgroundColor: "rgba(192, 57, 43, 0.08)",
     borderRadius: "8px",
     marginBottom: "20px",
   } as React.CSSProperties,
@@ -427,10 +427,10 @@ const styles = {
 export function AnalysisIcon({width = 18, height = 18}: {width?: number; height?: number}) {
   return (
     <svg width={width} height={height} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M3 3v18h18" stroke="#2F3E34" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M8 14v5" stroke="#2F3E34" strokeWidth="2" strokeLinecap="round" />
-      <path d="M12 10v9" stroke="#2F3E34" strokeWidth="2" strokeLinecap="round" />
-      <path d="M16 6v13" stroke="#2F3E34" strokeWidth="2" strokeLinecap="round" />
+      <path d="M3 3v18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M8 14v5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path d="M12 10v9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path d="M16 6v13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }

@@ -15,9 +15,9 @@ const M3_TO_BBL = 6.28981; // 1 m³ = 6.28981 bbl (barriles)
 type Unit = "m3" | "bbl";
 
 const SERIES_COLORS = {
-    oil: "#3F6B4F",    // verde petróleo
-    water: "#3A7CA5",  // azul agua
-    gas: "#D97A00",    // naranja gas
+    oil: "var(--color-petroleum)",
+    water: "var(--color-water)",
+    gas: "var(--color-gas)",
   };
 
   
@@ -155,7 +155,7 @@ export function CurveChart({ data }: CurveChartProps) {
                             type="monotone"
                             dataKey="water_injection"
                             name={`Inyección Agua (${unit === "bbl" ? "BBL" : "m³"})`}
-                            stroke="#5EC1E6"
+                            stroke="var(--color-inj-water)"
                             dot={false}
                             />
 
@@ -163,7 +163,7 @@ export function CurveChart({ data }: CurveChartProps) {
                             type="monotone"
                             dataKey="gas_injection"
                             name="Inyección Gas (Mm³)"
-                            stroke="#FDAE10"
+                            stroke="var(--color-inj-gas)"
                             dot={false}
                         />
 
@@ -197,9 +197,9 @@ function tabButtonStyle(active: boolean): React.CSSProperties {
     return {
         padding: "8px 16px",
         borderRadius: 8,
-        border: "1px solid #3F6B4F",
-        backgroundColor: active ? "#3F6B4F" : "transparent",
-        color: active ? "#F3EEE6" : "#3F6B4F",
+        border: "1px solid var(--color-brand-mid)",
+        backgroundColor: active ? "var(--color-brand-mid)" : "transparent",
+        color: active ? "var(--color-text-inverse)" : "var(--color-brand-mid)",
         fontSize: 14,
         fontWeight: 500,
         cursor: "pointer",

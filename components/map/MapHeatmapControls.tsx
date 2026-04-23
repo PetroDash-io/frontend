@@ -68,7 +68,7 @@ const styles = {
     borderRadius: 999,
     border: `1px solid ${RESOURCE_COLORS[resource]}`,
     backgroundColor: active ? RESOURCE_COLORS[resource] : "transparent",
-    color: active ? "#fff" : colors.text,
+    color: active ? "var(--color-text-inverse)" : colors.text,
     fontWeight: active ? 600 : 500,
     cursor: "pointer",
     fontSize: 12,
