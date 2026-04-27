@@ -32,18 +32,13 @@ export interface ProductionMonthly {
   year: number,
   month: number,
   well_id: string;
-  reported_period_date: string; // "YYYY-MM-01"
+  data_date: string; // "YYYY-MM-01"
   oil_production: number;
   gas_production: number;
   water_production: number;
   water_injection?: number;
   gas_injection?: number;
   co2_injection?: number;
-
-  // Backend currently returns the misspelled fields as inyection, keep both for safety.
-  water_inyection?: number;
-  gas_inyection?: number;
-  co2_inyection?: number;
 }
 
 export interface Company {

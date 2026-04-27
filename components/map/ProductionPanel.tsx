@@ -63,15 +63,15 @@ export function ProductionPanel({
 
     return wellProduction
       .slice()
-      .sort((a, b) => a.reported_period_date.localeCompare(b.reported_period_date))
+      .sort((a, b) => a.data_date.localeCompare(b.data_date))
       .map((record) => ({
-        date: record.reported_period_date.slice(0, 7),
+        date: record.data_date.slice(0, 7),
         oil: toNumber(record.oil_production) ?? 0,
         gas: toNumber(record.gas_production) ?? 0,
         water: toNumber(record.water_production) ?? 0,
-        water_injection: toNumber(record.water_inyection ?? record.water_injection) ?? 0,
-        gas_injection: toNumber(record.gas_inyection ?? record.gas_injection) ?? 0,
-        co2_injection: toNumber(record.co2_inyection ?? record.co2_injection) ?? 0,
+        water_injection: toNumber(record.water_injection) ?? 0,
+        gas_injection: toNumber(record.gas_injection) ?? 0,
+        co2_injection: toNumber(record.co2_injection) ?? 0,
       }));
   }, [wellProduction]);
 

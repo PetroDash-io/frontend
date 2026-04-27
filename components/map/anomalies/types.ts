@@ -15,7 +15,7 @@ export interface WellProductionAnomalyPeriod {
   year: number;
   month: number;
   well_id: number;
-  reported_period_date: string;
+  data_date: string;
   resource: ProductionResource;
   resource_production: number;
   anomaly: WellProductionAnomalyEvidence;
