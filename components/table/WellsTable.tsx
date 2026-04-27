@@ -18,6 +18,9 @@ export function WellsTable({data}: WellsTableProps) {
 
     return (
       <div style={styles.tableContainer}>
+        <div style={styles.cardHeader}>
+          <span className="card-label">Listado de pozos</span>
+        </div>
         <table style={styles.table}>
           <thead>
             <tr>
@@ -68,9 +71,15 @@ const styles = {
     tableContainer: {
         background: "var(--color-bg-surface)",
         borderRadius: 12,
-        padding: 16,
+        padding: 24,
         border: `1px solid ${colors.panelBorder}`,
         overflowX: "auto",
+        boxShadow: "var(--shadow-sm)",
+    } as React.CSSProperties,
+    cardHeader: {
+        paddingBottom: 12,
+        marginBottom: 8,
+        borderBottom: "1px solid var(--color-border-subtle)",
     } as React.CSSProperties,
     table: {
         width: "100%",

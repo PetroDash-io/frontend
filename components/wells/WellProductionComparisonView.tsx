@@ -165,6 +165,9 @@ export function WellProductionComparisonView() {
       </div>
 
       <div style={styles.filtersContainer}>
+        <div style={styles.cardHeader}>
+          <span className="card-label">Filtros</span>
+        </div>
         <div style={styles.filterRow}>
           <label style={styles.label}>
             ID del Pozo:
@@ -224,6 +227,9 @@ export function WellProductionComparisonView() {
 
       {data && data.data && data.data.length > 0 && (
         <div style={styles.infoContainer}>
+          <div style={styles.cardHeader}>
+            <span className="card-label">Contexto del pozo</span>
+          </div>
           <p style={styles.info}>
             <strong>Pozo:</strong> {data.well_id} | <strong>Empresa:</strong> {data.company} |{" "}
             <strong>Área:</strong> {data.area} | <strong>Provincia:</strong> {data.province}
@@ -239,6 +245,9 @@ export function WellProductionComparisonView() {
       {data && data.data && data.data.length > 0 && (
         <div style={styles.chartsContainer}>
           <div style={styles.chartWrapper}>
+            <div style={styles.cardHeader}>
+              <span className="card-label">Comparación</span>
+            </div>
             <h3 style={styles.chartTitle}>Producción de Petróleo</h3>
             <ResponsiveContainer width="100%" height={400}>
               <BarChart data={oilData} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
@@ -255,6 +264,9 @@ export function WellProductionComparisonView() {
           </div>
 
           <div style={styles.chartWrapper}>
+            <div style={styles.cardHeader}>
+              <span className="card-label">Comparación</span>
+            </div>
             <h3 style={styles.chartTitle}>Producción de Gas</h3>
             <ResponsiveContainer width="100%" height={400}>
               <BarChart data={gasData} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
@@ -271,6 +283,9 @@ export function WellProductionComparisonView() {
           </div>
 
           <div style={styles.chartWrapper}>
+            <div style={styles.cardHeader}>
+              <span className="card-label">Comparación</span>
+            </div>
             <h3 style={styles.chartTitle}>Producción de Agua</h3>
             <ResponsiveContainer width="100%" height={400}>
               <BarChart data={waterData} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
@@ -329,10 +344,16 @@ const styles = {
   } as React.CSSProperties,
   filtersContainer: {
     backgroundColor: colors.filtersBg,
-    padding: "20px",
+    padding: "24px",
     borderRadius: "8px",
     marginBottom: "24px",
     border: `1px solid ${colors.panelBorder}`,
+    boxShadow: "var(--shadow-sm)",
+  } as React.CSSProperties,
+  cardHeader: {
+    paddingBottom: "12px",
+    marginBottom: "12px",
+    borderBottom: "1px solid var(--color-border-subtle)",
   } as React.CSSProperties,
   filterRow: {
     display: "flex",
@@ -377,10 +398,11 @@ const styles = {
   } as React.CSSProperties,
   infoContainer: {
     backgroundColor: colors.filtersBg,
-    padding: "16px",
+    padding: "24px",
     borderRadius: "8px",
     marginBottom: "24px",
     border: `1px solid ${colors.panelBorder}`,
+    boxShadow: "var(--shadow-sm)",
   } as React.CSSProperties,
   info: {
     margin: "4px 0",
@@ -394,10 +416,10 @@ const styles = {
     width: "100%",
   } as React.CSSProperties,
   chartWrapper: {
-    backgroundColor: "white",
-    padding: "20px",
+    backgroundColor: "var(--color-bg-surface)",
+    padding: "24px",
     borderRadius: "8px",
-    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+    boxShadow: "var(--shadow-sm)",
     border: `1px solid ${colors.panelBorder}`,
   } as React.CSSProperties,
   chartTitle: {

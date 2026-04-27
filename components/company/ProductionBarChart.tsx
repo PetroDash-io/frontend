@@ -68,6 +68,9 @@ export function ProductionBarChart({ data, title, empresa, fechaInicio, fechaFin
 
     return (
         <div style={styles.chartWrapper}>
+            <div style={styles.cardHeader}>
+                <span className="card-label">Producción por empresa</span>
+            </div>
             <div style={styles.header}>
                 <h3 style={styles.title}>{title}</h3>
                 <button
@@ -110,6 +113,12 @@ const styles = {
         border: `1px solid ${colors.panelBorder}`,
         padding: 24,
         backgroundColor: "var(--color-bg-surface)",
+        boxShadow: "var(--shadow-sm)",
+    } as React.CSSProperties,
+    cardHeader: {
+        paddingBottom: 12,
+        marginBottom: 4,
+        borderBottom: "1px solid var(--color-border-subtle)",
     } as React.CSSProperties,
     header: {
         display: "flex",

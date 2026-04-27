@@ -49,9 +49,9 @@
   --color-info: #3a7fa8;
 
   /* 2) Typography */
-  --font-display: var(--font-plex-sans), "IBM Plex Sans", sans-serif;
-  --font-body: var(--font-plex-sans), "IBM Plex Sans", sans-serif;
-  --font-mono: var(--font-plex-mono), "IBM Plex Mono", monospace;
+  --font-display: "Canva Sans Variable", "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-body: "Canva Sans Variable", "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
 
   --text-page-title: 22px;
   --text-section-title: 16px;

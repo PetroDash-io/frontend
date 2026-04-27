@@ -21,9 +21,12 @@ export function CompanyComparisonPanel({
 }: CompanyComparisonPanelProps) {
   return (
     <div style={styles.container}>
-      <h3 style={styles.subheading}>Comparación entre Empresas</h3>
-
       <div style={styles.filtersContainer}>
+        <div style={styles.cardHeader}>
+          <span className="card-label">Comparación</span>
+          <h3 style={styles.subheading}>Comparación entre Empresas</h3>
+        </div>
+
         <div style={styles.companiesRow}>
           <SelectFilter value={filters.empresa_1 || ""}
                         onSelect={updateFilters}
@@ -71,10 +74,18 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     gap: 16,
-    padding: 20,
+    padding: 24,
     backgroundColor: colors.filtersBg,
     borderRadius: 12,
     border: `1px solid ${colors.panelBorder}`,
+    boxShadow: "var(--shadow-sm)",
+  } as React.CSSProperties,
+  cardHeader: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 8,
+    paddingBottom: 12,
+    borderBottom: "1px solid var(--color-border-subtle)",
   } as React.CSSProperties,
   companiesRow: {
     display: "grid",

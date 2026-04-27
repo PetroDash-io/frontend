@@ -83,9 +83,14 @@ export function WellAnomaliesPanel({
 
   return (
     <div style={styles.panel}>
-      <div style={styles.titleRow}>
-        <h3 style={styles.title}>Anomalias de produccion del pozo {selectedWellId} </h3>
-        <AnomalyMethodInfoButton />
+      <div style={styles.cardHeader}>
+        <div style={styles.titleRow}>
+          <div style={styles.titleGroup}>
+            <span className="card-label">Anomalías</span>
+            <h3 style={styles.title}>Anomalias de produccion del pozo {selectedWellId}</h3>
+          </div>
+          <AnomalyMethodInfoButton />
+        </div>
       </div>
 
       {!selectedWellId && <InlineMessage message="Selecciona un pozo para visualizar anomalias." />}
@@ -154,16 +159,27 @@ const styles = {
     marginTop: 24,
     border: `1px solid ${colors.panelBorder}`,
     borderRadius: 14,
-    padding: 16,
+    padding: 24,
     backgroundColor: colors.filtersBg,
     display: "flex",
     flexDirection: "column",
     gap: 12,
+    boxShadow: "var(--shadow-sm)",
+  } as React.CSSProperties,
+  cardHeader: {
+    paddingBottom: 12,
+    borderBottom: "1px solid var(--color-border-subtle)",
+    marginBottom: 4,
   } as React.CSSProperties,
   title: {
     margin: 0,
     fontSize: 18,
     fontWeight: 600,
+  } as React.CSSProperties,
+  titleGroup: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 8,
   } as React.CSSProperties,
   titleRow: {
     display: "flex",

@@ -227,9 +227,12 @@ export function CompanyRankingView() {
       {!loading && !error && chartData.length > 0 && (
         <div style={styles.mainChartContainer}>
           <div style={styles.headerSection}>
-            <h3 style={styles.chartTitle}>
-              Top 10 Empresas - {PRODUCTION_TYPE_LABEL[filters.tipo || "oil"]}
-            </h3>
+            <div style={styles.chartHeaderGroup}>
+              <span className="card-label">Distribución</span>
+              <h3 style={styles.chartTitle}>
+                Top 10 Empresas - {PRODUCTION_TYPE_LABEL[filters.tipo || "oil"]}
+              </h3>
+            </div>
             {data && (
               <div style={styles.headerStats}>
                 <div style={styles.headerStat}>
@@ -278,6 +281,7 @@ export function CompanyRankingView() {
             </div>
 
             <div style={styles.rankingContainer}>
+              <span className="card-label">Detalle</span>
               <h4 style={styles.rankingTitle}>Ranking de Empresas</h4>
               <div style={styles.rankingList}>
                 {chartData.map((company, index) => (
@@ -329,10 +333,11 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     flexDirection: "column",
     gap: 16,
-    padding: 20,
+    padding: 24,
     backgroundColor: colors.filtersBg,
     borderRadius: 12,
     border: `1px solid ${colors.panelBorder}`,
+    boxShadow: "var(--shadow-sm)",
   },
   topFiltersRow: {
     display: "grid",
@@ -345,21 +350,29 @@ const styles: Record<string, React.CSSProperties> = {
     gap: 16,
   },
   mainChartContainer: {
-    backgroundColor: "white",
-    borderRadius: 16,
-    padding: 32,
-    boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
+    backgroundColor: "var(--color-bg-surface)",
+    borderRadius: 12,
+    padding: 24,
+    border: "1px solid var(--color-border-subtle)",
+    boxShadow: "var(--shadow-sm)",
   },
   headerSection: {
     marginBottom: 24,
+    paddingBottom: 12,
+    borderBottom: "1px solid var(--color-border-subtle)",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
     flexWrap: "wrap",
     gap: 16,
   },
+  chartHeaderGroup: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 8,
+  },
   chartTitle: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: 600,
     color: colors.text,
     margin: 0,
@@ -397,9 +410,11 @@ const styles: Record<string, React.CSSProperties> = {
   rankingContainer: {
     backgroundColor: "var(--color-bg-surface)",
     borderRadius: 12,
-    padding: 20,
+    padding: 24,
     height: 450,
     overflowY: "auto",
+    border: "1px solid var(--color-border-subtle)",
+    boxShadow: "var(--shadow-sm)",
   },
   rankingTitle: {
     fontSize: 16,

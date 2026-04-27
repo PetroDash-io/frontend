@@ -83,7 +83,10 @@ export function ProductionPanel({
 
   return (
     <div style={styles.productionPanel}>
-      <h3 style={styles.productionPanelTitle}>Producción mensual del pozo {selectedWellId}</h3>
+      <div style={styles.cardHeader}>
+        <span className="card-label">Serie temporal</span>
+        <h3 style={styles.productionPanelTitle}>Producción mensual del pozo {selectedWellId}</h3>
+      </div>
 
       {!selectedWellId && <InlineMessage message="Selecciona un pozo en el mapa para ver su serie de produccion." />}
 
@@ -131,11 +134,20 @@ const styles = {
     marginTop: 24,
     border: "1px solid var(--color-border-subtle)",
     borderRadius: 14,
-    padding: 16,
+    padding: 24,
     backgroundColor: "var(--color-bg-surface)",
     display: "flex",
     flexDirection: "column",
     gap: 12,
+    boxShadow: "var(--shadow-sm)",
+  } as React.CSSProperties,
+  cardHeader: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 8,
+    paddingBottom: 12,
+    borderBottom: "1px solid var(--color-border-subtle)",
+    marginBottom: 4,
   } as React.CSSProperties,
   productionPanelTitle: {
     margin: 0,

@@ -80,6 +80,9 @@ interface ComparisonChartProps {
 function ComparisonChart({ title, data, companies, onDownload }: ComparisonChartProps) {
   return (
     <div style={styles.chartWrapper}>
+      <div style={styles.cardHeader}>
+        <span className="card-label">Comparación</span>
+      </div>
       <div style={styles.header}>
         <h3 style={styles.title}>{title}</h3>
         <button
@@ -179,6 +182,9 @@ export function CompanyComparisonCharts({
 
     return (
       <div style={styles.chartWrapper}>
+        <div style={styles.cardHeader}>
+          <span className="card-label">Distribución</span>
+        </div>
         <h3 style={styles.title}>{title}</h3>
         <div style={{ height: 350 }}>
           <ResponsiveContainer width="100%" height="100%">
@@ -252,6 +258,12 @@ const styles = {
     border: `1px solid ${colors.panelBorder}`,
     padding: 24,
     backgroundColor: "var(--color-bg-surface)",
+    boxShadow: "var(--shadow-sm)",
+  } as React.CSSProperties,
+  cardHeader: {
+    paddingBottom: 12,
+    marginBottom: 4,
+    borderBottom: "1px solid var(--color-border-subtle)",
   } as React.CSSProperties,
   header: {
     display: "flex",

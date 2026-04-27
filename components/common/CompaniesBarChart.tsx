@@ -133,6 +133,9 @@ export function CompaniesBarChart({
   if (!companies || companies.length === 0) {
     return (
       <div style={styles.container}>
+        <div style={styles.cardHeader}>
+          <span className="card-label">Ranking de empresas</span>
+        </div>
         <h3 style={styles.title}>{title}</h3>
         <div style={styles.noData}>No hay datos disponibles</div>
       </div>
@@ -141,6 +144,9 @@ export function CompaniesBarChart({
 
   return (
     <div style={styles.container}>
+      <div style={styles.cardHeader}>
+        <span className="card-label">Ranking de empresas</span>
+      </div>
       <div style={styles.header}>
         <h3 style={styles.title}>{title}</h3>
         <button
@@ -205,8 +211,13 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: "var(--color-bg-surface)",
     borderRadius: "12px",
     padding: "24px",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+    boxShadow: "var(--shadow-sm)",
     border: "1px solid var(--color-border-subtle)",
+  },
+  cardHeader: {
+    paddingBottom: "12px",
+    marginBottom: "8px",
+    borderBottom: "1px solid var(--color-border-subtle)",
   },
   header: {
     display: "flex",
