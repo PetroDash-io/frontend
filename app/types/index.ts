@@ -150,6 +150,17 @@ export interface TopProductionFilters {
   limit?: number;
 }
 
+export interface MapMetricsResponse {
+  source: string;
+  resource: "oil" | "gas" | "water";
+  active_wells: number;
+  stopped_wells: number;
+  inactive_wells: number;
+  not_informed_wells: number;
+  total_production_last_month: number | null;
+  last_month: string | null;
+}
+
 export type {
   ProductionResource,
   WellProductionAnomalyEvidence,
