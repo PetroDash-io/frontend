@@ -17,7 +17,7 @@ import {
 export type ValidatedProductionDateRange = DateRangeValue;
 
 interface ProductionPanelProps {
-  selectedWellId: string | null;
+  selectedWellId: number | null;
   wellProduction: ProductionMonthly[] | null;
   loadingWellProduction: boolean;
   errorWellProduction: string | null;

@@ -1,7 +1,7 @@
-import { colors, LEGEND_ITEMS } from "@/utils/constants";
-import { ActiveWell, WellDetail } from "@/app/types";
-import { LegendItem } from "@/components/map/LegendItem";
-import { getWellColor } from "@/utils/helpers";
+import {colors, LEGEND_ITEMS} from "@/utils/constants";
+import {ActiveWell, WellDetail} from "@/app/types";
+import {LegendItem} from "@/components/map/LegendItem";
+import {getWellColor} from "@/utils/helpers";
 
 import Map, {Marker, Popup, Source, Layer} from "react-map-gl/mapbox";
 import type { HeatmapLayer } from "mapbox-gl";
@@ -10,15 +10,15 @@ import React, {useState} from "react";
 
 interface WellsMapProps {
   wells: WellDetail[];
-  selectedWellId: string | null;
-  onSelectWell: (id: string) => void;
+  selectedWellId: number | null;
+  onSelectWell: (id: number) => void;
   mapMode: "markers" | "heatmap";
   heatmapData?: GeoJSON.FeatureCollection | null;
   heatmapMaxValue?: number;
 }
 
 export function WellsMap({ wells, selectedWellId, onSelectWell, mapMode, heatmapData, heatmapMaxValue = 1 }: WellsMapProps) {
-    const [focusedPozoId, setFocusedPozoId] = useState<string | null>(null);
+    const [focusedPozoId, setFocusedPozoId] = useState<number | null>(null);
     const [activePozo, setActivePozo] = useState<ActiveWell | null>(null);
     const safeHeatmapMaxValue = Number.isFinite(heatmapMaxValue) && heatmapMaxValue > 0 ? heatmapMaxValue : 1;
 
@@ -94,7 +94,7 @@ export function WellsMap({ wells, selectedWellId, onSelectWell, mapMode, heatmap
                         return null;
                     }
 
-                    const wellId = String(item.well_id);
+                    const wellId = item.well_id;
 
                     const isSelected = selectedWellId === wellId;
 

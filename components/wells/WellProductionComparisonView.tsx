@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useMemo, useState} from "react";
 import {colors} from "@/utils/constants";
 import {
   ResponsiveContainer,
@@ -11,12 +11,29 @@ import {
   Cell,
 } from "recharts";
 import { useWellProductionComparison } from "@/hooks/useWellProductionComparison";
-import { WellProductionComparisonFilters } from "@/app/types";
-import { exportMultipleSheetsToExcel } from "@/utils/excel";
-import { toast } from "react-toastify";
+import {ProductionResource, WellProductionComparisonFilters} from "@/app/types";
 import { LoadingState } from "@/components/common/LoadingState";
 import { InlineMessage } from "@/components/common/InlineMessage";
-import {YearMonthRangeFilters} from "@/components/common/YearMonthRangeFilters";
+import {useWellsProduction} from "@/hooks/useWellProduction";
+import {ProductionCurveChart} from "@/components/wells/ProductionCurveChart";
+import {InjectionCurveChart} from "@/components/wells/InjectionCurveChart";
+import {DateRangeFilters} from "@/components/map/DateRangeFilters";
+import {
+  DateRangeValue,
+  DEFAULT_WELL_CHART_DATE_RANGE,
+  getDateRangeCompleteness, getDateRangeWarningMessage,
+  getValidatedDateRange
+} from "@/utils/dateRange";
+import {useWellAnomalies} from "@/hooks/useWellAnomalies";
+import {WellAnomaliesChart} from "@/components/map/anomalies/WellAnomaliesChart";
+import {AnomalyMethodInfoButton} from "@/components/map/anomalies/AnomalyMethodInfoButton";
+import {SelectFilter, SelectFilterOption} from "@/components/common/SelectFilter";
+
+const resourceOptions: SelectFilterOption[] = [
+  {value: "oil", label: "Petroleo"},
+  {value: "gas", label: "Gas"},
+  {value: "water", label: "Agua"},
+];
 
 const formatYAxis = (value: number) => {
   if (value >= 1000000) {
@@ -36,27 +53,51 @@ const formatTooltip = (value: number | string | undefined) => {
 
 export function WellProductionComparisonView() {
   const [wellId, setWellId] = useState<number | null>(null);
+  const [wellIdInput, setWellIdInput] = useState("");
+  const [wellIdInputError, setWellIdInputError] = useState<string | null>(null);
   const [filters, setFilters] = useState<Partial<WellProductionComparisonFilters>>({median_by: []});
-  const { data, loading, error } = useWellProductionComparison(wellId, filters);
-  const errorMessage = error || null;
+  const [dateRange, setDateRange] = useState<DateRangeValue>(DEFAULT_WELL_CHART_DATE_RANGE);
+  const [selectedResource, setSelectedResource] = useState<ProductionResource>("oil");
+  const validatedDateRange = useMemo(() => getValidatedDateRange(dateRange), [dateRange]);
+  const {isStartRangeIncomplete, isEndRangeIncomplete} = useMemo(
+      () => getDateRangeCompleteness(dateRange),
+      [dateRange]
+  );
 
-  useEffect(() => {
-    if (!errorMessage) return;
-    toast.error(errorMessage || "Unexpected error", {toastId: errorMessage || "Unexpected error"});
-  }, [errorMessage]);
+  const {
+    data: comparisonData,
+    loading: loadingComparisonData,
+    error: errorInComparisonData
+  } = useWellProductionComparison(wellId, filters, validatedDateRange);
 
-  const handleWellIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+  const {
+    data: wellProduction,
+    loading: loadingWellProduction,
+    error: errorInWellProduction
+  } = useWellsProduction({wellId: wellId, dateRange: validatedDateRange});
+
+  const {
+    data: anomalyPeriods,
+    loading: loadingAnomalies,
+    error: errorAnomalies
+  } = useWellAnomalies({wellId: wellId, resource: selectedResource, dateRange: validatedDateRange});
+
+  const handleApplyWellId = () => {
+    const value = wellIdInput.trim();
     if (value === "") {
       setWellId(null);
-    } else {
-      const parsed = parseInt(value, 10);
-      if (!isNaN(parsed) && parsed > 0) {
-        setWellId(parsed);
-      } else {
-        setWellId(null);
-      }
+      setWellIdInputError(null);
+      return;
     }
+
+    const parsed = parseInt(value, 10);
+    if (!isNaN(parsed) && parsed > 0) {
+      setWellId(parsed);
+      setWellIdInputError(null);
+      return;
+    }
+
+    setWellIdInputError("Ingresá un ID de pozo válido.");
   };
 
   const handleMedianByChange = (value: string, checked: boolean) => {
@@ -70,98 +111,57 @@ export function WellProductionComparisonView() {
     });
   };
 
-  const updateFilters = (filterName: string, value: unknown) => {
-    setFilters((previousValues) => ({...previousValues, [filterName]: value}));
+  const updateDateRange = (filterName: string, value: unknown) => {
+    setDateRange((previousValues) => ({...previousValues, [filterName]: value}));
   }
 
+  const updateSelectedResource = (filterName: string, value: unknown) => {
+    setSelectedResource("oil");
+  }
+
+  const curveSeriesData = useMemo(() => {
+    if (!wellProduction || wellProduction.length === 0) return [];
+    return wellProduction
+      .slice()
+      .sort((a, b) => a.data_date.localeCompare(b.data_date))
+      .map((record) => ({
+        date: record.data_date.slice(0, 7),
+        oil: Number(record.oil_production) || 0,
+        gas: Number(record.gas_production) || 0,
+        water: Number(record.water_production) || 0,
+        water_injection: Number(record.water_injection) || 0,
+        gas_injection: Number(record.gas_injection) || 0,
+        co2_injection: Number(record.co2_injection) || 0,
+      }));
+  }, [wellProduction]);
+
   // Preparar datos para los gráficos
-  const oilData = data?.data?.[0]
+  const oilData = comparisonData?.data?.[0]
     ? [
-        { name: "Pozo", value: data.data[0].oil.total },
-        { name: "Mediana", value: data.data[0].oil.median },
+        { name: "Pozo", value: comparisonData.data[0].oil.total },
+        { name: "Mediana", value: comparisonData.data[0].oil.median },
       ]
     : [];
 
-  const gasData = data?.data?.[0]
+  const gasData = comparisonData?.data?.[0]
     ? [
-        { name: "Pozo", value: data.data[0].gas.total },
-        { name: "Mediana", value: data.data[0].gas.median },
+        { name: "Pozo", value: comparisonData.data[0].gas.total },
+        { name: "Mediana", value: comparisonData.data[0].gas.median },
       ]
     : [];
 
-  const waterData = data?.data?.[0]
+  const waterData = comparisonData?.data?.[0]
     ? [
-        { name: "Pozo", value: data.data[0].water.total },
-        { name: "Mediana", value: data.data[0].water.median },
+        { name: "Pozo", value: comparisonData.data[0].water.total },
+        { name: "Mediana", value: comparisonData.data[0].water.median },
       ]
     : [];
 
-  const handleDownloadExcel = () => {
-    if (!data || !data.data || data.data.length === 0) return;
-
-    const dataToExport = [
-      {
-        Recurso: "Petróleo",
-        Pozo: data.data[0].oil.total,
-        Mediana: data.data[0].oil.median,
-        Unidad: "m³",
-      },
-      {
-        Recurso: "Gas",
-        Pozo: data.data[0].gas.total,
-        Mediana: data.data[0].gas.median,
-        Unidad: "Mm³",
-      },
-      {
-        Recurso: "Agua",
-        Pozo: data.data[0].water.total,
-        Mediana: data.data[0].water.median,
-        Unidad: "m³",
-      },
-    ];
-
-    const today = new Date().toISOString().split('T')[0];
-    let fileName = `pozo-${wellId}`;
-    
-    if (data.start_year && data.start_month && data.end_year && data.end_month) {
-      fileName += `-${data.start_year}-${data.start_month.toString().padStart(2, '0')}-a-${data.end_year}-${data.end_month.toString().padStart(2, '0')}`;
-    }
-    
-    if (filters.median_by && filters.median_by.length > 0) {
-      fileName += `-mediana-por-${filters.median_by.join('-')}`;
-    }
-    
-    fileName += `-${today}`;
-
-    exportMultipleSheetsToExcel(
-      [
-        {
-          data: dataToExport,
-          sheetName: "Comparación",
-        },
-      ],
-      fileName
-    );
-  };
 
   return (
     <div style={styles.container}>
       <div style={styles.headerContainer}>
         <h2 style={styles.mainTitle}>Análisis de Producción por Pozo</h2>
-        {data && data.data && data.data.length > 0 && (
-          <button
-            onClick={handleDownloadExcel}
-            style={styles.downloadButton}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "var(--color-brand-dark)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "var(--color-brand-mid)";
-            }}
-          >
-            📊 Descargar Excel
-          </button>
-        )}
       </div>
 
       <div style={styles.filtersContainer}>
@@ -169,142 +169,213 @@ export function WellProductionComparisonView() {
           <span className="card-label">Filtros</span>
         </div>
         <div style={styles.filterRow}>
-          <label style={styles.label}>
-            ID del Pozo:
-            <input
-              type="number"
-              value={wellId || ""}
-              onChange={handleWellIdChange}
-              placeholder="Ingrese ID del pozo"
-              style={styles.input}
-            />
-          </label>
+          <div style={styles.wellIdFieldContainer}>
+            <label style={styles.label}>
+              ID del Pozo:
+              <input
+                type="number"
+                value={wellIdInput}
+                onChange={(e) => {
+                  setWellIdInput(e.target.value);
+                  if (wellIdInputError) setWellIdInputError(null);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleApplyWellId();
+                  }
+                }}
+                placeholder="Ingrese ID del pozo"
+                style={styles.input}
+              />
+            </label>
+          </div>
+          <button type="button" style={styles.searchButton} onClick={handleApplyWellId}>
+            Buscar
+          </button>
         </div>
 
+        {wellIdInputError && <InlineMessage message={wellIdInputError} variant="warning" />}
+
         <div style={styles.filterRow}>
-          <YearMonthRangeFilters
-            onSelect={updateFilters}
-            startYearValue={filters.inicio_anio || ""}
-            startMonthValue={filters.inicio_mes || ""}
-            endYearValue={filters.fin_anio || ""}
-            endMonthValue={filters.fin_mes || ""}
+          <DateRangeFilters
+              value={dateRange}
+              onChange={updateDateRange}
+              isStartRangeIncomplete={isStartRangeIncomplete}
+              isEndRangeIncomplete={isEndRangeIncomplete}
           />
         </div>
-
-        <div style={styles.filterRow}>
-          <label style={styles.checkboxLabel}>
-            Filtrar mediana por:
-          </label>
-          <label style={styles.checkboxLabel}>
-            <input
-              type="checkbox"
-              checked={filters.median_by?.includes("company") || false}
-              onChange={(e) => handleMedianByChange("company", e.target.checked)}
+        {(isStartRangeIncomplete || isEndRangeIncomplete) && (
+            <InlineMessage
+                variant="warning"
+                message={getDateRangeWarningMessage(isStartRangeIncomplete, isEndRangeIncomplete)}
             />
-            Empresa
-          </label>
-          <label style={styles.checkboxLabel}>
-            <input
-              type="checkbox"
-              checked={filters.median_by?.includes("area") || false}
-              onChange={(e) => handleMedianByChange("area", e.target.checked)}
-            />
-            Área
-          </label>
-          <label style={styles.checkboxLabel}>
-            <input
-              type="checkbox"
-              checked={filters.median_by?.includes("province") || false}
-              onChange={(e) => handleMedianByChange("province", e.target.checked)}
-            />
-            Provincia
-          </label>
-        </div>
+        )}
       </div>
 
-      {loading && <LoadingState/>}
-      {errorMessage && <InlineMessage message={errorMessage || "Unexpected error"} variant="error"/>}
+      {!wellId && !loadingComparisonData && <InlineMessage message="Ingrese un ID de pozo para ver el análisis de producción." />}
 
-      {data && data.data && data.data.length > 0 && (
-        <div style={styles.infoContainer}>
-          <div style={styles.cardHeader}>
-            <span className="card-label">Contexto del pozo</span>
+      {wellId && (
+        <>
+          <div style={styles.stablePanelWithSurface}>
+            <div style={styles.cardHeader}>
+              <span className="card-label">Curva de producción</span>
+            </div>
+            {loadingWellProduction && <LoadingState/>}
+            {errorInWellProduction && <InlineMessage message={errorInWellProduction} variant="error"/>}
+            {!loadingWellProduction && !errorInWellProduction && curveSeriesData.length === 0 && (
+              <InlineMessage message="No hay curvas de producción para este pozo." />
+            )}
+            {!loadingWellProduction && !errorInWellProduction && curveSeriesData.length > 0 && (
+              <ProductionCurveChart data={curveSeriesData} />
+            )}
           </div>
-          <p style={styles.info}>
-            <strong>Pozo:</strong> {data.well_id} | <strong>Empresa:</strong> {data.company} |{" "}
-            <strong>Área:</strong> {data.area} | <strong>Provincia:</strong> {data.province}
-          </p>
-          {data.start_year && data.start_month && data.end_year && data.end_month && (
-            <p style={styles.info}>
-              <strong>Período:</strong> {data.start_month}/{data.start_year} - {data.end_month}/{data.end_year}
-            </p>
-          )}
-        </div>
-      )}
 
-      {data && data.data && data.data.length > 0 && (
-        <div style={styles.chartsContainer}>
-          <div style={styles.chartWrapper}>
+          <div style={styles.stablePanelLarge}>
             <div style={styles.cardHeader}>
               <span className="card-label">Comparación</span>
             </div>
-            <h3 style={styles.chartTitle}>Producción de Petróleo</h3>
-            <ResponsiveContainer width="100%" height={400}>
-              <BarChart data={oilData} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis tickFormatter={formatYAxis} width={60} />
-                <Tooltip formatter={formatTooltip} />
-                <Bar dataKey="value" name="Petróleo (m³)">
-                  <Cell fill={colors.oil} />
-                  <Cell fill={colors.oil} opacity={0.6} />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
 
-          <div style={styles.chartWrapper}>
-            <div style={styles.cardHeader}>
-              <span className="card-label">Comparación</span>
+            <div style={styles.filterRow}>
+              <label style={styles.checkboxLabel}>
+                Filtrar mediana por:
+              </label>
+              <label style={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={filters.median_by?.includes("company") || false}
+                  onChange={(e) => handleMedianByChange("company", e.target.checked)}
+                />
+                Empresa
+              </label>
+              <label style={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={filters.median_by?.includes("area") || false}
+                  onChange={(e) => handleMedianByChange("area", e.target.checked)}
+                />
+                Área
+              </label>
+              <label style={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={filters.median_by?.includes("province") || false}
+                  onChange={(e) => handleMedianByChange("province", e.target.checked)}
+                />
+                Provincia
+              </label>
             </div>
-            <h3 style={styles.chartTitle}>Producción de Gas</h3>
-            <ResponsiveContainer width="100%" height={400}>
-              <BarChart data={gasData} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis tickFormatter={formatYAxis} width={60} />
-                <Tooltip formatter={formatTooltip} />
-                <Bar dataKey="value" name="Gas (Mm³)">
-                  <Cell fill={colors.gas} />
-                  <Cell fill={colors.gas} opacity={0.6} />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
 
-          <div style={styles.chartWrapper}>
-            <div style={styles.cardHeader}>
-              <span className="card-label">Comparación</span>
+            {loadingComparisonData && <LoadingState/>}
+            {errorInComparisonData && <InlineMessage message={errorInComparisonData || "Unexpected error"} variant="error"/>}
+
+            {comparisonData && comparisonData.data && comparisonData.data.length > 0 && (
+              <div style={styles.infoContainer}>
+                <p style={styles.info}>
+                  <strong>Pozo:</strong> {comparisonData.well_id} | <strong>Empresa:</strong> {comparisonData.company} |{" "}
+                  <strong>Área:</strong> {comparisonData.area} | <strong>Provincia:</strong> {comparisonData.province}
+                </p>
+                {comparisonData.start_year && comparisonData.start_month && comparisonData.end_year && comparisonData.end_month && (
+                  <p style={styles.info}>
+                    <strong>Período:</strong> {comparisonData.start_month}/{comparisonData.start_year} - {comparisonData.end_month}/{comparisonData.end_year}
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div style={styles.chartsContainer}>
+              <div style={styles.chartWrapper}>
+                <h3 style={styles.chartTitle}>Producción de Petróleo</h3>
+                <ResponsiveContainer width="100%" height={400}>
+                  <BarChart data={oilData} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis tickFormatter={formatYAxis} width={60} />
+                    <Tooltip formatter={formatTooltip} />
+                    <Bar dataKey="value" name="Petróleo (m³)">
+                      <Cell fill={colors.oil} />
+                      <Cell fill={colors.oil} opacity={0.6} />
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div style={styles.chartWrapper}>
+                <h3 style={styles.chartTitle}>Producción de Gas</h3>
+                <ResponsiveContainer width="100%" height={400}>
+                  <BarChart data={gasData} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis tickFormatter={formatYAxis} width={60} />
+                    <Tooltip formatter={formatTooltip} />
+                    <Bar dataKey="value" name="Gas (Mm³)">
+                      <Cell fill={colors.gas} />
+                      <Cell fill={colors.gas} opacity={0.6} />
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div style={styles.chartWrapper}>
+                <h3 style={styles.chartTitle}>Producción de Agua</h3>
+                <ResponsiveContainer width="100%" height={400}>
+                  <BarChart data={waterData} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis tickFormatter={formatYAxis} width={60} />
+                    <Tooltip formatter={formatTooltip} />
+                    <Bar dataKey="value" name="Agua (m³)">
+                      <Cell fill={colors.water} />
+                      <Cell fill={colors.water} opacity={0.6} />
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
             </div>
-            <h3 style={styles.chartTitle}>Producción de Agua</h3>
-            <ResponsiveContainer width="100%" height={400}>
-              <BarChart data={waterData} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis tickFormatter={formatYAxis} width={60} />
-                <Tooltip formatter={formatTooltip} />
-                <Bar dataKey="value" name="Agua (m³)">
-                  <Cell fill={colors.water} />
-                  <Cell fill={colors.water} opacity={0.6} />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
           </div>
-        </div>
-      )}
 
-      {!wellId && !loading && (
-        <InlineMessage message="Ingrese un ID de pozo para ver el análisis de producción." />
+          <div style={styles.stablePanelWithSurface}>
+            <div style={styles.cardHeader}>
+              <span className="card-label">Anomalías</span>
+              <AnomalyMethodInfoButton />
+            </div>
+            <div style={styles.filterRow}>
+              <SelectFilter
+                  value={selectedResource}
+                  onSelect={updateSelectedResource}
+                  filterName="selectedResource"
+                  inputLabel="Recurso"
+                  options={resourceOptions}
+              />
+            </div>
+            {loadingAnomalies && <LoadingState/>}
+            {errorAnomalies && <InlineMessage message={errorAnomalies} variant="error"/>}
+            {!loadingAnomalies && !errorAnomalies && anomalyPeriods.length === 0 && (
+                <InlineMessage message="No hay curvas de producción para este pozo." />
+            )}
+            {!loadingAnomalies && !errorAnomalies && anomalyPeriods.length > 0 && (
+                <WellAnomaliesChart
+                    production={wellProduction}
+                    anomalyPeriods={anomalyPeriods}
+                    resource={selectedResource}
+                />
+            )}
+          </div>
+
+          <div style={styles.stablePanelWithSurface}>
+            <div style={styles.cardHeader}>
+              <span className="card-label">Curva de inyección</span>
+            </div>
+            {loadingWellProduction && <LoadingState/>}
+            {errorInWellProduction && <InlineMessage message={errorInWellProduction} variant="error"/>}
+            {!loadingWellProduction && !errorInWellProduction && curveSeriesData.length === 0 && (
+              <InlineMessage message="No hay curvas de inyección para este pozo." />
+            )}
+            {!loadingWellProduction && !errorInWellProduction && curveSeriesData.length > 0 && (
+              <InjectionCurveChart data={curveSeriesData} />
+            )}
+          </div>
+        </>
       )}
     </div>
   );
@@ -359,8 +430,12 @@ const styles = {
     display: "flex",
     gap: "16px",
     marginBottom: "12px",
-    alignItems: "center",
+    alignItems: "flex-end",
     flexWrap: "wrap",
+  } as React.CSSProperties,
+  wellIdFieldContainer: {
+    flex: 1,
+    minWidth: "150px",
   } as React.CSSProperties,
   label: {
     display: "flex",
@@ -387,6 +462,18 @@ const styles = {
     fontSize: "14px",
     minWidth: "120px",
   } as React.CSSProperties,
+  searchButton: {
+    border: "none",
+    borderRadius: "8px",
+    padding: "9px 14px",
+    height: "40px",
+    backgroundColor: "var(--color-brand-primary)",
+    color: "var(--color-text-inverse)",
+    fontSize: "13px",
+    fontWeight: 600,
+    cursor: "pointer",
+    alignSelf: "flex-end",
+  } as React.CSSProperties,
   select: {
     padding: "8px 12px",
     borderRadius: "4px",
@@ -398,11 +485,11 @@ const styles = {
   } as React.CSSProperties,
   infoContainer: {
     backgroundColor: colors.filtersBg,
-    padding: "24px",
+    padding: "16px",
     borderRadius: "8px",
-    marginBottom: "24px",
+    marginBottom: "16px",
     border: `1px solid ${colors.panelBorder}`,
-    boxShadow: "var(--shadow-sm)",
+    boxShadow: "none",
   } as React.CSSProperties,
   info: {
     margin: "4px 0",
@@ -443,6 +530,36 @@ const styles = {
     backgroundColor: "rgba(192, 57, 43, 0.08)",
     borderRadius: "8px",
     marginBottom: "20px",
+  } as React.CSSProperties,
+  curvesSection: {
+    backgroundColor: "var(--color-bg-surface)",
+    padding: "24px",
+    borderRadius: "8px",
+    border: `1px solid ${colors.panelBorder}`,
+    boxShadow: "var(--shadow-sm)",
+    marginTop: "24px",
+  } as React.CSSProperties,
+  stablePanel: {
+    minHeight: "420px",
+    marginTop: "24px",
+  } as React.CSSProperties,
+  stablePanelWithSurface: {
+    minHeight: "420px",
+    marginTop: "24px",
+    backgroundColor: "var(--color-bg-surface)",
+    padding: "24px",
+    borderRadius: "8px",
+    border: `1px solid ${colors.panelBorder}`,
+    boxShadow: "var(--shadow-sm)",
+  } as React.CSSProperties,
+  stablePanelLarge: {
+    minHeight: "520px",
+    marginTop: "24px",
+    backgroundColor: "var(--color-bg-surface)",
+    padding: "24px",
+    borderRadius: "8px",
+    border: `1px solid ${colors.panelBorder}`,
+    boxShadow: "var(--shadow-sm)",
   } as React.CSSProperties,
 };
 

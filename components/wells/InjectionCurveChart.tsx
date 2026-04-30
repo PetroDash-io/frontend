@@ -1,0 +1,86 @@
+import React, {useState} from "react";
+import {colors} from "@/utils/constants";
+import {CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
+
+const M3_TO_BBL = 6.28981;
+type Unit = "m3" | "bbl";
+
+interface InjectionCurvePoint {
+  date: string;
+  water_injection?: number | null;
+  gas_injection?: number | null;
+  co2_injection?: number | null;
+}
+
+export function InjectionCurveChart({data}: {data: InjectionCurvePoint[]}) {
+  const [unit, setUnit] = useState<Unit>("m3");
+
+  const convertedData = data.map((d) => ({
+    ...d,
+    water_injection: d.water_injection == null ? null : unit === "bbl" ? d.water_injection * M3_TO_BBL : d.water_injection,
+    gas_injection: d.gas_injection,
+    co2_injection: d.co2_injection,
+  }));
+
+  return (
+    <div style={styles.wrapper}>
+      <div style={styles.controlsRow}>
+        <button style={tabButtonStyle(unit === "m3")} onClick={() => setUnit("m3")}>m³</button>
+        <button style={tabButtonStyle(unit === "bbl")} onClick={() => setUnit("bbl")}>BBL</button>
+      </div>
+
+      <div style={{height: 320}}>
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={convertedData} margin={{top: 10, right: 20, left: 0, bottom: 10}}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" minTickGap={18} />
+            <YAxis tickFormatter={(v) => (unit === "bbl" ? v.toFixed(0) : v.toFixed(1))} />
+            <Tooltip
+              formatter={(value: number | string | undefined, name?: string | number) => {
+                if (name === "gas_injection") return [`${Number(value).toFixed(2)} Mm³`, "Inyección Gas"];
+                const unitLabel = unit === "bbl" ? "BBL" : "m³";
+                if (name === "water_injection") return [`${Number(value).toFixed(2)} ${unitLabel}`, "Inyección Agua"];
+                if (name === "co2_injection") return [`${Number(value).toFixed(2)} ${unitLabel}`, "Inyección CO2"];
+                return String(value);
+              }}
+            />
+            <Legend />
+
+            <Line type="monotone" dataKey="water_injection" name={`Inyección Agua (${unit === "bbl" ? "BBL" : "m³"})`} stroke="var(--color-inj-water)" dot={false} />
+            <Line type="monotone" dataKey="gas_injection" name="Inyección Gas (Mm³)" stroke="var(--color-inj-gas)" dot={false} />
+            <Line type="monotone" dataKey="co2_injection" name="Inyección CO2" stroke="var(--color-inj-co2)" dot={false} />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
+}
+
+const styles = {
+  wrapper: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
+    borderRadius: 14,
+    border: `1px solid ${colors.panelBorder}`,
+    backgroundColor: "var(--color-bg-surface)",
+  } as React.CSSProperties,
+  controlsRow: {
+    display: "flex",
+    gap: 12,
+    padding: "12px 24px",
+  } as React.CSSProperties,
+};
+
+function tabButtonStyle(active: boolean): React.CSSProperties {
+  return {
+    padding: "8px 16px",
+    borderRadius: 8,
+    border: "1px solid var(--color-brand-mid)",
+    backgroundColor: active ? "var(--color-brand-mid)" : "transparent",
+    color: active ? "var(--color-text-inverse)" : "var(--color-brand-mid)",
+    fontSize: 14,
+    fontWeight: 500,
+    cursor: "pointer",
+  };
+}

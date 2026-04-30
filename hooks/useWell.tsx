@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import {WellDetail} from "@/app/types";
 
 interface useWellParams {
-    wellId: string | null;
+    wellId: number | null;
 }
 
 export function useWell({wellId}: useWellParams) {

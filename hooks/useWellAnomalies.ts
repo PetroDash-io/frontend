@@ -1,30 +1,22 @@
 import {useEffect, useRef, useState} from "react";
 import {ProductionResource, WellProductionAnomalyPeriod} from "@/app/types/anomalies";
-
-interface WellProductionDateRange {
-  startYear?: string | number | null;
-  startMonth?: string | number | null;
-  endYear?: string | number | null;
-  endMonth?: string | number | null;
-}
+import {DateRangeValue} from "@/utils/dateRange";
 
 interface UseWellAnomaliesParams {
-  wellId: string | null;
+  wellId: number | null;
   resource: ProductionResource;
-  dateRange?: WellProductionDateRange;
+  dateRange: DateRangeValue;
 }
 
-const hasValue = (value?: string | number | null) => value !== undefined && value !== null && value !== "";
-
 export function useWellAnomalies({wellId, resource, dateRange}: UseWellAnomaliesParams) {
-  const [data, setData] = useState<WellProductionAnomalyPeriod[] | null>(null);
+  const [data, setData] = useState<WellProductionAnomalyPeriod[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const previousWellId = useRef<string | null>(null);
+  const previousWellId = useRef<number | null>(null);
 
   useEffect(() => {
     if (!wellId) {
-      setData(null);
+      setData([]);
       setLoading(false);
       setError(null);
       return;
@@ -38,26 +30,21 @@ export function useWellAnomalies({wellId, resource, dateRange}: UseWellAnomalies
       setError(null);
 
       if (hasWellChanged) {
-        setData(null);
+        setData([]);
       }
 
       try {
         const params = new URLSearchParams();
         params.append("resource", resource);
 
-        const startYear = hasValue(dateRange?.startYear) ? String(dateRange?.startYear) : null;
-        const startMonth = hasValue(dateRange?.startMonth) ? String(dateRange?.startMonth) : null;
-        const endYear = hasValue(dateRange?.endYear) ? String(dateRange?.endYear) : null;
-        const endMonth = hasValue(dateRange?.endMonth) ? String(dateRange?.endMonth) : null;
-
-        if (startYear && startMonth) {
-          params.append("start_year", startYear);
-          params.append("start_month", startMonth);
+        if (dateRange.startYear && dateRange.startMonth) {
+          params.append("start_year", dateRange.startYear);
+          params.append("start_month", dateRange.startMonth);
         }
 
-        if (endYear && endMonth) {
-          params.append("end_year", endYear);
-          params.append("end_month", endMonth);
+        if (dateRange.endYear && dateRange.endMonth) {
+          params.append("end_year", dateRange.endYear);
+          params.append("end_month", dateRange.endMonth);
         }
 
         const url = `${process.env.NEXT_PUBLIC_API_URL}/pozos/${wellId}/anomalias-produccion?${params.toString()}`;
@@ -75,14 +62,14 @@ export function useWellAnomalies({wellId, resource, dateRange}: UseWellAnomalies
         setData(Array.isArray(json.data) ? json.data : []);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unexpected error");
-        setData(null);
+        setData([]);
       } finally {
         setLoading(false);
       }
     };
 
     fetchAnomalies();
-  }, [wellId, resource, dateRange?.startYear, dateRange?.startMonth, dateRange?.endYear, dateRange?.endMonth]);
+  }, [wellId, resource, dateRange]);
 
   return {data, loading, error};
 }

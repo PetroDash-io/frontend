@@ -1,5 +1,5 @@
 export interface ActiveWell {
-  id: string;
+  id: number;
   lon: number;
   lat: number;
   company: string | null;
@@ -12,7 +12,7 @@ export interface WellGeoPoint {
 }
 
 export interface WellDetail {
-  well_id: string | number;
+  well_id: number;
   watershed: string;
   province: string;
   area: string;
@@ -126,10 +126,6 @@ export interface WellProductionComparisonResponse {
 }
 
 export interface WellProductionComparisonFilters {
-  inicio_anio?: number;
-  inicio_mes?: number;
-  fin_anio?: number;
-  fin_mes?: number;
   median_by?: string[];
 }
 
