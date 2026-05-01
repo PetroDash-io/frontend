@@ -98,10 +98,13 @@ export function WellComparisonSection({wellId, dateRange}: WellComparisonSection
       {error && <InlineMessage message={error} variant="error" />}
 
       {!loading && !error && (!data?.data || data.data.length === 0) && (
-        <InlineMessage message="No hay datos de comparación para este pozo en el período seleccionado." />
+        <InlineMessage
+          message="Sin datos de comparación para el período seleccionado."
+          variant="warning"
+        />
       )}
 
-      {!loading && !error && data?.data && data.data.length > 0 && (
+      {!loading && !error && (
         <div style={styles.chartsContainer}>
           <div style={styles.chartWrapper}>
             <h3 style={styles.chartTitle}>Producción de Petróleo</h3>

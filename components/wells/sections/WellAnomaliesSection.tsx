@@ -69,14 +69,16 @@ export function WellAnomaliesSection({
       )}
 
       {!loadingAnomalies && !errorAnomalies && !productionLoading && !productionError && anomalyPeriods.length === 0 && (
-        <InlineMessage message="No hay anomalías para este pozo y recurso en el período seleccionado." />
+        <InlineMessage
+          message="Sin anomalías detectadas para este recurso en el período seleccionado."
+          variant="warning"
+        />
       )}
 
       {!loadingAnomalies &&
         !errorAnomalies &&
         !productionLoading &&
-        !productionError &&
-        anomalyPeriods.length > 0 && (
+        !productionError && (
           <AnomaliesTimeSeries
             production={production}
             anomalyPeriods={anomalyPeriods}

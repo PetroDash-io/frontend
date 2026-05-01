@@ -24,10 +24,7 @@ export function WellProductionSection({loading, error, data}: WellProductionSect
     <>
       {loading && <LoadingState />}
       {error && <InlineMessage message={error} variant="error" />}
-      {!loading && !error && data.length === 0 && (
-        <InlineMessage message="No hay curvas de producción para este pozo." />
-      )}
-      {!loading && !error && data.length > 0 && <ProductionTimeSeries data={data} />}
+      {!loading && !error && <ProductionTimeSeries data={data} />}
     </>
   );
 }

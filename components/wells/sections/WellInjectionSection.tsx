@@ -24,10 +24,7 @@ export function WellInjectionSection({loading, error, data}: WellInjectionSectio
     <>
       {loading && <LoadingState />}
       {error && <InlineMessage message={error} variant="error" />}
-      {!loading && !error && data.length === 0 && (
-        <InlineMessage message="No hay curvas de inyección para este pozo." />
-      )}
-      {!loading && !error && data.length > 0 && <InjectionTimeSeries data={data} />}
+      {!loading && !error && <InjectionTimeSeries data={data} />}
     </>
   );
 }
