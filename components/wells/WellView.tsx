@@ -1,5 +1,3 @@
-"use client";
-
 import React, {useState, useMemo} from "react";
 import {MapView} from "@/components/map/MapView";
 import {TableView} from "@/components/table/TableView";

@@ -1,5 +1,3 @@
-"use client";
-
 import React, {useEffect} from "react";
 import {WellInfo} from "@/components/map/WellInfo";
 import {WellsMap} from "@/components/map/WellsMap";

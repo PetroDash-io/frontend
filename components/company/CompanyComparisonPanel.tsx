@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import {colors} from "@/utils/constants";
 import {ComparisonFilters} from "@/app/types";

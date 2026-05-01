@@ -1,5 +1,3 @@
-"use client";
-
 import React, {useEffect, useMemo, useState} from "react";
 import {colors, WATERSHED_OPTIONS} from "@/utils/constants";
 import {useCompanies} from "@/hooks/useCompanies";

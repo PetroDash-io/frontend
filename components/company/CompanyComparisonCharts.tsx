@@ -1,5 +1,3 @@
-"use client";
-
 import React, {useMemo} from "react";
 import {colors, COMPANY_COLORS} from "@/utils/constants";
 import {Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis, Pie, PieChart, Cell} from "recharts";
