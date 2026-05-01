@@ -40,7 +40,7 @@ export function MapView({filters, mode, heatmapResource, onSelectHeatmapResource
   const {data: selectedWellDetails, loading: loadingWell, error: errorGettingWellDetails} =
       useWell({wellId: selectedWellId});
 
-  const {data: wellProduction, loading: loadingWellProduction, error: errorGettingWellProduction} =
+  const {data: wellProduction, eur, loading: loadingWellProduction, error: errorGettingWellProduction} =
       useWellsProduction({wellId: selectedWellId, dateRange: validatedDateRange});
 
   const errorMessage =
@@ -87,6 +87,7 @@ export function MapView({filters, mode, heatmapResource, onSelectHeatmapResource
           key={selectedWellId ?? "none"}
           selectedWellId={selectedWellId}
           wellProduction={wellProduction}
+          eur={eur}
           loadingWellProduction={loadingWellProduction}
           errorWellProduction={errorGettingWellProduction}
           onValidatedRangeChange={setValidatedDateRange}

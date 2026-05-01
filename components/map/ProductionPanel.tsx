@@ -19,6 +19,7 @@ export type ValidatedProductionDateRange = DateRangeValue;
 interface ProductionPanelProps {
   selectedWellId: string | null;
   wellProduction: ProductionMonthly[] | null;
+  eur: number | null;
   loadingWellProduction: boolean;
   errorWellProduction: string | null;
   onValidatedRangeChange: (range: ValidatedProductionDateRange) => void;
@@ -29,6 +30,7 @@ export const EMPTY_VALIDATED_RANGE: ValidatedProductionDateRange = DEFAULT_WELL_
 export function ProductionPanel({
   selectedWellId,
   wellProduction,
+  eur,
   loadingWellProduction,
   errorWellProduction,
   onValidatedRangeChange,
@@ -61,18 +63,42 @@ export function ProductionPanel({
   const timeSeriesChartData = useMemo(() => {
     if (!wellProduction || wellProduction.length === 0) return null;
 
-    return wellProduction
+    const sortedRecords = wellProduction
       .slice()
-      .sort((a, b) => a.reported_period_date.localeCompare(b.reported_period_date))
-      .map((record) => ({
+      .sort((a, b) => a.reported_period_date.localeCompare(b.reported_period_date));
+
+    let oilAccumulated = 0;
+    let waterAccumulated = 0;
+    let gasAccumulated = 0;
+
+    return sortedRecords.map((record) => {
+      const oil = toNumber(record.oil_production) ?? 0;
+      const gas = toNumber(record.gas_production) ?? 0;
+      const water = toNumber(record.water_production) ?? 0;
+      const oilFromApi = toNumber(record.produccion_acumulada);
+
+      if (oilFromApi != null) {
+        oilAccumulated = oilFromApi;
+      } else {
+        oilAccumulated += oil;
+      }
+
+      waterAccumulated += water;
+      gasAccumulated += gas;
+
+      return {
         date: record.reported_period_date.slice(0, 7),
-        oil: toNumber(record.oil_production) ?? 0,
-        gas: toNumber(record.gas_production) ?? 0,
-        water: toNumber(record.water_production) ?? 0,
+        oil,
+        gas,
+        water,
+        cumulative_oil: oilAccumulated,
+        cumulative_water: waterAccumulated,
+        cumulative_gas: gasAccumulated,
         water_injection: toNumber(record.water_inyection ?? record.water_injection) ?? 0,
         gas_injection: toNumber(record.gas_inyection ?? record.gas_injection) ?? 0,
         co2_injection: toNumber(record.co2_inyection ?? record.co2_injection) ?? 0,
-      }));
+      };
+    });
   }, [wellProduction]);
 
   const updateChartDateRange = (filterName: string, value: unknown) => {
@@ -117,7 +143,7 @@ export function ProductionPanel({
             )}
 
             {!loadingWellProduction && !errorWellProduction && wellProduction && (
-              <TimeSeriesChart data={timeSeriesChartData} />
+              <TimeSeriesChart data={timeSeriesChartData} eur={eur} />
             )}
           </div>
         </>
