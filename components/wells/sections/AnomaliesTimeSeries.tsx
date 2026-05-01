@@ -8,13 +8,13 @@ import {ProductionMonthly} from "@/app/types";
 import {useUnit} from "@/hooks/useUnit";
 import {UnitTabs} from "@/components/common/UnitTabs";
 
-interface WellAnomaliesChartProps {
+interface AnomaliesTimeSeriesProps {
   production: ProductionMonthly[] | null,
   anomalyPeriods: WellProductionAnomalyPeriod[],
   resource: ProductionResource,
 }
 
-export function WellAnomaliesChart({production, anomalyPeriods, resource}: WellAnomaliesChartProps) {
+export function AnomaliesTimeSeries({production, anomalyPeriods, resource}: AnomaliesTimeSeriesProps) {
   const {unit, setUnit} = useUnit();
 
   const chartData = useMemo(() => {
@@ -42,7 +42,6 @@ export function WellAnomaliesChart({production, anomalyPeriods, resource}: WellA
     }
   };
 
-  {console.log(chartData)}
   return (
     <div style={styles.wrapper}>
       <div style={styles.controlsRow}>
@@ -54,7 +53,7 @@ export function WellAnomaliesChart({production, anomalyPeriods, resource}: WellA
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" minTickGap={18} />
             <YAxis tickFormatter={yAxisTickFormatter}/>
-            <Tooltip formatter={tooltipFormatter}/>
+            <Tooltip formatter={tooltipFormatter} itemStyle={{color: "var(--color-cat-2)"}}/>
             <Legend />
             <Line
               type="linear"
@@ -68,7 +67,7 @@ export function WellAnomaliesChart({production, anomalyPeriods, resource}: WellA
             <Line
               type="linear"
               dataKey="anomalyMarker"
-              name="Anomalia"
+              name={`${PRODUCTION_TYPES[resource].name}`}
               stroke="transparent"
               connectNulls={false}
               dot={{r: 6, fill: "var(--color-anomaly)", stroke: "var(--color-bg-surface)", strokeWidth: 2}}

@@ -1,9 +1,9 @@
 import React, {useState} from "react";
-import {colors} from "@/utils/constants";
+import {colors, PRODUCTION_TYPES} from "@/utils/constants";
 import {CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
-
-const M3_TO_BBL = 6.28981;
-type Unit = "m3" | "bbl";
+import {UnitTabs} from "@/components/common/UnitTabs";
+import {useUnit} from "@/hooks/useUnit";
+import {convertValueToUnit, UNITS} from "@/utils/units";
 
 interface InjectionCurvePoint {
   date: string;
@@ -12,21 +12,27 @@ interface InjectionCurvePoint {
   co2_injection?: number | null;
 }
 
-export function InjectionCurveChart({data}: {data: InjectionCurvePoint[]}) {
-  const [unit, setUnit] = useState<Unit>("m3");
+export function InjectionTimeSeries({data}: {data: InjectionCurvePoint[]}) {
+  const {unit, setUnit} = useUnit();
 
-  const convertedData = data.map((d) => ({
-    ...d,
-    water_injection: d.water_injection == null ? null : unit === "bbl" ? d.water_injection * M3_TO_BBL : d.water_injection,
-    gas_injection: d.gas_injection,
-    co2_injection: d.co2_injection,
+  const convertedData = data.map((row) => ({
+    ...row,
+    water_injection: row.water_injection != null ? convertValueToUnit(row.water_injection, unit) : null,
+    gas_injection: row.gas_injection ?? null,
+    co2_injection: row.co2_injection ?? null,
   }));
+
+  const tooltipFormatter = (value?: number, name?: string) => {
+    if (name === "gas_injection") return [`${Number(value).toFixed(2)} Mm³`, "Inyección Gas"];
+    const unitLabel = unit === "bbl" ? "BBL" : "m³";
+    if (name === "water_injection") return [`${Number(value).toFixed(2)} ${unitLabel}`, "Inyección Agua"];
+    if (name === "co2_injection") return [`${Number(value).toFixed(2)} ${unitLabel}`, "Inyección CO2"];
+  };
 
   return (
     <div style={styles.wrapper}>
       <div style={styles.controlsRow}>
-        <button style={tabButtonStyle(unit === "m3")} onClick={() => setUnit("m3")}>m³</button>
-        <button style={tabButtonStyle(unit === "bbl")} onClick={() => setUnit("bbl")}>BBL</button>
+        <UnitTabs onChange={setUnit} currentUnit={unit}/>
       </div>
 
       <div style={{height: 320}}>
@@ -35,15 +41,7 @@ export function InjectionCurveChart({data}: {data: InjectionCurvePoint[]}) {
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" minTickGap={18} />
             <YAxis tickFormatter={(v) => (unit === "bbl" ? v.toFixed(0) : v.toFixed(1))} />
-            <Tooltip
-              formatter={(value: number | string | undefined, name?: string | number) => {
-                if (name === "gas_injection") return [`${Number(value).toFixed(2)} Mm³`, "Inyección Gas"];
-                const unitLabel = unit === "bbl" ? "BBL" : "m³";
-                if (name === "water_injection") return [`${Number(value).toFixed(2)} ${unitLabel}`, "Inyección Agua"];
-                if (name === "co2_injection") return [`${Number(value).toFixed(2)} ${unitLabel}`, "Inyección CO2"];
-                return String(value);
-              }}
-            />
+            <Tooltip formatter={tooltipFormatter}/>
             <Legend />
 
             <Line type="monotone" dataKey="water_injection" name={`Inyección Agua (${unit === "bbl" ? "BBL" : "m³"})`} stroke="var(--color-inj-water)" dot={false} />
