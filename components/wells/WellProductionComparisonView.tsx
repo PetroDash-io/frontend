@@ -3,13 +3,7 @@ import {colors} from "@/utils/constants";
 import {InlineMessage} from "@/components/common/InlineMessage";
 import {useWellsProduction} from "@/hooks/useWellProduction";
 import {DateRangeFilters} from "@/components/map/DateRangeFilters";
-import {
-  DateRangeValue,
-  DEFAULT_WELL_CHART_DATE_RANGE,
-  getDateRangeCompleteness,
-  getDateRangeWarningMessage,
-  getValidatedDateRange,
-} from "@/utils/dateRange";
+import {DateRangeValue, DEFAULT_WELL_CHART_DATE_RANGE, getValidatedDateRange,} from "@/utils/dateRange";
 import {CollapsiblePanel} from "@/components/wells/sections/CollapsiblePanel";
 import {WellProductionSection} from "@/components/wells/sections/WellProductionSection";
 import {WellAnomaliesSection} from "@/components/wells/sections/WellAnomaliesSection";

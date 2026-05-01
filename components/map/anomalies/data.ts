@@ -1,20 +1,11 @@
 import {ProductionMonthly} from "@/app/types";
-import {ProductionResource, WellProductionAnomalyPeriod, AnomalyChartPoint} from "@/components/map/anomalies/types";
+import {AnomalyChartPoint, ProductionResource} from "@/components/map/anomalies/types";
 import {convertValueToUnit} from "@/utils/units";
 import {PRODUCTION_TYPES} from "@/utils/constants";
 
 const dataDateToUtcTimestamp = (dataDate: string): number => {
   const [year, month] = dataDate.split("-").map((part) => Number(part));
   return Date.UTC(year, month - 1, 1);
-};
-
-export const getAnomalyDateSet = (anomalyPeriods: WellProductionAnomalyPeriod[] | null): Set<string> => {
-  if (!anomalyPeriods || anomalyPeriods.length === 0) {
-    return new Set<string>();
-  }
-
-  const filteredPeriods = anomalyPeriods.filter((period) => period.anomaly?.is_anomaly === true);
-  return new Set(filteredPeriods.map((period) => period.data_date.slice(0, 7)));
 };
 
 export const buildAnomalyChartData = (

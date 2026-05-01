@@ -1,9 +1,9 @@
-import React, {useState} from "react";
-import {colors, PRODUCTION_TYPES} from "@/utils/constants";
+import React from "react";
+import {colors} from "@/utils/constants";
 import {CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
 import {UnitTabs} from "@/components/common/UnitTabs";
 import {useUnit} from "@/hooks/useUnit";
-import {convertValueToUnit, UNITS} from "@/utils/units";
+import {convertValueToUnit} from "@/utils/units";
 
 interface InjectionCurvePoint {
   date: string;
