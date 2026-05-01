@@ -59,3 +59,15 @@ test("genera opciones de filtros desde los datos", () => {
     // no vemos los selects reales, pero verificamos que no crashea
     expect(screen.getAllByTestId("select-filter").length).toBeGreaterThan(0);
   });
+
+test("mantiene solo control primario de vista", () => {
+    const { useWells } = require("@/hooks/useWells");
+    useWells.mockReturnValue({ data: [] });
+
+    render(<WellView />);
+
+    expect(screen.getByText("Mapa")).toBeInTheDocument();
+    expect(screen.getByText("Tabla")).toBeInTheDocument();
+    expect(screen.queryByText("Pozos")).not.toBeInTheDocument();
+    expect(screen.queryByText("Heatmap")).not.toBeInTheDocument();
+  });

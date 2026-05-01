@@ -15,9 +15,20 @@ interface WellsMapProps {
   mapMode: "markers" | "heatmap";
   heatmapData?: GeoJSON.FeatureCollection | null;
   heatmapMaxValue?: number;
+  overlayControlsTopRight?: React.ReactNode;
+  overlayControlsBottomCenter?: React.ReactNode;
 }
 
-export function WellsMap({ wells, selectedWellId, onSelectWell, mapMode, heatmapData, heatmapMaxValue = 1 }: WellsMapProps) {
+export function WellsMap({
+    wells,
+    selectedWellId,
+    onSelectWell,
+    mapMode,
+    heatmapData,
+    heatmapMaxValue = 1,
+    overlayControlsTopRight,
+    overlayControlsBottomCenter,
+}: WellsMapProps) {
     const [focusedPozoId, setFocusedPozoId] = useState<number | null>(null);
     const [activePozo, setActivePozo] = useState<ActiveWell | null>(null);
     const safeHeatmapMaxValue = Number.isFinite(heatmapMaxValue) && heatmapMaxValue > 0 ? heatmapMaxValue : 1;
@@ -29,6 +40,8 @@ export function WellsMap({ wells, selectedWellId, onSelectWell, mapMode, heatmap
                     <LegendItem key={item.label} color={item.color} label={item.label} />
                 ))}
             </div>
+            {overlayControlsTopRight ? <div style={styles.overlayControlsTopRight}>{overlayControlsTopRight}</div> : null}
+            {overlayControlsBottomCenter ? <div style={styles.overlayControlsBottomCenter}>{overlayControlsBottomCenter}</div> : null}
             <Map
                 initialViewState={{
                     longitude: -68.059167,
@@ -170,6 +183,19 @@ const styles = {
         width: "100%",
         height: "100%",
         borderRadius: 14,
+    } as React.CSSProperties,
+    overlayControlsTopRight: {
+        position: "absolute",
+        top: 12,
+        right: 12,
+        zIndex: 10,
+    } as React.CSSProperties,
+    overlayControlsBottomCenter: {
+        position: "absolute",
+        left: "50%",
+        bottom: 14,
+        transform: "translateX(-50%)",
+        zIndex: 10,
     } as React.CSSProperties,
     markerDot: (opts: {selected: boolean; status: string, focused: boolean}) => ({
         width: opts.selected ? 10 : 8,

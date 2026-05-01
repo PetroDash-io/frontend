@@ -18,24 +18,25 @@ jest.mock("@/hooks/useMapHeatmap", () => ({
 }));
 
 jest.mock("@/components/map/WellsMap", () => ({
-  WellsMap: ({onSelectWell}: {onSelectWell: (wellId: number) => void}) => (
-    <button onClick={() => onSelectWell(1)}>Select Well</button>
+  WellsMap: ({
+    onSelectWell,
+    overlayControlsTopRight,
+    overlayControlsBottomCenter,
+  }: {
+    onSelectWell: (wellId: number) => void;
+    overlayControlsTopRight?: React.ReactNode;
+    overlayControlsBottomCenter?: React.ReactNode;
+  }) => (
+    <div>
+      {overlayControlsTopRight}
+      {overlayControlsBottomCenter}
+      <button onClick={() => onSelectWell(1)}>Select Well</button>
+    </div>
   ),
 }));
 
 jest.mock("@/components/map/WellInfo", () => ({
   WellInfo: () => <div>WellInfo</div>,
-}));
-
-jest.mock("@/components/map/MapHeatmapControls", () => ({
-  MapHeatmapControls: ({selectedResource, onSelectResource}: {selectedResource: string; onSelectResource: (resource: "oil" | "gas" | "water") => void}) => (
-    <div>
-      <span>{selectedResource}</span>
-      <button onClick={() => onSelectResource("oil")}>Petróleo</button>
-      <button onClick={() => onSelectResource("gas")}>Gas</button>
-      <button onClick={() => onSelectResource("water")}>Agua</button>
-    </div>
-  ),
 }));
 
 const defaultProps = {
@@ -47,6 +48,9 @@ const defaultProps = {
     limit: 0,
   },
   mode: "pozos" as const,
+  onChangeMode: jest.fn(),
+  selectedWellId: null,
+  onSelectWell: jest.fn(),
   heatmapResource: "oil" as const,
   onSelectHeatmapResource: jest.fn(),
 };
@@ -93,6 +97,14 @@ describe("MapView", () => {
     expect(screen.queryByText("Petróleo")).not.toBeInTheDocument();
   });
 
+  it("permite cambiar la visualización desde el dock", () => {
+    const onChangeMode = jest.fn();
+    render(<MapView {...defaultProps} mode="pozos" onChangeMode={onChangeMode} />);
+
+    fireEvent.click(screen.getByText("Heatmap"));
+    expect(onChangeMode).toHaveBeenCalledWith("heatmap");
+  });
+
   it("llama onSelectHeatmapResource al seleccionar recurso", () => {
     const onSelectHeatmapResource = jest.fn();
     (useMapHeatmap as jest.Mock).mockReturnValue({
@@ -115,10 +127,12 @@ describe("MapView", () => {
   });
 
   it("renderiza WellInfo y permite seleccionar pozo", () => {
-    render(<MapView {...defaultProps} mode="pozos" />);
+    const onSelectWell = jest.fn();
+    render(<MapView {...defaultProps} mode="pozos" onSelectWell={onSelectWell} />);
 
     expect(screen.getByText("WellInfo")).toBeInTheDocument();
     fireEvent.click(screen.getByText("Select Well"));
+    expect(onSelectWell).toHaveBeenCalledWith(1);
     expect(screen.getByText("WellInfo")).toBeInTheDocument();
   });
 
