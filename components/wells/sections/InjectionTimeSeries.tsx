@@ -69,16 +69,3 @@ const styles = {
     padding: "12px 24px",
   } as React.CSSProperties,
 };
-
-function tabButtonStyle(active: boolean): React.CSSProperties {
-  return {
-    padding: "8px 16px",
-    borderRadius: 8,
-    border: "1px solid var(--color-brand-mid)",
-    backgroundColor: active ? "var(--color-brand-mid)" : "transparent",
-    color: active ? "var(--color-text-inverse)" : "var(--color-brand-mid)",
-    fontSize: 14,
-    fontWeight: 500,
-    cursor: "pointer",
-  };
-}
