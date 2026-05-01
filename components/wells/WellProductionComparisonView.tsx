@@ -190,6 +190,8 @@ const styles = {
   container: {
     padding: "24px",
     width: "100%",
+    boxSizing: "border-box",
+    minWidth: 0,
     minHeight: "calc(100vh - 200px)",
   } as React.CSSProperties,
   headerContainer: {

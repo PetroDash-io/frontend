@@ -48,7 +48,7 @@ export function DashboardShell({children}: {children: React.ReactNode}) {
         <h1 className={styles.title}>PetroDash</h1>
       </header>
 
-      <div className={styles.dashboardLayout}>
+      <div className={`${styles.dashboardLayout} ${isDrawerOpen ? styles.dashboardLayoutExpanded : styles.dashboardLayoutCollapsed}`}>
         <div
           className={`${styles.drawerBackdrop} ${isDrawerOpen ? styles.drawerBackdropVisible : ""}`}
           onClick={closeDrawer}
@@ -89,7 +89,7 @@ export function DashboardShell({children}: {children: React.ReactNode}) {
           </nav>
         </aside>
 
-        <main className={`${styles.contentArea} ${isDrawerOpen ? styles.contentAreaExpanded : styles.contentAreaCollapsed}`}>
+        <main className={styles.contentArea}>
           {children}
         </main>
       </div>

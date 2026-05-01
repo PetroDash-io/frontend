@@ -320,6 +320,9 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: "column",
     gap: 24,
     padding: 24,
+    width: "100%",
+    boxSizing: "border-box",
+    minWidth: 0,
     backgroundColor: colors.bg,
   },
   mainTitle: {
