@@ -231,6 +231,9 @@ export function CompanyRankingView() {
                 Top 10 Empresas - {PRODUCTION_TYPE_LABEL[filters.tipo || "oil"]}
               </h3>
             </div>
+            <h3 style={styles.chartTitle}>
+              Top 10 Empresas - {PRODUCTION_TYPE_LABEL[filters.tipo || "oil"]}
+            </h3>
             {data && (
               <div style={styles.headerStats}>
                 <div style={styles.headerStat}>
@@ -266,8 +269,8 @@ export function CompanyRankingView() {
                     paddingAngle={2}
                   >
                     {chartData.map((entry, index) => (
-                      <Cell 
-                        key={`cell-${index}`} 
+                      <Cell
+                        key={`cell-${index}`}
                         fill={PIE_CHART_COLORS[index % PIE_CHART_COLORS.length]}
                         style={{filter: "drop-shadow(0px 2px 4px rgba(0,0,0,0.1))"}}
                       />
@@ -515,9 +518,15 @@ const styles: Record<string, React.CSSProperties> = {
 export function RankingIcon({width = 18, height = 18}: {width?: number; height?: number}) {
   return (
     <svg width={width} height={height} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<<<<<<<< HEAD:components/companies-ranking/CompanyRankingView.tsx
       <path d="M8 2h8v4a4 4 0 01-4 4 4 4 0 01-4-4V2z" stroke="currentColor" strokeWidth="2" />
       <path d="M6 6h12v3a5 5 0 01-5 5h-2a5 5 0 01-5-5V6z" stroke="currentColor" strokeWidth="2" />
       <path d="M9 18h6v4H9v-4z" stroke="currentColor" strokeWidth="2" />
+========
+      <path d="M8 2h8v4a4 4 0 01-4 4 4 4 0 01-4-4V2z" stroke="#2F3E34" strokeWidth="2" />
+      <path d="M6 6h12v3a5 5 0 01-5 5h-2a5 5 0 01-5-5V6z" stroke="#2F3E34" strokeWidth="2" />
+      <path d="M9 18h6v4H9v-4z" stroke="#2F3E34" strokeWidth="2" />
+>>>>>>>> dev:components/company/CompanyRankingView.tsx
     </svg>
   );
 }

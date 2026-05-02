@@ -33,6 +33,7 @@ export const PRODUCTION_TYPES = {
     defaultColor: "var(--color-inj-co2)"
   },
 };
+
 export const colors = {
   bg: "var(--color-bg-base)",
   panel: "var(--color-bg-overlay)",
