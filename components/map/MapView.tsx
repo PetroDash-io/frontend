@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {WellInfo} from "@/components/map/WellInfo";
 import {WellsMap} from "@/components/map/WellsMap";
 import {EMPTY_VALIDATED_RANGE, ProductionPanel, ValidatedProductionDateRange} from "@/components/map/ProductionPanel";
@@ -9,12 +9,15 @@ import {useWell} from "@/hooks/useWell";
 import {useWellsProduction} from "@/hooks/useWellProduction";
 import type {HeatmapResource} from "@/hooks/useWellsHeatmap";
 import {useMapHeatmap} from "@/hooks/useMapHeatmap";
+import {useMapMetrics} from "@/hooks/useMapMetrics";
 import {LoadingState} from "@/components/common/LoadingState";
 import {InlineMessage} from "@/components/common/InlineMessage";
 import {toast} from "react-toastify";
 import {WellFilters} from "@/app/types/wellFilters";
 import {WellAnomaliesPanel} from "@/components/map/anomalies/WellAnomaliesPanel";
 import {MapHeatmapControls} from "@/components/map/MapHeatmapControls";
+import {formatCompactNumber} from "@/utils/helpers";
+import {PRODUCTION_TYPES} from "@/utils/constants";
 
 export type MapViewMode = "pozos" | "heatmap";
 
@@ -59,6 +62,43 @@ export function MapView({filters, mode, heatmapResource, onSelectHeatmapResource
     filters
   });
 
+  const {
+    data: mapMetrics,
+    loading: loadingMetrics,
+    error: errorGettingMetrics,
+  } = useMapMetrics(filters, heatmapResource);
+
+  const metricsItems = useMemo(() => {
+    if (!mapMetrics) return [];
+
+    const productionLabel = PRODUCTION_TYPES[mapMetrics.resource]?.label || "Petróleo";
+    const lastMonthLabel = mapMetrics.last_month ? mapMetrics.last_month.slice(0, 7) : "Sin datos";
+
+    return [
+      {
+        label: "Pozos activos",
+        value: formatCompactNumber(mapMetrics.active_wells),
+      },
+      {
+        label: `Producción total del último mes (${productionLabel})`,
+        value: formatCompactNumber(mapMetrics.total_production_last_month),
+        subLabel: mapMetrics.last_month ? `Mes registrado: ${lastMonthLabel}` : "Sin datos",
+      },
+      {
+        label: "Pozos parados",
+        value: formatCompactNumber(mapMetrics.stopped_wells),
+      },
+      {
+        label: "Pozos inactivos",
+        value: formatCompactNumber(mapMetrics.inactive_wells),
+      },
+      {
+        label: "No informados",
+        value: formatCompactNumber(mapMetrics.not_informed_wells),
+      },
+    ];
+  }, [mapMetrics]);
+
   return (
       <>
         {isHeatmapMode && (
@@ -80,6 +120,10 @@ export function MapView({filters, mode, heatmapResource, onSelectHeatmapResource
           <WellInfo
               wellInfo={selectedWellDetails}
               loadingWell={loadingWell}
+              metricsItems={metricsItems}
+              metricsLoading={loadingMetrics}
+              metricsError={errorGettingMetrics}
+              metricsHint={selectedWellId ? undefined : "Seleccioná un pozo para ver el detalle."}
           />
         </div>
 

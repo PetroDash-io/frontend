@@ -1,16 +1,39 @@
 import React from "react";
 import {colors} from "@/utils/constants";
 import {WellDetail} from "@/app/types";
+import {MetricsSummary, MetricsSummaryItem} from "@/components/map/MetricsSummary";
 
 interface WellInfoProps {
     wellInfo: WellDetail | null;
     loadingWell: boolean;
+    metricsItems?: MetricsSummaryItem[];
+    metricsLoading?: boolean;
+    metricsError?: string | null;
+    metricsHint?: string;
 }
 
-export function WellInfo({wellInfo, loadingWell}: WellInfoProps) {
+export function WellInfo({
+    wellInfo,
+    loadingWell,
+    metricsItems = [],
+    metricsLoading = false,
+    metricsError,
+    metricsHint,
+}: WellInfoProps) {
+    const showMetrics = !wellInfo && !loadingWell;
+
     return (
         <div style={styles.infoContainer}>
-            {!wellInfo && <p style={styles.sidePanelHint}>Seleccioná un pozo en el mapa</p>}
+            {showMetrics && (
+                <MetricsSummary
+                    title="Métricas clave"
+                    items={metricsItems}
+                    loading={metricsLoading}
+                    error={metricsError}
+                    hint={metricsHint}
+                    tone="dark"
+                />
+            )}
             {loadingWell && <p>Cargando información...</p>}
 
             {wellInfo && !loadingWell && (
@@ -53,9 +76,6 @@ const styles = {
         backgroundColor: colors.panel,
         color: colors.textLight,
         overflowY: "auto",
-    } as React.CSSProperties,
-    sidePanelHint: {
-        opacity: 0.8,
     } as React.CSSProperties,
     sidePanelTitle: {
         marginBottom: 16,
