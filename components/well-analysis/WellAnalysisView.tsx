@@ -46,6 +46,7 @@ export function WellAnalysisView() {
 
   const {
     data: wellProduction,
+    eur,
     loading: loadingWellProduction,
     error: errorInWellProduction,
   } = useWellsProduction({wellId, dateRange: validatedDateRange});
@@ -168,6 +169,7 @@ export function WellAnalysisView() {
               loading={loadingWellProduction}
               error={errorInWellProduction}
               data={curveSeriesData}
+              eur={eur}
             />
           </div>
 

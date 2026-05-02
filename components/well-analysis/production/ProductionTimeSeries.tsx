@@ -12,7 +12,7 @@ interface ProductionCurvePoint {
   water: number | null;
 }
 
-export function ProductionTimeSeries({data}: {data: ProductionCurvePoint[]}) {
+export function ProductionTimeSeries({data, eur}: {data: ProductionCurvePoint[]; eur?: number | null}) {
   const {unit, setUnit} = useUnit();
 
   const convertedData = data.map((row) => ({
@@ -36,10 +36,16 @@ export function ProductionTimeSeries({data}: {data: ProductionCurvePoint[]}) {
     }
   }
 
+  const eurValue = typeof eur === "number" ? convertValueToUnit(eur, unit) : null;
+  const formattedEur = eurValue != null
+    ? eurValue.toLocaleString("es-AR", {maximumFractionDigits: 2})
+    : null;
+
   return (
     <div style={styles.wrapper}>
       <div style={styles.controlsRow}>
         <UnitTabs onChange={setUnit} currentUnit={unit}/>
+        {formattedEur && <span style={styles.eurBadge}>EUR: {formattedEur} {unit}</span>}
       </div>
 
       <div style={{height: 320}}>
@@ -88,7 +94,17 @@ const styles = {
   } as React.CSSProperties,
   controlsRow: {
     display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
     gap: 12,
     padding: "12px 24px",
+  } as React.CSSProperties,
+  eurBadge: {
+    borderRadius: 999,
+    padding: "6px 12px",
+    backgroundColor: colors.oil,
+    color: "#F3EEE6",
+    fontSize: 12,
+    fontWeight: 600,
   } as React.CSSProperties,
 };

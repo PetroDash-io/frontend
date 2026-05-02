@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useMemo} from "react";
 import {WellInfo} from "@/components/wells/common/WellInfo";
 import {WellsMap} from "@/components/wells/map/WellsMap";
 import {useWells} from "@/hooks/useWells";
@@ -9,7 +9,9 @@ import {LoadingState} from "@/components/common/LoadingState";
 import {InlineMessage} from "@/components/common/InlineMessage";
 import {toast} from "react-toastify";
 import {WellFilters} from "@/app/types/wellFilters";
-import {colors} from "@/utils/constants";
+import {colors, PRODUCTION_TYPES} from "@/utils/constants";
+import {useMapMetrics} from "@/hooks/useMapMetrics";
+import {formatCompactNumber} from "@/utils/helpers";
 
 export type MapViewMode = "pozos" | "heatmap";
 
@@ -52,6 +54,43 @@ export function MapView({
     resource: heatmapResource,
     filters,
   });
+
+  const {
+    data: mapMetrics,
+    loading: loadingMetrics,
+    error: errorGettingMetrics,
+  } = useMapMetrics(filters, heatmapResource);
+
+  const metricsItems = useMemo(() => {
+    if (!mapMetrics) return [];
+
+    const productionLabel = PRODUCTION_TYPES[mapMetrics.resource]?.label || "Petróleo";
+    const lastMonthLabel = mapMetrics.last_month ? mapMetrics.last_month.slice(0, 7) : "Sin datos";
+
+    return [
+      {
+        label: "Pozos activos",
+        value: formatCompactNumber(mapMetrics.active_wells),
+      },
+      {
+        label: `Producción total del último mes (${productionLabel})`,
+        value: formatCompactNumber(mapMetrics.total_production_last_month),
+        subLabel: mapMetrics.last_month ? `Mes registrado: ${lastMonthLabel}` : "Sin datos",
+      },
+      {
+        label: "Pozos parados",
+        value: formatCompactNumber(mapMetrics.stopped_wells),
+      },
+      {
+        label: "Pozos inactivos",
+        value: formatCompactNumber(mapMetrics.inactive_wells),
+      },
+      {
+        label: "No informados",
+        value: formatCompactNumber(mapMetrics.not_informed_wells),
+      },
+    ];
+  }, [mapMetrics]);
 
   return (
     <>
@@ -114,7 +153,14 @@ export function MapView({
             </div>
           }
         />
-        <WellInfo wellInfo={selectedWellDetails} loadingWell={loadingWell} />
+        <WellInfo
+          wellInfo={selectedWellDetails}
+          loadingWell={loadingWell}
+          metricsItems={metricsItems}
+          metricsLoading={loadingMetrics}
+          metricsError={errorGettingMetrics}
+          metricsHint={selectedWellId ? undefined : "Seleccioná un pozo para ver el detalle."}
+        />
       </div>
 
       {errorMessage && (

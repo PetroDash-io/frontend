@@ -1,13 +1,27 @@
 import React from "react";
 import {WellDetail} from "@/app/types";
 import Link from "next/link";
+import {MetricsSummary, MetricsSummaryItem} from "@/components/map/MetricsSummary";
 
 interface WellInfoProps {
     wellInfo: WellDetail | null;
     loadingWell: boolean;
+    metricsItems?: MetricsSummaryItem[];
+    metricsLoading?: boolean;
+    metricsError?: string | null;
+    metricsHint?: string;
 }
 
-export function WellInfo({wellInfo, loadingWell}: WellInfoProps) {
+export function WellInfo({
+    wellInfo,
+    loadingWell,
+    metricsItems = [],
+    metricsLoading = false,
+    metricsError,
+    metricsHint,
+}: WellInfoProps) {
+    const showMetrics = !wellInfo && !loadingWell;
+
     const locationRows: Array<[string, string | number | null | undefined]> = wellInfo ? [
         ["ID Pozo", wellInfo.well_id],
         ["Cuenca", wellInfo.watershed],
@@ -36,6 +50,16 @@ export function WellInfo({wellInfo, loadingWell}: WellInfoProps) {
                 <span className="card-label">Detalle de pozo</span>
                 <h3 style={styles.sidePanelTitle}>Pozo {wellInfo?.well_id ?? "-"}</h3>
             </div>
+
+            {showMetrics && (
+                <MetricsSummary
+                    title="Métricas clave"
+                    items={metricsItems}
+                    loading={metricsLoading}
+                    error={metricsError}
+                    hint={metricsHint}
+                />
+            )}
 
             {!wellInfo && <p style={styles.sidePanelHint}>Seleccioná un pozo en el mapa</p>}
             {loadingWell && <p>Cargando información...</p>}

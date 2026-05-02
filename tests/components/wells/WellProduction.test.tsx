@@ -44,6 +44,7 @@ describe("WellProductionComparisonView", () => {
 
     (useWellsProduction as jest.Mock).mockReturnValue({
       data: [],
+      eur: null,
       loading: false,
       error: null,
     });

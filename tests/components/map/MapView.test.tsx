@@ -4,6 +4,7 @@ import {MapView} from "@/components/wells/MapView";
 import {useWells} from "@/hooks/useWells";
 import {useWell} from "@/hooks/useWell";
 import {useMapHeatmap} from "@/hooks/useMapHeatmap";
+import {useMapMetrics} from "@/hooks/useMapMetrics";
 
 jest.mock("@/hooks/useWells", () => ({
   useWells: jest.fn(),
@@ -15,6 +16,10 @@ jest.mock("@/hooks/useWell", () => ({
 
 jest.mock("@/hooks/useMapHeatmap", () => ({
   useMapHeatmap: jest.fn(),
+}));
+
+jest.mock("@/hooks/useMapMetrics", () => ({
+  useMapMetrics: jest.fn(),
 }));
 
 jest.mock("@/components/wells/map/WellsMap", () => ({
@@ -36,7 +41,12 @@ jest.mock("@/components/wells/map/WellsMap", () => ({
 }));
 
 jest.mock("@/components/wells/common/WellInfo", () => ({
-  WellInfo: () => <div>WellInfo</div>,
+  WellInfo: ({metricsItems}: {metricsItems?: Array<{label: string}>}) => (
+    <div>
+      WellInfo
+      {metricsItems && metricsItems.length > 0 ? <span>MetricsLoaded</span> : null}
+    </div>
+  ),
 }));
 
 const defaultProps = {
@@ -73,6 +83,12 @@ beforeEach(() => {
     mapMode: "pozos",
     heatmapData: null,
     heatmapMaxValue: 0,
+  });
+
+  (useMapMetrics as jest.Mock).mockReturnValue({
+    data: null,
+    loading: false,
+    error: null,
   });
 });
 
@@ -134,6 +150,27 @@ describe("MapView", () => {
     fireEvent.click(screen.getByText("Select Well"));
     expect(onSelectWell).toHaveBeenCalledWith(1);
     expect(screen.getByText("WellInfo")).toBeInTheDocument();
+  });
+
+  it("pasa métricas a WellInfo cuando hay datos iniciales", () => {
+    (useMapMetrics as jest.Mock).mockReturnValue({
+      data: {
+        source: "db",
+        resource: "oil",
+        active_wells: 10,
+        stopped_wells: 2,
+        inactive_wells: 1,
+        not_informed_wells: 0,
+        total_production_last_month: 12345,
+        last_month: "2024-01-01",
+      },
+      loading: false,
+      error: null,
+    });
+
+    render(<MapView {...defaultProps} mode="pozos" />);
+
+    expect(screen.getByText("MetricsLoaded")).toBeInTheDocument();
   });
 
   it("muestra mensaje de error si falla useWells", () => {
