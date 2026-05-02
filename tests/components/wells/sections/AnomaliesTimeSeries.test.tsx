@@ -1,7 +1,7 @@
 import React from "react";
 import {render, screen} from "@testing-library/react";
 import "@testing-library/jest-dom";
-import {AnomaliesTimeSeries} from "@/components/wells/sections/AnomaliesTimeSeries";
+import {AnomaliesTimeSeries} from "@/components/well-analysis/anomalies/AnomaliesTimeSeries";
 
 jest.mock("recharts", () => ({
   ResponsiveContainer: ({children}: {children: React.ReactNode}) => <div>{children}</div>,
@@ -14,7 +14,7 @@ jest.mock("@/hooks/useUnit", () => ({
   useUnit: () => ({unit: "m3", setUnit: jest.fn()}),
 }));
 
-jest.mock("@/components/map/anomalies/data", () => ({
+jest.mock("@/components/well-analysis/anomalies/data", () => ({
   buildAnomalyChartData: () => [{date: "2024-01", resourceProduction: 10, anomalyMarker: null}],
 }));
 

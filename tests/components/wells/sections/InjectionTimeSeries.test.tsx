@@ -1,7 +1,7 @@
 import React from "react";
 import {render, screen} from "@testing-library/react";
 import "@testing-library/jest-dom";
-import {InjectionTimeSeries} from "@/components/wells/sections/InjectionTimeSeries";
+import {InjectionTimeSeries} from "@/components/well-analysis/injection/InjectionTimeSeries";
 
 jest.mock("recharts", () => ({
   ResponsiveContainer: ({children}: {children: React.ReactNode}) => <div>{children}</div>,

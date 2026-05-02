@@ -1,5 +1,5 @@
 import {ProductionMonthly} from "@/app/types";
-import {AnomalyChartPoint, ProductionResource} from "@/components/map/anomalies/types";
+import {AnomalyChartPoint, ProductionResource} from "@/components/well-analysis/anomalies/types";
 import {convertValueToUnit} from "@/utils/units";
 import {PRODUCTION_TYPES} from "@/utils/constants";
 

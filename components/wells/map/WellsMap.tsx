@@ -1,6 +1,6 @@
 import {colors, LEGEND_ITEMS} from "@/utils/constants";
 import {ActiveWell, WellDetail} from "@/app/types";
-import {LegendItem} from "@/components/map/LegendItem";
+import {LegendItem} from "@/components/wells/map/LegendItem";
 import {getWellColor} from "@/utils/helpers";
 
 import Map, {Marker, Popup, Source, Layer} from "react-map-gl/mapbox";

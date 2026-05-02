@@ -1,6 +1,6 @@
 import React, {useEffect} from "react";
-import {WellInfo} from "@/components/map/WellInfo";
-import {WellsMap} from "@/components/map/WellsMap";
+import {WellInfo} from "@/components/wells/common/WellInfo";
+import {WellsMap} from "@/components/wells/map/WellsMap";
 import {useWells} from "@/hooks/useWells";
 import {useWell} from "@/hooks/useWell";
 import type {HeatmapResource} from "@/hooks/useWellsHeatmap";

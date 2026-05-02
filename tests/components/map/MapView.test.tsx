@@ -1,6 +1,6 @@
 import {fireEvent, render, screen} from "@testing-library/react";
 import "@testing-library/jest-dom";
-import {MapView} from "@/components/map/MapView";
+import {MapView} from "@/components/wells/MapView";
 import {useWells} from "@/hooks/useWells";
 import {useWell} from "@/hooks/useWell";
 import {useMapHeatmap} from "@/hooks/useMapHeatmap";
@@ -17,7 +17,7 @@ jest.mock("@/hooks/useMapHeatmap", () => ({
   useMapHeatmap: jest.fn(),
 }));
 
-jest.mock("@/components/map/WellsMap", () => ({
+jest.mock("@/components/wells/map/WellsMap", () => ({
   WellsMap: ({
     onSelectWell,
     overlayControlsTopRight,
@@ -35,7 +35,7 @@ jest.mock("@/components/map/WellsMap", () => ({
   ),
 }));
 
-jest.mock("@/components/map/WellInfo", () => ({
+jest.mock("@/components/wells/common/WellInfo", () => ({
   WellInfo: () => <div>WellInfo</div>,
 }));
 

@@ -2,17 +2,17 @@ import React, {useEffect, useMemo, useState} from "react";
 import {colors} from "@/utils/constants";
 import {InlineMessage} from "@/components/common/InlineMessage";
 import {useWellsProduction} from "@/hooks/useWellProduction";
-import {DateRangeFilters} from "@/components/map/DateRangeFilters";
+import {DateRangeFilters} from "@/components/common/DateRangeFilters";
 import {DateRangeValue, DEFAULT_WELL_CHART_DATE_RANGE, getValidatedDateRange,} from "@/utils/dateRange";
-import {CollapsiblePanel} from "@/components/wells/sections/CollapsiblePanel";
-import {WellProductionSection} from "@/components/wells/sections/WellProductionSection";
-import {WellAnomaliesSection} from "@/components/wells/sections/WellAnomaliesSection";
-import {WellInjectionSection} from "@/components/wells/sections/WellInjectionSection";
-import {AnomalyMethodInfoButton} from "@/components/map/anomalies/AnomalyMethodInfoButton";
-import {WellComparisonSection} from "@/components/wells/sections/WellComparisonSection";
+import {CollapsiblePanel} from "@/components/well-analysis/common/CollapsiblePanel";
+import {WellProductionSection} from "@/components/well-analysis/production/WellProductionSection";
+import {WellAnomaliesSection} from "@/components/well-analysis/anomalies/WellAnomaliesSection";
+import {WellInjectionSection} from "@/components/well-analysis/injection/WellInjectionSection";
+import {AnomalyInfoButton} from "@/components/well-analysis/anomalies/AnomalyInfoButton";
+import {WellComparisonSection} from "@/components/well-analysis/comparison/WellComparisonSection";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
 
-export function WellProductionComparisonView() {
+export function WellAnalysisView() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -176,7 +176,7 @@ export function WellProductionComparisonView() {
               title="Anomalías"
               isOpen={openSections.anomalies}
               onToggle={() => toggleSection("anomalies")}
-              headerAction={<AnomalyMethodInfoButton />}
+              headerAction={<AnomalyInfoButton />}
             >
               <WellAnomaliesSection
                 wellId={wellId}

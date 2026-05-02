@@ -1,7 +1,7 @@
 import React, {useState, useMemo} from "react";
-import {MapView} from "@/components/map/MapView";
-import {TableView} from "@/components/table/TableView";
-import {LimitFilter} from "@/components/map/LimitFilter";
+import {MapView} from "@/components/wells/MapView";
+import {TableView} from "@/components/wells/TableView";
+import {LimitFilter} from "@/components/wells/common/LimitFilter";
 import {WellFilters} from "@/app/types/wellFilters";
 import {SELECT_DEFAULT_VALUE, SelectFilter} from "@/components/common/SelectFilter";
 import {colors, WATERSHED_OPTIONS} from "@/utils/constants";
@@ -15,7 +15,7 @@ const DEFAULT_FILTERS = {
     limit: 100,
 };
 
-export function WellView() {
+export function WellsView() {
     const [filters, setFilters] = useState<WellFilters>(DEFAULT_FILTERS);
     const [tablePage, setTablePage] = useState(0);
     const [selectedWellId, setSelectedWellId] = useState<number | null>(null);

@@ -1,7 +1,7 @@
 import React from "react";
 import {InlineMessage} from "@/components/common/InlineMessage";
 import {LoadingState} from "@/components/common/LoadingState";
-import {ProductionTimeSeries} from "@/components/wells/sections/ProductionTimeSeries";
+import {ProductionTimeSeries} from "@/components/well-analysis/production/ProductionTimeSeries";
 
 interface CurveSeriesPoint {
   date: string;

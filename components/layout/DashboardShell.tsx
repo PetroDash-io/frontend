@@ -4,11 +4,12 @@ import React, {useState} from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {usePathname} from "next/navigation";
-import {WellIcon} from "@/components/wells/WellView";
+import {WellIcon} from "@/components/wells/WellsView";
 import {CompanyIcon} from "@/components/company/CompanyView";
-import {AnalysisIcon} from "@/components/wells/WellProductionComparisonView";
-import {RankingIcon} from "@/components/company/CompanyRankingView";
+import {AnalysisIcon} from "@/components/well-analysis/WellAnalysisView";
+import {RankingIcon} from "@/components/companies-ranking/CompanyRankingView";
 import styles from "@/app/page.module.css";
+import {NAV_ROUTE_KEYS, type NavRouteKey, ROUTES} from "@/config/routes";
 
 function DrawerChevronIcon({open}: {open: boolean}) {
   return (
@@ -22,12 +23,23 @@ function DrawerChevronIcon({open}: {open: boolean}) {
   );
 }
 
-const NAV_ITEMS = [
-  {href: "/pozos", label: "Pozos", Icon: WellIcon},
-  {href: "/empresas", label: "Empresas", Icon: CompanyIcon},
-  {href: "/analisis-pozo", label: "Análisis de Pozo", Icon: AnalysisIcon},
-  {href: "/ranking-empresas", label: "Ranking Empresas", Icon: RankingIcon},
-] as const;
+type NavItemMeta = {
+  label: string;
+  Icon: React.ComponentType;
+};
+
+const NAV_META: Record<NavRouteKey, NavItemMeta> = {
+  wells: {label: "Pozos", Icon: WellIcon},
+  companies: {label: "Empresas", Icon: CompanyIcon},
+  wellAnalysis: {label: "Análisis de Pozo", Icon: AnalysisIcon},
+  companiesRanking: {label: "Ranking Empresas", Icon: RankingIcon},
+};
+
+const NAV_ITEMS = NAV_ROUTE_KEYS.map((key) => ({
+  href: ROUTES[key].public,
+  label: NAV_META[key].label,
+  Icon: NAV_META[key].Icon,
+}));
 
 export function DashboardShell({children}: {children: React.ReactNode}) {
   const pathname = usePathname();

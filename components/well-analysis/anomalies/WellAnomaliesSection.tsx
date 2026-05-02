@@ -5,7 +5,7 @@ import {useWellAnomalies} from "@/hooks/useWellAnomalies";
 import {SelectFilter, SelectFilterOption} from "@/components/common/SelectFilter";
 import {LoadingState} from "@/components/common/LoadingState";
 import {InlineMessage} from "@/components/common/InlineMessage";
-import {AnomaliesTimeSeries} from "@/components/wells/sections/AnomaliesTimeSeries";
+import {AnomaliesTimeSeries} from "@/components/well-analysis/anomalies/AnomaliesTimeSeries";
 
 const resourceOptions: SelectFilterOption[] = [
   {value: "oil", label: "Petroleo"},

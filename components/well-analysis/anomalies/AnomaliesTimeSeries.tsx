@@ -1,9 +1,9 @@
 import React, {useMemo} from "react";
-import {ProductionResource, WellProductionAnomalyPeriod} from "@/components/map/anomalies/types";
+import {ProductionResource, WellProductionAnomalyPeriod} from "@/components/well-analysis/anomalies/types";
 import {UNITS} from "@/utils/units";
 import {CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
 import {colors, PRODUCTION_TYPES} from "@/utils/constants";
-import {buildAnomalyChartData} from "@/components/map/anomalies/data";
+import {buildAnomalyChartData} from "@/components/well-analysis/anomalies/data";
 import {ProductionMonthly} from "@/app/types";
 import {useUnit} from "@/hooks/useUnit";
 import {UnitTabs} from "@/components/common/UnitTabs";
