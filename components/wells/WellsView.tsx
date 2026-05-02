@@ -32,17 +32,17 @@ export function WellsView() {
 
     const provinceFilterOptions = useMemo(() => {
         if (!allWells) return [];
-        return [...new Set(allWells.map((well) => well.province))].filter(Boolean);
+        return [...new Set(allWells.map((well) => well.province))].filter((value): value is string => Boolean(value));
     }, [allWells]);
 
     const statusFilterOptions = useMemo(() => {
         if (!allWells) return [];
-        return [...new Set(allWells.map((well) => well.status))].filter(Boolean);
+        return [...new Set(allWells.map((well) => well.status))].filter((value): value is string => Boolean(value));
     }, [allWells]);
 
     const companyFilterOptions = useMemo(() => {
         if (!allWells) return [];
-        return [...new Set(allWells.map((well) => well.company))].filter(Boolean);
+        return [...new Set(allWells.map((well) => well.company))].filter((value): value is string => Boolean(value));
     }, [allWells]);
 
     return (

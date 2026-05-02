@@ -79,20 +79,6 @@ const renderBarLabel = ({x, y, width, height, value}: BarLabelProps) => {
     return null;
   }
 
-  const xNumber = Number(x);
-  const yNumber = Number(y);
-  const widthNumber = Number(width);
-  const heightNumber = Number(height);
-
-  if (
-    Number.isNaN(xNumber) ||
-    Number.isNaN(yNumber) ||
-    Number.isNaN(widthNumber) ||
-    Number.isNaN(heightNumber)
-  ) {
-    return null;
-  }
-
   return (
     <text
       x={xNumber + widthNumber + 10}

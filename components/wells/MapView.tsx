@@ -59,7 +59,7 @@ export function MapView({
     data: mapMetrics,
     loading: loadingMetrics,
     error: errorGettingMetrics,
-  } = useMapMetrics(filters, heatmapResource);
+  } = useMapMetrics(filters);
 
   const metricsItems = useMemo(() => {
     if (!mapMetrics) return [];
