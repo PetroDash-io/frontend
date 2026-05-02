@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {colors} from "@/utils/constants";
 import {InlineMessage} from "@/components/common/InlineMessage";
 import {useWellsProduction} from "@/hooks/useWellProduction";
@@ -10,8 +10,12 @@ import {WellAnomaliesSection} from "@/components/wells/sections/WellAnomaliesSec
 import {WellInjectionSection} from "@/components/wells/sections/WellInjectionSection";
 import {AnomalyMethodInfoButton} from "@/components/map/anomalies/AnomalyMethodInfoButton";
 import {WellComparisonSection} from "@/components/wells/sections/WellComparisonSection";
+import {usePathname, useRouter, useSearchParams} from "next/navigation";
 
 export function WellProductionComparisonView() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [wellId, setWellId] = useState<number | null>(null);
   const [wellIdInput, setWellIdInput] = useState("");
   const [wellIdInputError, setWellIdInputError] = useState<string | null>(null);
@@ -23,6 +27,22 @@ export function WellProductionComparisonView() {
   });
 
   const validatedDateRange = useMemo(() => getValidatedDateRange(dateRange), [dateRange]);
+
+  useEffect(() => {
+    const queryWellId = searchParams.get("wellId");
+    if (!queryWellId) {
+      return;
+    }
+
+    const parsed = parseInt(queryWellId.trim(), 10);
+    if (isNaN(parsed) || parsed <= 0) {
+      return;
+    }
+
+    setWellId(parsed);
+    setWellIdInput(String(parsed));
+    setWellIdInputError(null);
+  }, [searchParams]);
 
   const {
     data: wellProduction,
@@ -54,6 +74,10 @@ export function WellProductionComparisonView() {
     if (value === "") {
       setWellId(null);
       setWellIdInputError(null);
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("wellId");
+      const nextQuery = params.toString();
+      router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname);
       return;
     }
 
@@ -61,6 +85,9 @@ export function WellProductionComparisonView() {
     if (!isNaN(parsed) && parsed > 0) {
       setWellId(parsed);
       setWellIdInputError(null);
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("wellId", String(parsed));
+      router.replace(`${pathname}?${params.toString()}`);
       return;
     }
 

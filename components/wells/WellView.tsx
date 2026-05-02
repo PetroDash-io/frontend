@@ -23,7 +23,6 @@ export function WellView() {
     const updateFilters = (filterName: string, value: unknown) => {
         setFilters(prev => ({...prev, [filterName]: value}));
         setTablePage(0);
-        setSelectedWellId(null);
     };
 
     const [view, setView] = useState<"map" | "table">("map");

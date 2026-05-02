@@ -1,5 +1,6 @@
 import React from "react";
 import {WellDetail} from "@/app/types";
+import Link from "next/link";
 
 interface WellInfoProps {
     wellInfo: WellDetail | null;
@@ -76,6 +77,10 @@ export function WellInfo({wellInfo, loadingWell}: WellInfoProps) {
                             ))}
                         </dl>
                     </section>
+
+                    <Link href={`/analisis-pozo?wellId=${wellInfo.well_id}`} style={styles.analyzeButton}>
+                        Analizar pozo
+                    </Link>
                 </>
             )}
         </div>
@@ -134,5 +139,19 @@ const styles = {
     detailValue: {
         margin: 0,
         color: "var(--color-text-primary)",
-    } as React.CSSProperties
+    } as React.CSSProperties,
+    analyzeButton: {
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "100%",
+        border: "1px solid var(--color-brand-primary)",
+        borderRadius: 8,
+        padding: "10px 12px",
+        backgroundColor: "var(--color-brand-primary)",
+        color: "var(--color-text-inverse)",
+        fontSize: 13,
+        fontWeight: 700,
+        textDecoration: "none",
+    } as React.CSSProperties,
 } as const;

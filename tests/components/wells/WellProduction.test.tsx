@@ -2,9 +2,16 @@ import {fireEvent, render, screen} from "@testing-library/react";
 import "@testing-library/jest-dom";
 import {WellProductionComparisonView} from "@/components/wells/WellProductionComparisonView";
 import {useWellsProduction} from "@/hooks/useWellProduction";
+import {usePathname, useRouter, useSearchParams} from "next/navigation";
 
 jest.mock("@/hooks/useWellProduction", () => ({
   useWellsProduction: jest.fn(),
+}));
+
+jest.mock("next/navigation", () => ({
+  useSearchParams: jest.fn(),
+  useRouter: jest.fn(),
+  usePathname: jest.fn(),
 }));
 
 jest.mock("@/components/wells/sections/WellProductionSection", () => ({
@@ -24,7 +31,17 @@ jest.mock("@/components/wells/sections/WellComparisonSection", () => ({
 }));
 
 describe("WellProductionComparisonView", () => {
+  const replaceMock = jest.fn();
+
   beforeEach(() => {
+    replaceMock.mockClear();
+    (useRouter as jest.Mock).mockReturnValue({replace: replaceMock});
+    (usePathname as jest.Mock).mockReturnValue("/analisis-pozo");
+    (useSearchParams as jest.Mock).mockReturnValue({
+      get: () => null,
+      toString: () => "",
+    });
+
     (useWellsProduction as jest.Mock).mockReturnValue({
       data: [],
       loading: false,
@@ -79,5 +96,26 @@ describe("WellProductionComparisonView", () => {
     expect(screen.queryByText("WellComparisonSection")).not.toBeInTheDocument();
     fireEvent.click(screen.getByText("Comparación").closest("div")!.querySelector("button")!);
     expect(screen.getByText("WellComparisonSection")).toBeInTheDocument();
+  });
+
+  test("actualiza la URL al buscar con ID válido", () => {
+    render(<WellProductionComparisonView />);
+
+    const input = screen.getByPlaceholderText(/Ingrese ID del pozo/i);
+    fireEvent.change(input, {target: {value: "123"}});
+    fireEvent.click(screen.getByText("Buscar"));
+
+    expect(replaceMock).toHaveBeenCalledWith("/analisis-pozo?wellId=123");
+  });
+
+  test("auto-aplica wellId desde query param", () => {
+    (useSearchParams as jest.Mock).mockReturnValue({
+      get: (key: string) => (key === "wellId" ? "456" : null),
+    });
+
+    render(<WellProductionComparisonView />);
+
+    expect(screen.getByDisplayValue("456")).toBeInTheDocument();
+    expect(screen.getByText("WellProductionSection")).toBeInTheDocument();
   });
 });
