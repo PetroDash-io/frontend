@@ -197,15 +197,25 @@ const styles = {
         transform: "translateX(-50%)",
         zIndex: 10,
     } as React.CSSProperties,
-    markerDot: (opts: {selected: boolean; status: string, focused: boolean}) => ({
-        width: opts.selected ? 10 : 8,
-        height: opts.selected ? 10 : 8,
-        backgroundColor: opts.selected ? colors.selectedWell : getWellColor(opts.status),
+    markerDot: (opts: { selected: boolean; status: string; focused: boolean }) => ({
+        width: opts.selected ? 14 : 8,
+        height: opts.selected ? 14 : 8,
+        backgroundColor: getWellColor(opts.status),
         borderRadius: "50%",
         border: "1px solid rgba(0,0,0,0.3)",
         cursor: "pointer",
         outline: "none",
-        boxShadow: opts.focused ? `0 0 0 2px ${colors.accent}` : "none",
+
+        transform: opts.selected ? "scale(1.4)" : "scale(1)",
+        transition: "all 0.15s ease",
+
+        boxShadow: opts.selected
+            ? "0 0 0 4px rgba(0, 123, 255, 0.25)" // halo
+            : opts.focused
+            ? `0 0 0 2px ${colors.accent}`
+            : "none",
+
+        zIndex: opts.selected ? 10 : 1,
     }) as React.CSSProperties,
     popupBox: {
         backgroundColor: colors.panel,
