@@ -15,8 +15,8 @@
   align-items: center;
   gap: 10px;
   padding: 0 28px;
-  background: var(--color-bg-surface);
-  border-bottom: 1px solid var(--color-border-subtle);
+  background: var(--color-brand-dark);
+  border-bottom: 1px solid var(--color-brand-mid);
   z-index: 50;
 }
 
@@ -31,7 +31,7 @@
 .title {
   font-size: 20px;
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: var(--color-text-inverse);
   letter-spacing: 0.2px;
 }
 
@@ -39,8 +39,8 @@
   display: inline-flex;
   margin-left: auto;
   border: 1px solid var(--color-border-medium);
-  background: var(--color-bg-sunken);
-  color: var(--color-text-primary);
+  background: rgba(240, 236, 228, 0.12);
+  color: var(--color-text-inverse);
   border-radius: var(--radius-md);
   padding: 7px 12px;
   font-size: 13px;
@@ -94,7 +94,7 @@
   height: 42px;
   border: none;
   border-radius: var(--radius-xl);
-  background: var(--color-brand-mid);
+  background: rgba(30, 58, 30, 0.9);
   color: var(--color-text-inverse);
   cursor: pointer;
   display: flex;
@@ -107,7 +107,7 @@
 }
 
 .drawerToggle:hover {
-  background: var(--color-brand-light);
+  background: rgba(30, 58, 30, 0.72);
   transform: translateY(-1px);
 }
 
