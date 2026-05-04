@@ -17,6 +17,9 @@ import { toast } from "react-toastify";
 import { LoadingState } from "@/components/common/LoadingState";
 import { InlineMessage } from "@/components/common/InlineMessage";
 import {YearMonthRangeFilters} from "@/components/common/YearMonthRangeFilters";
+import { useMonthlyAggregatedProduction } from "@/hooks/useMonthlyAggregatedProduction";
+import { MonthlyAggregatedChart } from "@/components/production/MonthlyAggregatedChart";
+
 
 const formatYAxis = (value: number) => {
   if (value >= 1000000) {
@@ -37,8 +40,26 @@ const formatTooltip = (value: number | string | undefined) => {
 export function WellProductionComparisonView() {
   const [wellId, setWellId] = useState<number | null>(null);
   const [filters, setFilters] = useState<Partial<WellProductionComparisonFilters>>({median_by: []});
+  const [aggParams, setAggParams] = useState({
+    group_by: "company",
+    metric: "sum",
+    fluid: "oil",
+  });
+
+  const { data: aggData, loading: aggLoading } = useMonthlyAggregatedProduction(aggParams);
   const { data, loading, error } = useWellProductionComparison(wellId, filters);
   const errorMessage = error || null;
+
+  const [selectedGroup, setSelectedGroup] = useState<string>("");
+
+  const availableGroups = aggData
+    ? [...new Set(aggData.map((d: any) => d.group))].sort()
+    : [];
+
+  const handleGroupByChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setAggParams((p) => ({ ...p, group_by: e.target.value }));
+    setSelectedGroup("");
+  };
 
   useEffect(() => {
     if (!errorMessage) return;
@@ -72,9 +93,8 @@ export function WellProductionComparisonView() {
 
   const updateFilters = (filterName: string, value: unknown) => {
     setFilters((previousValues) => ({...previousValues, [filterName]: value}));
-  }
+  };
 
-  // Preparar datos para los gráficos
   const oilData = data?.data?.[0]
     ? [
         { name: "Pozo", value: data.data[0].oil.total },
@@ -100,48 +120,22 @@ export function WellProductionComparisonView() {
     if (!data || !data.data || data.data.length === 0) return;
 
     const dataToExport = [
-      {
-        Recurso: "Petróleo",
-        Pozo: data.data[0].oil.total,
-        Mediana: data.data[0].oil.median,
-        Unidad: "m³",
-      },
-      {
-        Recurso: "Gas",
-        Pozo: data.data[0].gas.total,
-        Mediana: data.data[0].gas.median,
-        Unidad: "Mm³",
-      },
-      {
-        Recurso: "Agua",
-        Pozo: data.data[0].water.total,
-        Mediana: data.data[0].water.median,
-        Unidad: "m³",
-      },
+      { Recurso: "Petróleo", Pozo: data.data[0].oil.total, Mediana: data.data[0].oil.median, Unidad: "m³" },
+      { Recurso: "Gas", Pozo: data.data[0].gas.total, Mediana: data.data[0].gas.median, Unidad: "Mm³" },
+      { Recurso: "Agua", Pozo: data.data[0].water.total, Mediana: data.data[0].water.median, Unidad: "m³" },
     ];
 
     const today = new Date().toISOString().split('T')[0];
     let fileName = `pozo-${wellId}`;
-    
     if (data.start_year && data.start_month && data.end_year && data.end_month) {
       fileName += `-${data.start_year}-${data.start_month.toString().padStart(2, '0')}-a-${data.end_year}-${data.end_month.toString().padStart(2, '0')}`;
     }
-    
     if (filters.median_by && filters.median_by.length > 0) {
       fileName += `-mediana-por-${filters.median_by.join('-')}`;
     }
-    
     fileName += `-${today}`;
 
-    exportMultipleSheetsToExcel(
-      [
-        {
-          data: dataToExport,
-          sheetName: "Comparación",
-        },
-      ],
-      fileName
-    );
+    exportMultipleSheetsToExcel([{ data: dataToExport, sheetName: "Comparación" }], fileName);
   };
 
   return (
@@ -152,18 +146,15 @@ export function WellProductionComparisonView() {
           <button
             onClick={handleDownloadExcel}
             style={styles.downloadButton}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "var(--color-brand-dark)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "var(--color-brand-mid)";
-            }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "var(--color-brand-dark)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "var(--color-brand-mid)"; }}
           >
             📊 Descargar Excel
           </button>
         )}
       </div>
 
+      {/* FILTROS DE POZO */}
       <div style={styles.filtersContainer}>
         <div style={styles.cardHeader}>
           <span className="card-label">Filtros</span>
@@ -180,7 +171,6 @@ export function WellProductionComparisonView() {
             />
           </label>
         </div>
-
         <div style={styles.filterRow}>
           <YearMonthRangeFilters
             onSelect={updateFilters}
@@ -190,40 +180,104 @@ export function WellProductionComparisonView() {
             endMonthValue={filters.fin_mes || ""}
           />
         </div>
-
         <div style={styles.filterRow}>
+          <label style={styles.checkboxLabel}>Filtrar mediana por:</label>
           <label style={styles.checkboxLabel}>
-            Filtrar mediana por:
-          </label>
-          <label style={styles.checkboxLabel}>
-            <input
-              type="checkbox"
-              checked={filters.median_by?.includes("company") || false}
-              onChange={(e) => handleMedianByChange("company", e.target.checked)}
-            />
+            <input type="checkbox" checked={filters.median_by?.includes("company") || false} onChange={(e) => handleMedianByChange("company", e.target.checked)} />
             Empresa
           </label>
           <label style={styles.checkboxLabel}>
-            <input
-              type="checkbox"
-              checked={filters.median_by?.includes("area") || false}
-              onChange={(e) => handleMedianByChange("area", e.target.checked)}
-            />
+            <input type="checkbox" checked={filters.median_by?.includes("area") || false} onChange={(e) => handleMedianByChange("area", e.target.checked)} />
             Área
           </label>
           <label style={styles.checkboxLabel}>
-            <input
-              type="checkbox"
-              checked={filters.median_by?.includes("province") || false}
-              onChange={(e) => handleMedianByChange("province", e.target.checked)}
-            />
+            <input type="checkbox" checked={filters.median_by?.includes("province") || false} onChange={(e) => handleMedianByChange("province", e.target.checked)} />
             Provincia
           </label>
         </div>
       </div>
 
-      {loading && <LoadingState/>}
-      {errorMessage && <InlineMessage message={errorMessage || "Unexpected error"} variant="error"/>}
+      {!wellId && !loading && (
+        <InlineMessage message="Ingrese un ID de pozo para ver el análisis de producción." />
+      )}
+
+      {/* CURVA AGREGADA */}
+      <div style={styles.filtersContainer}>
+        <div style={styles.cardHeader}>
+          <span className="card-label">Curva agregada</span>
+        </div>
+
+        <div style={styles.filterRow}>
+          {/* Agrupar por */}
+          <div style={selectStyles.filterGroup}>
+            <label style={selectStyles.label}>
+              Agrupar por
+              <select style={selectStyles.select} onChange={handleGroupByChange}>
+                <option value="company">Empresa</option>
+                <option value="watershed">Cuenca</option>
+              </select>
+            </label>
+          </div>
+
+          {/* Empresa / Cuenca */}
+          <div style={selectStyles.filterGroup}>
+            <label style={selectStyles.label}>
+              {aggParams.group_by === "company" ? "Empresa" : "Cuenca"}
+              <select
+                style={selectStyles.select}
+                value={selectedGroup}
+                onChange={(e) => setSelectedGroup(e.target.value)}
+                disabled={aggLoading || availableGroups.length === 0}
+              >
+                <option value="">-- Seleccioná --</option>
+                {availableGroups.map((g: string) => (
+                  <option key={g} value={g}>{g}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          {/* Métrica */}
+          <div style={selectStyles.filterGroup}>
+            <label style={selectStyles.label}>
+              Métrica
+              <select
+                style={selectStyles.select}
+                onChange={(e) => setAggParams((p) => ({ ...p, metric: e.target.value }))}
+              >
+                <option value="sum">Suma</option>
+                <option value="avg">Promedio</option>
+              </select>
+            </label>
+          </div>
+
+          {/* Fluido */}
+          <div style={selectStyles.filterGroup}>
+            <label style={selectStyles.label}>
+              Fluido
+              <select
+                style={selectStyles.select}
+                onChange={(e) => setAggParams((p) => ({ ...p, fluid: e.target.value }))}
+              >
+                <option value="oil">Petróleo</option>
+                <option value="gas">Gas</option>
+                <option value="water">Agua</option>
+              </select>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      {aggLoading && <LoadingState />}
+      {aggData && aggData.length > 0 && selectedGroup && (
+        <MonthlyAggregatedChart data={aggData} selectedGroup={selectedGroup} groupBy={aggParams.group_by} metric={aggParams.metric} />
+      )}
+      {aggData && aggData.length > 0 && !selectedGroup && (
+        <InlineMessage message="Seleccioná una empresa o cuenca para ver la curva." />
+      )}
+
+      {loading && <LoadingState />}
+      {errorMessage && <InlineMessage message={errorMessage || "Unexpected error"} variant="error" />}
 
       {data && data.data && data.data.length > 0 && (
         <div style={styles.infoContainer}>
@@ -245,9 +299,7 @@ export function WellProductionComparisonView() {
       {data && data.data && data.data.length > 0 && (
         <div style={styles.chartsContainer}>
           <div style={styles.chartWrapper}>
-            <div style={styles.cardHeader}>
-              <span className="card-label">Comparación</span>
-            </div>
+            <div style={styles.cardHeader}><span className="card-label">Comparación</span></div>
             <h3 style={styles.chartTitle}>Producción de Petróleo</h3>
             <ResponsiveContainer width="100%" height={400}>
               <BarChart data={oilData} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
@@ -264,9 +316,7 @@ export function WellProductionComparisonView() {
           </div>
 
           <div style={styles.chartWrapper}>
-            <div style={styles.cardHeader}>
-              <span className="card-label">Comparación</span>
-            </div>
+            <div style={styles.cardHeader}><span className="card-label">Comparación</span></div>
             <h3 style={styles.chartTitle}>Producción de Gas</h3>
             <ResponsiveContainer width="100%" height={400}>
               <BarChart data={gasData} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
@@ -283,9 +333,7 @@ export function WellProductionComparisonView() {
           </div>
 
           <div style={styles.chartWrapper}>
-            <div style={styles.cardHeader}>
-              <span className="card-label">Comparación</span>
-            </div>
+            <div style={styles.cardHeader}><span className="card-label">Comparación</span></div>
             <h3 style={styles.chartTitle}>Producción de Agua</h3>
             <ResponsiveContainer width="100%" height={400}>
               <BarChart data={waterData} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
@@ -303,9 +351,7 @@ export function WellProductionComparisonView() {
         </div>
       )}
 
-      {!wellId && !loading && (
-        <InlineMessage message="Ingrese un ID de pozo para ver el análisis de producción." />
-      )}
+      
     </div>
   );
 }
@@ -443,6 +489,34 @@ const styles = {
     backgroundColor: "rgba(192, 57, 43, 0.08)",
     borderRadius: "8px",
     marginBottom: "20px",
+  } as React.CSSProperties,
+};
+
+const selectStyles = {
+  filterGroup: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 8,
+    minWidth: 220,
+    flex: 1,
+  } as React.CSSProperties,
+  label: {
+    fontSize: 13,
+    fontWeight: 500,
+    color: "var(--color-text-secondary)",
+    display: "flex",
+    flexDirection: "column",
+    gap: 6,
+  } as React.CSSProperties,
+  select: {
+    padding: "10px 14px",
+    borderRadius: 6,
+    border: "1px solid var(--color-border-medium)",
+    backgroundColor: "var(--color-bg-sunken)",
+    fontSize: 13,
+    color: "var(--color-text-primary)",
+    cursor: "pointer",
+    minWidth: 200,
   } as React.CSSProperties,
 };
 
