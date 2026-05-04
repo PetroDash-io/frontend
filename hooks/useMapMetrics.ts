@@ -1,7 +1,6 @@
 import {useEffect, useState} from "react";
 import {MapMetricsResponse} from "@/app/types";
 import {WellFilters} from "@/app/types/wellFilters";
-import type {HeatmapResource} from "@/hooks/useWellsHeatmap";
 
 interface UseMapMetricsResult {
   data: MapMetricsResponse | null;
@@ -9,7 +8,7 @@ interface UseMapMetricsResult {
   error: string | null;
 }
 
-export function useMapMetrics(filters: WellFilters, resource: HeatmapResource = "oil"): UseMapMetricsResult {
+export function useMapMetrics(filters: WellFilters): UseMapMetricsResult {
   const [data, setData] = useState<MapMetricsResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,10 +41,6 @@ export function useMapMetrics(filters: WellFilters, resource: HeatmapResource = 
           params.append("status", filters.status);
         }
 
-        if (resource) {
-          params.append("resource", resource);
-        }
-
         const url = `${process.env.NEXT_PUBLIC_API_URL}/pozos/resumen-mapa?${params.toString()}`;
         const response = await fetch(url, {
           headers: {
@@ -68,7 +63,7 @@ export function useMapMetrics(filters: WellFilters, resource: HeatmapResource = 
     };
 
     fetchMetrics();
-  }, [filters.watershed, filters.company, filters.province, filters.status, resource]);
+  }, [filters.watershed, filters.company, filters.province, filters.status]);
 
   return {data, loading, error};
 }

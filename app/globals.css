@@ -1,25 +1,100 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --surface: #faf8f3;
-  --surface-border: #ddd2c2;
-  --control-bg: #ffffff;
-  --control-border: #cfc4b5;
-  --control-text: #2f3e34;
+  /* 1) Color tokens */
+  --color-brand-dark: #1e3a1e;
+  --color-brand-primary: #2d4a2d;
+  --color-brand-mid: #3d6b3d;
+  --color-brand-light: #5a8f5a;
+
+  --color-bg-base: #f0ece4;
+  --color-bg-surface: #faf8f4;
+  --color-bg-sunken: #e8e3d8;
+  --color-bg-overlay: #1e3a1ef2;
+
+  --color-text-primary: #1a1a18;
+  --color-text-secondary: #4a4a44;
+  --color-text-muted: #7a7a70;
+  --color-text-inverse: #f0ece4;
+
+  --color-border-subtle: #d8d2c4;
+  --color-border-medium: #b8b0a0;
+
+  --color-petroleum: #3d6b3d;
+  --color-gas: #c47d0e;
+  --color-water: #3a7fa8;
+  --color-inj-water: #5ba3cc;
+  --color-inj-co2: #8b5ea8;
+  --color-inj-gas: #e8a030;
+  --color-status-active: #3d9e3d;
+  --color-status-stopped: #e8a030;
+  --color-status-inactive: #c0392b;
+  --color-status-unknown: #9a9a90;
+  --color-anomaly: #c0392b;
+
+  --color-cat-1: #2d4a2d;
+  --color-cat-2: #c47d0e;
+  --color-cat-3: #3a7fa8;
+  --color-cat-4: #8b5ea8;
+  --color-cat-5: #c0392b;
+  --color-cat-6: #5a8f5a;
+  --color-cat-7: #e8a030;
+  --color-cat-8: #5ba3cc;
+  --color-cat-9: #7a7a70;
+  --color-cat-10: #1e3a1e;
+
+  --color-success: #3d9e3d;
+  --color-warning: #e8a030;
+  --color-error: #c0392b;
+  --color-info: #3a7fa8;
+
+  /* 2) Typography */
+  --font-display: "Canva Sans Variable", "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-body: "Canva Sans Variable", "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+
+  --text-page-title: 22px;
+  --text-section-title: 16px;
+  --text-card-label: 11px;
+  --text-body: 13px;
+  --text-data: 13px;
+  --text-data-lg: 20px;
+  --text-mono: 12px;
+  --text-label: 11px;
+
+  /* 3) Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* 4) Radius and shadows */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+
+  --shadow-sm: 0 1px 3px rgba(30, 58, 30, 0.08);
+  --shadow-md: 0 2px 8px rgba(30, 58, 30, 0.1);
+  --shadow-lg: 0 4px 16px rgba(30, 58, 30, 0.12);
+
+  --background: var(--color-bg-base);
+  --foreground: var(--color-text-primary);
+  --surface: var(--color-bg-surface);
+  --surface-border: var(--color-border-subtle);
+  --control-bg: var(--color-bg-sunken);
+  --control-border: var(--color-border-medium);
+  --control-text: var(--color-text-primary);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 html,
@@ -31,28 +106,46 @@ main {
   padding: 0;
   background: var(--background);
   color: var(--foreground);
-  font-family: "Segoe UI", sans-serif;
-  overflow-x: hidden;
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  overflow: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.card-label {
+  font-size: var(--text-card-label);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.mono-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-mono);
 }
 
 .pozo-popup-wrapper .mapboxgl-popup-content {
-  padding: 0 !important;      /* 🔑 elimina padding interno */
+  padding: 0 !important;
   background: transparent !important;
   box-shadow: none !important;
 }
 
 .pozo-popup {
-  background: #fff;
-  color: #000;
-  padding: 4px 6px;           
-  border-radius: 4px;
-  font-size: 12px;
+  background: var(--color-bg-overlay);
+  color: var(--color-text-inverse);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-mono);
   font-weight: 500;
-  white-space: nowrap;        
+  white-space: nowrap;
 }
 
 .pozo-popup-wrapper .mapboxgl-popup-tip {
-  border-top-color: #000 !important;
+  border-top-color: var(--color-bg-overlay) !important;
 }
 
 
@@ -61,17 +154,17 @@ main {
   background: var(--control-bg);
   color: var(--control-text);
   padding: 6px 10px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--control-border);
-  font-size: 13px;
+  font-size: var(--text-body);
   line-height: 1.3;
 }
 
 .select-filter:focus,
 .select-filter:focus-visible {
   outline: none;
-  border-color: #3f6b4f;
-  box-shadow: 0 0 0 2px rgba(63, 107, 79, 0.15);
+  border-color: var(--color-brand-mid);
+  box-shadow: 0 0 0 2px rgba(61, 107, 61, 0.15);
 }
 
 @keyframes spin {

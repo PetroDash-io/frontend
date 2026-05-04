@@ -1,3 +1,4 @@
+
 import {colors, PRODUCTION_TYPES} from "@/utils/constants";
 
 import {CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis,} from "recharts";
@@ -7,7 +8,7 @@ import {useUnit} from "@/hooks/useUnit";
 import {UnitTabs} from "@/components/common/UnitTabs";
 import React, {useMemo} from "react";
 
-  
+
 interface CurveDataPoint {
   date: string;
   oil: number | null;

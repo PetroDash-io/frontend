@@ -1,27 +1,19 @@
 import {useEffect, useRef, useState} from "react";
 import {ProductionMonthly} from "@/app/types";
+import {DateRangeValue} from "@/utils/dateRange";
 import {ProductionMonthlyResponse} from "@/app/api_client/ProductionMonthlyResponse";
 
-interface WellProductionDateRange {
-    startYear?: string | number | null;
-    startMonth?: string | number | null;
-    endYear?: string | number | null;
-    endMonth?: string | number | null;
-}
-
 interface useWellProductionParams {
-    wellId: string | null;
-    dateRange?: WellProductionDateRange;
+    wellId: number | null,
+    dateRange: DateRangeValue;
 }
-
-const hasValue = (value?: string | number | null) => value !== undefined && value !== null && value !== "";
 
 export function useWellsProduction({wellId, dateRange}: useWellProductionParams) {
     const [data, setData] = useState<ProductionMonthly[] | null>(null);
     const [eur, setEur] = useState<number | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const previousWellId = useRef<string | null>(null);
+    const previousWellId = useRef<number | null>(null);
 
     useEffect(() => {
         if (!wellId) {
@@ -47,19 +39,14 @@ export function useWellsProduction({wellId, dateRange}: useWellProductionParams)
             try {
                 const params = new URLSearchParams();
 
-                const startYear = hasValue(dateRange?.startYear) ? String(dateRange?.startYear) : null;
-                const startMonth = hasValue(dateRange?.startMonth) ? String(dateRange?.startMonth) : null;
-                const endYear = hasValue(dateRange?.endYear) ? String(dateRange?.endYear) : null;
-                const endMonth = hasValue(dateRange?.endMonth) ? String(dateRange?.endMonth) : null;
-
-                if (startYear && startMonth) {
-                    params.append("start_year", startYear);
-                    params.append("start_month", startMonth);
+                if (dateRange.startYear && dateRange.startMonth) {
+                    params.append("start_year", dateRange.startYear);
+                    params.append("start_month", dateRange.startMonth);
                 }
 
-                if (endYear && endMonth) {
-                    params.append("end_year", endYear);
-                    params.append("end_month", endMonth);
+                if (dateRange.endYear && dateRange.endMonth) {
+                    params.append("end_year", dateRange.endYear);
+                    params.append("end_month", dateRange.endMonth);
                 }
 
                 const queryString = params.toString();

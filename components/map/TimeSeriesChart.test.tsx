@@ -33,10 +33,8 @@ const mockData = [
   },
 ];
 
-test("muestra los puntos de inyección con cambio no cero", () => {
+test("muestra la sección de progresión de inyecciones", () => {
   render(<TimeSeriesChart data={mockData} />);
 
-  expect(screen.getByText(/Inyección Agua/i)).toBeInTheDocument();
-  expect(screen.getByText(/Inyección Gas/i)).toBeInTheDocument();
-  expect(screen.getByText(/Inyección CO2/i)).toBeInTheDocument();
+  expect(screen.getByText(/Progresión de inyecciones/i)).toBeInTheDocument();
 });

@@ -1,6 +1,8 @@
 .pageShell {
-  min-height: 100vh;
-  background: #f3eee6;
+  height: 100dvh;
+  background: var(--color-bg-base);
+  --header-height: 64px;
+  overflow: hidden;
 }
 
 .header {
@@ -8,18 +10,14 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 64px;
+  height: var(--header-height);
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 0 28px;
-  background: #2f3e34;
-  border-bottom: 1px solid #3f6b4f;
+  background: var(--color-brand-dark);
+  border-bottom: 1px solid var(--color-brand-mid);
   z-index: 50;
-}
-
-.pageShell {
-  padding-top: 64px;
 }
 
 .logo {
@@ -33,17 +31,17 @@
 .title {
   font-size: 20px;
   font-weight: 600;
-  color: #f3eee6;
+  color: var(--color-text-inverse);
   letter-spacing: 0.2px;
 }
 
 .menuButton {
   display: inline-flex;
   margin-left: auto;
-  border: 1px solid rgba(243, 238, 230, 0.6);
-  background: rgba(243, 238, 230, 0.12);
-  color: #f3eee6;
-  border-radius: 6px;
+  border: 1px solid var(--color-border-medium);
+  background: rgba(240, 236, 228, 0.12);
+  color: var(--color-text-inverse);
+  border-radius: var(--radius-md);
   padding: 7px 12px;
   font-size: 13px;
   font-weight: 500;
@@ -52,21 +50,32 @@
 }
 
 .dashboardLayout {
-  min-height: calc(100vh - 64px);
+  display: grid;
+  grid-template-columns: 60px minmax(0, 1fr);
+  min-height: calc(100dvh - var(--header-height));
+  height: calc(100dvh - var(--header-height));
+  padding-top: var(--header-height);
+}
+
+.dashboardLayoutExpanded {
+  grid-template-columns: 248px minmax(0, 1fr);
+}
+
+.dashboardLayoutCollapsed {
+  grid-template-columns: 60px minmax(0, 1fr);
 }
 
 .drawer {
-  position: fixed;
-  top: 64px;
-  left: 0;
-  bottom: 0;
+  position: sticky;
+  top: 0;
   width: 60px;
-  border-right: 1px solid #ddd2c2;
-  background: #f7f3ec;
+  height: calc(100dvh - var(--header-height));
+  border-right: 1px solid var(--color-border-subtle);
+  background: var(--color-bg-surface);
   padding: 16px 8px;
   transition: width 0.25s ease;
   z-index: 40;
-  box-shadow: 4px 0 18px rgba(20, 25, 19, 0.08);
+  box-shadow: var(--shadow-md);
   overflow: hidden;
 }
 
@@ -84,9 +93,9 @@
   width: 42px;
   height: 42px;
   border: none;
-  border-radius: 12px;
-  background: rgba(47, 62, 52, 0.9);
-  color: #FFFFFF;
+  border-radius: var(--radius-xl);
+  background: rgba(30, 58, 30, 0.9);
+  color: var(--color-text-inverse);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -94,11 +103,11 @@
   font-size: 16px;
   font-weight: 700;
   transition: background 0.15s, transform 0.15s;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+  box-shadow: var(--shadow-md);
 }
 
 .drawerToggle:hover {
-  background: rgba(47, 62, 52, 0.32);
+  background: rgba(30, 58, 30, 0.72);
   transform: translateY(-1px);
 }
 
@@ -134,28 +143,25 @@
 
 .contentArea {
   min-width: 0;
-  background: #f3eee6;
-  min-height: calc(100vh - 64px);
-  padding-top: 24px;
-  transition: margin-left 0.25s ease;
-}
-
-.contentAreaExpanded {
-  margin-left: 248px;
-}
-
-.contentAreaCollapsed {
-  margin-left: 60px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: var(--color-bg-base);
+  min-height: 0;
+  height: 100%;
+  padding: 16px 12px 28px;
+  transition: padding 0.25s ease;
 }
 
 .drawerBackdrop {
   display: none;
   position: fixed;
-  top: 64px;
+  top: var(--header-height);
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(18, 21, 15, 0.24);
+  background: rgba(30, 58, 30, 0.2);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.25s ease;
@@ -194,9 +200,10 @@
 
   .drawer {
     position: fixed;
-    top: 0;
+    top: var(--header-height);
     left: 0;
     bottom: 0;
+    height: auto;
     z-index: 40;
     transform: translateX(-100%);
     transition: transform 0.25s ease;
@@ -207,19 +214,40 @@
     transform: translateX(0);
   }
 
-  .contentAreaExpanded,
-  .contentAreaCollapsed {
-    margin-left: 0;
-  }
-
   .contentArea {
-    padding-top: 16px;
+    padding: 16px 12px 28px;
   }
 
 }
 
+@media (min-width: 1024px) and (max-width: 1365px) {
+  .dashboardLayout {
+    display: block;
+  }
+
+  .drawer {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    bottom: 0;
+    width: 248px;
+    z-index: 40;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: 6px 0 18px rgba(20, 25, 19, 0.14);
+  }
+
+  .drawerOpen {
+    transform: translateX(0);
+  }
+
+  .contentArea {
+    padding: 16px 12px 28px;
+  }
+}
+
 @media (max-width: 1280px) {
   .contentArea {
-    padding-top: 16px;
+    padding: 16px 12px 28px;
   }
 }

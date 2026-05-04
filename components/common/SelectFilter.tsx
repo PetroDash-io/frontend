@@ -1,5 +1,4 @@
 import React from "react";
-import {colors} from "@/utils/constants";
 
 export type SelectFilterOption = {
     value: string | number;
@@ -65,25 +64,25 @@ const styles = {
         flex: 1,
     } as React.CSSProperties,
     label: {
-        fontSize: 14,
+        fontSize: 13,
         fontWeight: 500,
-        color: colors.text,
+        color: "var(--color-text-secondary)",
         display: "flex",
         flexDirection: "column",
         gap: 6,
     } as React.CSSProperties,
     select: {
         padding: "10px 14px",
-        borderRadius: 12,
-        border: `1px solid ${colors.secondary}`,
-        backgroundColor: "#fff",
-        fontSize: 14,
-        color: colors.text,
+        borderRadius: 6,
+        border: "1px solid var(--color-border-medium)",
+        backgroundColor: "var(--color-bg-sunken)",
+        fontSize: 13,
+        color: "var(--color-text-primary)",
         cursor: "pointer",
         minWidth: 200,
     } as React.CSSProperties,
     selectError: {
-        borderColor: "#dc2626",
-        boxShadow: "0 0 0 1px #dc2626",
+        borderColor: "var(--color-error)",
+        boxShadow: "0 0 0 1px var(--color-error)",
     } as React.CSSProperties,
 }

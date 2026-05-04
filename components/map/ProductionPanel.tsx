@@ -4,7 +4,7 @@ import {ProductionMonthly} from "@/app/types";
 import {InlineMessage} from "@/components/common/InlineMessage";
 import {LoadingState} from "@/components/common/LoadingState";
 import {TimeSeriesChart} from "@/components/map/TimeSeriesChart";
-import {DateRangeFilters} from "@/components/map/DateRangeFilters";
+import {DateRangeFilters} from "@/components/common/DateRangeFilters";
 import {
   applyDateRangeInputChange,
   DateRangeValue,
@@ -63,15 +63,28 @@ export function ProductionPanel({
   const timeSeriesChartData = useMemo(() => {
     if (!wellProduction || wellProduction.length === 0) return null;
 
+    type LegacyProductionMonthly = ProductionMonthly & {
+      reported_period_date?: string;
+      water_inyection?: number;
+      gas_inyection?: number;
+      co2_inyection?: number;
+    };
+
     const sortedRecords = wellProduction
       .slice()
-      .sort((a, b) => a.reported_period_date.localeCompare(b.reported_period_date));
+      .sort((a, b) => {
+        const aDate = (a as LegacyProductionMonthly).reported_period_date ?? a.data_date;
+        const bDate = (b as LegacyProductionMonthly).reported_period_date ?? b.data_date;
+        return aDate.localeCompare(bDate);
+      });
 
     let oilAccumulated = 0;
     let waterAccumulated = 0;
     let gasAccumulated = 0;
 
     return sortedRecords.map((record) => {
+      const legacyRecord = record as LegacyProductionMonthly;
+      const recordDate = legacyRecord.reported_period_date ?? record.data_date;
       const oil = toNumber(record.oil_production) ?? 0;
       const gas = toNumber(record.gas_production) ?? 0;
       const water = toNumber(record.water_production) ?? 0;
@@ -87,16 +100,16 @@ export function ProductionPanel({
       gasAccumulated += gas;
 
       return {
-        date: record.reported_period_date.slice(0, 7),
+        date: recordDate.slice(0, 7),
         oil,
         gas,
         water,
         cumulative_oil: oilAccumulated,
         cumulative_water: waterAccumulated,
         cumulative_gas: gasAccumulated,
-        water_injection: toNumber(record.water_inyection ?? record.water_injection) ?? 0,
-        gas_injection: toNumber(record.gas_inyection ?? record.gas_injection) ?? 0,
-        co2_injection: toNumber(record.co2_inyection ?? record.co2_injection) ?? 0,
+        water_injection: toNumber(legacyRecord.water_inyection ?? record.water_injection) ?? 0,
+        gas_injection: toNumber(legacyRecord.gas_inyection ?? record.gas_injection) ?? 0,
+        co2_injection: toNumber(legacyRecord.co2_inyection ?? record.co2_injection) ?? 0,
       };
     });
   }, [wellProduction]);

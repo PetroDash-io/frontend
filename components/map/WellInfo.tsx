@@ -21,6 +21,7 @@ export function WellInfo({
     metricsHint,
 }: WellInfoProps) {
     const showMetrics = !wellInfo && !loadingWell;
+    const wellType = (wellInfo as (WellDetail & {type?: string}) | null)?.type ?? wellInfo?.well_type;
 
     return (
         <div style={styles.infoContainer}>
@@ -50,7 +51,7 @@ export function WellInfo({
                             ["Formación", wellInfo.formation],
                             ["Clasificación", wellInfo.classification],
                             ["Tipo recurso", wellInfo.resource_type],
-                            ["Tipo pozo", wellInfo.type],
+                            ["Tipo pozo", wellType],
                             ["Estado", wellInfo.status],
                             ["Profundidad", `${wellInfo.depth} metros`],
                         ].map(([label, value]) => (
