@@ -190,7 +190,8 @@ const styles = {
     gridTemplateColumns: "minmax(0, 1fr) minmax(320px, 420px)",
     alignItems: "stretch",
     gap: 16,
-    minHeight: 560,
+    minWidth: 0,
+    minHeight: 0,
     height: "min(70vh, 700px)",
   } as React.CSSProperties,
   modeDock: {
