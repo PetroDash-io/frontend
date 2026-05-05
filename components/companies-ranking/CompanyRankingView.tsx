@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useMemo, useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { TopProductionFilters } from "@/app/types";
@@ -233,6 +231,7 @@ export function CompanyRankingView() {
                 Top 10 Empresas - {PRODUCTION_TYPE_LABEL[filters.tipo || "oil"]}
               </h3>
             </div>
+
             {data && (
               <div style={styles.headerStats}>
                 <div style={styles.headerStat}>
@@ -268,8 +267,8 @@ export function CompanyRankingView() {
                     paddingAngle={2}
                   >
                     {chartData.map((entry, index) => (
-                      <Cell 
-                        key={`cell-${index}`} 
+                      <Cell
+                        key={`cell-${index}`}
                         fill={PIE_CHART_COLORS[index % PIE_CHART_COLORS.length]}
                         style={{filter: "drop-shadow(0px 2px 4px rgba(0,0,0,0.1))"}}
                       />
@@ -322,6 +321,9 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: "column",
     gap: 24,
     padding: 24,
+    width: "100%",
+    boxSizing: "border-box",
+    minWidth: 0,
     backgroundColor: colors.bg,
   },
   mainTitle: {

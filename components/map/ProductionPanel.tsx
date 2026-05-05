@@ -4,7 +4,7 @@ import {ProductionMonthly} from "@/app/types";
 import {InlineMessage} from "@/components/common/InlineMessage";
 import {LoadingState} from "@/components/common/LoadingState";
 import {TimeSeriesChart} from "@/components/map/TimeSeriesChart";
-import {DateRangeFilters} from "@/components/map/DateRangeFilters";
+import {DateRangeFilters} from "@/components/common/DateRangeFilters";
 import {
   applyDateRangeInputChange,
   DateRangeValue,
@@ -19,6 +19,7 @@ export type ValidatedProductionDateRange = DateRangeValue;
 interface ProductionPanelProps {
   selectedWellId: string | null;
   wellProduction: ProductionMonthly[] | null;
+  eur: number | null;
   loadingWellProduction: boolean;
   errorWellProduction: string | null;
   onValidatedRangeChange: (range: ValidatedProductionDateRange) => void;
@@ -29,6 +30,7 @@ export const EMPTY_VALIDATED_RANGE: ValidatedProductionDateRange = DEFAULT_WELL_
 export function ProductionPanel({
   selectedWellId,
   wellProduction,
+  eur,
   loadingWellProduction,
   errorWellProduction,
   onValidatedRangeChange,
@@ -61,19 +63,55 @@ export function ProductionPanel({
   const timeSeriesChartData = useMemo(() => {
     if (!wellProduction || wellProduction.length === 0) return null;
 
-    return wellProduction
-      .filter((r)=> r.data_date != null)
+    type LegacyProductionMonthly = ProductionMonthly & {
+      reported_period_date?: string;
+      water_inyection?: number;
+      gas_inyection?: number;
+      co2_inyection?: number;
+    };
+
+    const sortedRecords = wellProduction
       .slice()
-      .sort((a, b) => a.data_date.localeCompare(b.data_date))
-      .map((record) => ({
-        date: record.data_date.slice(0, 7),
-        oil: toNumber(record.oil_production) ?? 0,
-        gas: toNumber(record.gas_production) ?? 0,
-        water: toNumber(record.water_production) ?? 0,
-        water_injection: toNumber(record.water_injection) ?? 0,
-        gas_injection: toNumber(record.gas_injection) ?? 0,
-        co2_injection: toNumber(record.co2_injection) ?? 0,
-      }));
+      .sort((a, b) => {
+        const aDate = (a as LegacyProductionMonthly).reported_period_date ?? a.data_date;
+        const bDate = (b as LegacyProductionMonthly).reported_period_date ?? b.data_date;
+        return aDate.localeCompare(bDate);
+      });
+
+    let oilAccumulated = 0;
+    let waterAccumulated = 0;
+    let gasAccumulated = 0;
+
+    return sortedRecords.map((record) => {
+      const legacyRecord = record as LegacyProductionMonthly;
+      const recordDate = legacyRecord.reported_period_date ?? record.data_date;
+      const oil = toNumber(record.oil_production) ?? 0;
+      const gas = toNumber(record.gas_production) ?? 0;
+      const water = toNumber(record.water_production) ?? 0;
+      const oilFromApi = toNumber(record.produccion_acumulada);
+
+      if (oilFromApi != null) {
+        oilAccumulated = oilFromApi;
+      } else {
+        oilAccumulated += oil;
+      }
+
+      waterAccumulated += water;
+      gasAccumulated += gas;
+
+      return {
+        date: recordDate.slice(0, 7),
+        oil,
+        gas,
+        water,
+        cumulative_oil: oilAccumulated,
+        cumulative_water: waterAccumulated,
+        cumulative_gas: gasAccumulated,
+        water_injection: toNumber(legacyRecord.water_inyection ?? record.water_injection) ?? 0,
+        gas_injection: toNumber(legacyRecord.gas_inyection ?? record.gas_injection) ?? 0,
+        co2_injection: toNumber(legacyRecord.co2_inyection ?? record.co2_injection) ?? 0,
+      };
+    });
   }, [wellProduction]);
 
   const updateChartDateRange = (filterName: string, value: unknown) => {
@@ -84,10 +122,7 @@ export function ProductionPanel({
 
   return (
     <div style={styles.productionPanel}>
-      <div style={styles.cardHeader}>
-        <span className="card-label">Serie temporal</span>
-        <h3 style={styles.productionPanelTitle}>Producción mensual del pozo {selectedWellId}</h3>
-      </div>
+      <h3 style={styles.productionPanelTitle}>Producción mensual del pozo {selectedWellId}</h3>
 
       {!selectedWellId && <InlineMessage message="Selecciona un pozo en el mapa para ver su serie de produccion." />}
 
@@ -121,7 +156,7 @@ export function ProductionPanel({
             )}
 
             {!loadingWellProduction && !errorWellProduction && wellProduction && (
-              <TimeSeriesChart data={timeSeriesChartData} />
+              <TimeSeriesChart data={timeSeriesChartData} eur={eur} />
             )}
           </div>
         </>
@@ -133,22 +168,13 @@ export function ProductionPanel({
 const styles = {
   productionPanel: {
     marginTop: 24,
-    border: "1px solid var(--color-border-subtle)",
+    border: "1px solid #3F6B4F",
     borderRadius: 14,
-    padding: 24,
-    backgroundColor: "var(--color-bg-surface)",
+    padding: 16,
+    backgroundColor: "#FAFAF9",
     display: "flex",
     flexDirection: "column",
     gap: 12,
-    boxShadow: "var(--shadow-sm)",
-  } as React.CSSProperties,
-  cardHeader: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
-    paddingBottom: 12,
-    borderBottom: "1px solid var(--color-border-subtle)",
-    marginBottom: 4,
   } as React.CSSProperties,
   productionPanelTitle: {
     margin: 0,

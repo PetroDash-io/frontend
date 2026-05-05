@@ -1,6 +1,8 @@
 .pageShell {
-  min-height: 100vh;
+  height: 100dvh;
   background: var(--color-bg-base);
+  --header-height: 64px;
+  overflow: hidden;
 }
 
 .header {
@@ -8,7 +10,7 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 64px;
+  height: var(--header-height);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -16,10 +18,6 @@
   background: var(--color-brand-dark);
   border-bottom: 1px solid var(--color-brand-mid);
   z-index: 50;
-}
-
-.pageShell {
-  padding-top: 64px;
 }
 
 .logo {
@@ -52,15 +50,26 @@
 }
 
 .dashboardLayout {
-  min-height: calc(100vh - 64px);
+  display: grid;
+  grid-template-columns: 60px minmax(0, 1fr);
+  min-height: calc(100dvh - var(--header-height));
+  height: calc(100dvh - var(--header-height));
+  padding-top: var(--header-height);
+}
+
+.dashboardLayoutExpanded {
+  grid-template-columns: 248px minmax(0, 1fr);
+}
+
+.dashboardLayoutCollapsed {
+  grid-template-columns: 60px minmax(0, 1fr);
 }
 
 .drawer {
-  position: fixed;
-  top: 64px;
-  left: 0;
-  bottom: 0;
+  position: sticky;
+  top: 0;
   width: 60px;
+  height: calc(100dvh - var(--header-height));
   border-right: 1px solid var(--color-border-subtle);
   background: var(--color-bg-surface);
   padding: 16px 8px;
@@ -134,24 +143,21 @@
 
 .contentArea {
   min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
   background: var(--color-bg-base);
-  min-height: calc(100vh - 64px);
-  padding-top: 24px;
-  transition: margin-left 0.25s ease;
-}
-
-.contentAreaExpanded {
-  margin-left: 248px;
-}
-
-.contentAreaCollapsed {
-  margin-left: 60px;
+  min-height: 0;
+  height: 100%;
+  padding: 16px 12px 28px;
+  transition: padding 0.25s ease;
 }
 
 .drawerBackdrop {
   display: none;
   position: fixed;
-  top: 64px;
+  top: var(--header-height);
   left: 0;
   right: 0;
   bottom: 0;
@@ -194,9 +200,10 @@
 
   .drawer {
     position: fixed;
-    top: 0;
+    top: var(--header-height);
     left: 0;
     bottom: 0;
+    height: auto;
     z-index: 40;
     transform: translateX(-100%);
     transition: transform 0.25s ease;
@@ -207,19 +214,40 @@
     transform: translateX(0);
   }
 
-  .contentAreaExpanded,
-  .contentAreaCollapsed {
-    margin-left: 0;
-  }
-
   .contentArea {
-    padding-top: 16px;
+    padding: 16px 12px 28px;
   }
 
 }
 
+@media (min-width: 1024px) and (max-width: 1365px) {
+  .dashboardLayout {
+    display: block;
+  }
+
+  .drawer {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    bottom: 0;
+    width: 248px;
+    z-index: 40;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: 6px 0 18px rgba(20, 25, 19, 0.14);
+  }
+
+  .drawerOpen {
+    transform: translateX(0);
+  }
+
+  .contentArea {
+    padding: 16px 12px 28px;
+  }
+}
+
 @media (max-width: 1280px) {
   .contentArea {
-    padding-top: 16px;
+    padding: 16px 12px 28px;
   }
 }

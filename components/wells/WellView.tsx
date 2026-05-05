@@ -1,9 +1,9 @@
 "use client";
 
 import React, {useState, useMemo} from "react";
-import {MapView} from "@/components/map/MapView";
-import {TableView} from "@/components/table/TableView";
-import {LimitFilter} from "@/components/map/LimitFilter";
+import {MapView} from "@/components/wells/MapView";
+import {TableView} from "@/components/wells/TableView";
+import {LimitFilter} from "@/components/wells/common/LimitFilter";
 import {WellFilters} from "@/app/types/wellFilters";
 import {SELECT_DEFAULT_VALUE, SelectFilter} from "@/components/common/SelectFilter";
 import {WATERSHED_OPTIONS} from "@/utils/constants";
@@ -29,6 +29,7 @@ export function WellView() {
     const [view, setView] = useState<"map" | "table">("map");
     const [dataMode, setDataMode] = useState<"pozos" | "heatmap">("pozos");
     const [heatmapResource, setHeatmapResource] = useState<"oil" | "gas" | "water">("oil");
+    const [selectedWellId, setSelectedWellId] = useState<number | null>(null);
     const {data: allWells} = useWells({filters});
 
   const provinceFilterOptions = useMemo(() => {
@@ -101,23 +102,6 @@ export function WellView() {
             Tabla
           </button>
         </div>
-
-        {view === "map" && (
-          <div style={styles.modeBar}>
-            <button
-              style={styles.modeBtn(dataMode === "pozos")}
-              onClick={() => setDataMode("pozos")}
-            >
-              Pozos
-            </button>
-            <button
-              style={styles.modeBtn(dataMode === "heatmap")}
-              onClick={() => setDataMode("heatmap")}
-            >
-              Heatmap
-            </button>
-          </div>
-        )}
       </div>
 
       {view === "map" && (
@@ -125,6 +109,9 @@ export function WellView() {
           <MapView
             filters={filters}
             mode={dataMode}
+            onChangeMode={setDataMode}
+            selectedWellId={selectedWellId}
+            onSelectWell={setSelectedWellId}
             heatmapResource={heatmapResource}
             onSelectHeatmapResource={setHeatmapResource}
           />

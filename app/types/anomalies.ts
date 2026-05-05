@@ -2,4 +2,4 @@ export type {
   ProductionResource,
   WellProductionAnomalyEvidence,
   WellProductionAnomalyPeriod,
-} from "@/components/map/anomalies/types";
+} from "@/components/well-analysis/anomalies/types";

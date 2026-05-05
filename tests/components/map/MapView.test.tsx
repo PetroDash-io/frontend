@@ -1,156 +1,197 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import {fireEvent, render, screen} from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { MapView } from "../../../components/map/MapView";
-
-// hooks
-import { useWells } from "@/hooks/useWells";
-import { useWell } from "@/hooks/useWell";
-import { useWellsProduction } from "@/hooks/useWellProduction";
-import { useWellsHeatmap } from "@/hooks/useWellsHeatmap";
-
-
-// mockeo de hooks
+import {MapView} from "@/components/wells/MapView";
+import {useWells} from "@/hooks/useWells";
+import {useWell} from "@/hooks/useWell";
+import {useMapHeatmap} from "@/hooks/useMapHeatmap";
+import {useMapMetrics} from "@/hooks/useMapMetrics";
 
 jest.mock("@/hooks/useWells", () => ({
-    useWells: jest.fn(),
+  useWells: jest.fn(),
 }));
-  
+
 jest.mock("@/hooks/useWell", () => ({
-    useWell: jest.fn(),
-}));
-  
-jest.mock("@/hooks/useWellProduction", () => ({
-    useWellsProduction: jest.fn(),
-}));
-  
-jest.mock("@/hooks/useWellsHeatmap", () => ({
-    useWellsHeatmap: jest.fn(),
+  useWell: jest.fn(),
 }));
 
-// mockear componentes hijos:
-
-jest.mock("@/components/map/WellsMap", () => ({
-    WellsMap: ({ onSelectWell }: any) => (
-      <button onClick={() => onSelectWell("well-1")}>
-        Select Well
-      </button>
-    ),
-}));
-  
-jest.mock("@/components/map/WellInfo", () => ({
-    WellInfo: () => <div>WellInfo</div>,
-}));
-  
-jest.mock("@/components/map/ProductionPanel", () => ({
-    ProductionPanel: () => <div>ProductionPanel</div>,
-    EMPTY_VALIDATED_RANGE: {},
-}));
-  
-jest.mock("@/components/map/anomalies/WellAnomaliesPanel", () => ({
-    WellAnomaliesPanel: () => <div>Anomalies</div>,
+jest.mock("@/hooks/useMapHeatmap", () => ({
+  useMapHeatmap: jest.fn(),
 }));
 
+jest.mock("@/hooks/useMapMetrics", () => ({
+  useMapMetrics: jest.fn(),
+}));
 
+jest.mock("@/components/wells/map/WellsMap", () => ({
+  WellsMap: ({
+    onSelectWell,
+    overlayControlsTopRight,
+    overlayControlsBottomCenter,
+  }: {
+    onSelectWell: (wellId: number) => void;
+    overlayControlsTopRight?: React.ReactNode;
+    overlayControlsBottomCenter?: React.ReactNode;
+  }) => (
+    <div>
+      {overlayControlsTopRight}
+      {overlayControlsBottomCenter}
+      <button onClick={() => onSelectWell(1)}>Select Well</button>
+    </div>
+  ),
+}));
 
-// default mocks antes de cada test
+jest.mock("@/components/wells/common/WellInfo", () => ({
+  WellInfo: ({metricsItems}: {metricsItems?: Array<{label: string}>}) => (
+    <div>
+      WellInfo
+      {metricsItems && metricsItems.length > 0 ? <span>MetricsLoaded</span> : null}
+    </div>
+  ),
+}));
+
+const defaultProps = {
+  filters: {
+    watershed: "",
+    province: "",
+    status: "",
+    company: "",
+    limit: 0,
+  },
+  mode: "pozos" as const,
+  onChangeMode: jest.fn(),
+  selectedWellId: null,
+  onSelectWell: jest.fn(),
+  heatmapResource: "oil" as const,
+  onSelectHeatmapResource: jest.fn(),
+};
+
 beforeEach(() => {
-    (useWells as jest.Mock).mockReturnValue({
-      data: [],
+  (useWells as jest.Mock).mockReturnValue({
+    data: [],
+    loading: false,
+    error: null,
+  });
+
+  (useWell as jest.Mock).mockReturnValue({
+    data: null,
+    loading: false,
+    error: null,
+  });
+
+  (useMapHeatmap as jest.Mock).mockReturnValue({
+    isHeatmapMode: false,
+    mapMode: "pozos",
+    heatmapData: null,
+    heatmapMaxValue: 0,
+  });
+
+  (useMapMetrics as jest.Mock).mockReturnValue({
+    data: null,
+    loading: false,
+    error: null,
+  });
+});
+
+describe("MapView", () => {
+  it("muestra controles de recurso en modo heatmap", () => {
+    (useMapHeatmap as jest.Mock).mockReturnValue({
+      isHeatmapMode: true,
+      mapMode: "heatmap",
+      heatmapData: null,
+      heatmapMaxValue: 0,
+    });
+
+    render(<MapView {...defaultProps} mode="heatmap" />);
+
+    expect(screen.getByText("Petróleo")).toBeInTheDocument();
+    expect(screen.getByText("Gas")).toBeInTheDocument();
+    expect(screen.getByText("Agua")).toBeInTheDocument();
+  });
+
+  it("no muestra controles en modo pozos", () => {
+    render(<MapView {...defaultProps} mode="pozos" />);
+    expect(screen.queryByText("Petróleo")).not.toBeInTheDocument();
+  });
+
+  it("permite cambiar la visualización desde el dock", () => {
+    const onChangeMode = jest.fn();
+    render(<MapView {...defaultProps} mode="pozos" onChangeMode={onChangeMode} />);
+
+    fireEvent.click(screen.getByText("Heatmap"));
+    expect(onChangeMode).toHaveBeenCalledWith("heatmap");
+  });
+
+  it("llama onSelectHeatmapResource al seleccionar recurso", () => {
+    const onSelectHeatmapResource = jest.fn();
+    (useMapHeatmap as jest.Mock).mockReturnValue({
+      isHeatmapMode: true,
+      mapMode: "heatmap",
+      heatmapData: null,
+      heatmapMaxValue: 0,
+    });
+
+    render(
+      <MapView
+        {...defaultProps}
+        mode="heatmap"
+        onSelectHeatmapResource={onSelectHeatmapResource}
+      />
+    );
+
+    fireEvent.click(screen.getByText("Gas"));
+    expect(onSelectHeatmapResource).toHaveBeenCalledWith("gas");
+  });
+
+  it("renderiza WellInfo y permite seleccionar pozo", () => {
+    const onSelectWell = jest.fn();
+    render(<MapView {...defaultProps} mode="pozos" onSelectWell={onSelectWell} />);
+
+    expect(screen.getByText("WellInfo")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Select Well"));
+    expect(onSelectWell).toHaveBeenCalledWith(1);
+    expect(screen.getByText("WellInfo")).toBeInTheDocument();
+  });
+
+  it("pasa métricas a WellInfo cuando hay datos iniciales", () => {
+    (useMapMetrics as jest.Mock).mockReturnValue({
+      data: {
+        source: "db",
+        resource: "oil",
+        active_wells: 10,
+        stopped_wells: 2,
+        inactive_wells: 1,
+        not_informed_wells: 0,
+        total_production_last_month: 12345,
+        last_month: "2024-01-01",
+      },
       loading: false,
       error: null,
     });
-  
-    (useWell as jest.Mock).mockReturnValue({
+
+    render(<MapView {...defaultProps} mode="pozos" />);
+
+    expect(screen.getByText("MetricsLoaded")).toBeInTheDocument();
+  });
+
+  it("muestra mensaje de error si falla useWells", () => {
+    (useWells as jest.Mock).mockReturnValue({
       data: null,
       loading: false,
+      error: "Error cargando pozos",
+    });
+
+    render(<MapView {...defaultProps} mode="pozos" />);
+    expect(screen.getByText("Error cargando pozos")).toBeInTheDocument();
+  });
+
+  it("muestra loading mientras carga wells", () => {
+    (useWells as jest.Mock).mockReturnValue({
+      data: null,
+      loading: true,
       error: null,
     });
-  
-    (useWellsProduction as jest.Mock).mockReturnValue({
-      data: [],
-      loading: false,
-      error: null,
-    });
-  
-    (useWellsHeatmap as jest.Mock).mockReturnValue({
-      geojsonData: null,
-      maxValue: 0,
-    });
+
+    render(<MapView {...defaultProps} mode="pozos" />);
+    expect(screen.getByRole("status")).toBeInTheDocument();
   });
-  
-  const defaultProps = {
-    filters: {
-      watershed: "",
-      province: "",
-      status: "",
-      company: "",
-      limit: 0,
-    },
-    heatmapResource: "oil" as const,
-    onSelectHeatmapResource: jest.fn(),
-  };
-  
-  describe("MapView", () => {
-    it("muestra botones de recursos en modo heatmap", () => {
-      render(<MapView {...defaultProps} mode="heatmap" />);
-  
-      expect(screen.getByText("Petróleo")).toBeInTheDocument();
-      expect(screen.getByText("Gas")).toBeInTheDocument();
-      expect(screen.getByText("Agua")).toBeInTheDocument();
-    });
-  
-    it("NO muestra botones en modo pozos", () => {
-      render(<MapView {...defaultProps} mode="pozos" />);
-  
-      expect(screen.queryByText("Petróleo")).not.toBeInTheDocument();
-    });
-  
-    it("llama onSelectHeatmapResource al hacer click", () => {
-      const mockFn = jest.fn();
-  
-      render(
-        <MapView
-          {...defaultProps}
-          mode="heatmap"
-          onSelectHeatmapResource={mockFn}
-        />
-      );
-  
-      fireEvent.click(screen.getByText("Gas"));
-  
-      expect(mockFn).toHaveBeenCalledWith("gas");
-    });
-  
-    it("selecciona un pozo cuando el mapa dispara el evento", () => {
-      render(<MapView {...defaultProps} mode="pozos" />);
-  
-      fireEvent.click(screen.getByText("Select Well"));
-  
-      expect(screen.getByText("ProductionPanel")).toBeInTheDocument();
-    });
-  
-    it("muestra error si falla useWells", () => {
-      (useWells as jest.Mock).mockReturnValue({
-        data: null,
-        loading: false,
-        error: "Error cargando pozos",
-      });
-  
-      render(<MapView {...defaultProps} mode="pozos" />);
-  
-      expect(screen.getByText("Error cargando pozos")).toBeInTheDocument();
-    });
-  
-    it("muestra loading cuando está cargando wells", () => {
-      (useWells as jest.Mock).mockReturnValue({
-        data: null,
-        loading: true,
-        error: null,
-      });
-  
-      render(<MapView {...defaultProps} mode="pozos" />);
-  
-      
-      expect(screen.getByRole("status")).toBeInTheDocument();
-    });
-  });
+});

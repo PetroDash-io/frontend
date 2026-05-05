@@ -108,7 +108,7 @@ main {
   color: var(--foreground);
   font-family: var(--font-body);
   font-size: var(--text-body);
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 * {

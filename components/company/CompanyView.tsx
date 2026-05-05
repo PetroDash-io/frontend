@@ -1,5 +1,3 @@
-"use client";
-
 import React, {useEffect, useMemo, useState} from "react";
 import {colors, WATERSHED_OPTIONS} from "@/utils/constants";
 import {useCompanies} from "@/hooks/useCompanies";
@@ -204,6 +202,9 @@ const styles = {
     flexDirection: "column",
     gap: 24,
     padding: 24,
+    width: "100%",
+    boxSizing: "border-box",
+    minWidth: 0,
     backgroundColor: colors.bg,
   } as React.CSSProperties,
   heading: {

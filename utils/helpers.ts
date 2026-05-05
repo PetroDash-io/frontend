@@ -56,3 +56,14 @@ export const toNumber = (value: unknown): number | null => {
   }
   return null;
 }
+
+export const formatCompactNumber = (value?: number | null): string => {
+  if (value === null || value === undefined || !Number.isFinite(value)) {
+    return "-";
+  }
+
+  return new Intl.NumberFormat("en-US", {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(value);
+};

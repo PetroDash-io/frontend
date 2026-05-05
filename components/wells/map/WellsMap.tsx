@@ -1,7 +1,7 @@
-import { colors, LEGEND_ITEMS } from "@/utils/constants";
-import { ActiveWell, WellDetail } from "@/app/types";
-import { LegendItem } from "@/components/map/LegendItem";
-import { getWellColor } from "@/utils/helpers";
+import {colors, LEGEND_ITEMS} from "@/utils/constants";
+import {ActiveWell, WellDetail} from "@/app/types";
+import {LegendItem} from "@/components/wells/map/LegendItem";
+import {getWellColor} from "@/utils/helpers";
 
 import Map, {Marker, Popup, Source, Layer} from "react-map-gl/mapbox";
 import type { HeatmapLayer } from "mapbox-gl";
@@ -10,15 +10,26 @@ import React, {useState} from "react";
 
 interface WellsMapProps {
   wells: WellDetail[];
-  selectedWellId: string | null;
-  onSelectWell: (id: string) => void;
+  selectedWellId: number | null;
+  onSelectWell: (id: number) => void;
   mapMode: "markers" | "heatmap";
   heatmapData?: GeoJSON.FeatureCollection | null;
   heatmapMaxValue?: number;
+  overlayControlsTopRight?: React.ReactNode;
+  overlayControlsBottomCenter?: React.ReactNode;
 }
 
-export function WellsMap({ wells, selectedWellId, onSelectWell, mapMode, heatmapData, heatmapMaxValue = 1 }: WellsMapProps) {
-    const [focusedPozoId, setFocusedPozoId] = useState<string | null>(null);
+export function WellsMap({
+    wells,
+    selectedWellId,
+    onSelectWell,
+    mapMode,
+    heatmapData,
+    heatmapMaxValue = 1,
+    overlayControlsTopRight,
+    overlayControlsBottomCenter,
+}: WellsMapProps) {
+    const [focusedPozoId, setFocusedPozoId] = useState<number | null>(null);
     const [activePozo, setActivePozo] = useState<ActiveWell | null>(null);
     const safeHeatmapMaxValue = Number.isFinite(heatmapMaxValue) && heatmapMaxValue > 0 ? heatmapMaxValue : 1;
 
@@ -29,6 +40,8 @@ export function WellsMap({ wells, selectedWellId, onSelectWell, mapMode, heatmap
                     <LegendItem key={item.label} color={item.color} label={item.label} />
                 ))}
             </div>
+            {overlayControlsTopRight ? <div style={styles.overlayControlsTopRight}>{overlayControlsTopRight}</div> : null}
+            {overlayControlsBottomCenter ? <div style={styles.overlayControlsBottomCenter}>{overlayControlsBottomCenter}</div> : null}
             <Map
                 initialViewState={{
                     longitude: -68.059167,
@@ -94,7 +107,7 @@ export function WellsMap({ wells, selectedWellId, onSelectWell, mapMode, heatmap
                         return null;
                     }
 
-                    const wellId = String(item.well_id);
+                    const wellId = Number(item.well_id);
 
                     const isSelected = selectedWellId === wellId;
 
@@ -171,15 +184,38 @@ const styles = {
         height: "100%",
         borderRadius: 14,
     } as React.CSSProperties,
-    markerDot: (opts: {selected: boolean; status: string, focused: boolean}) => ({
-        width: opts.selected ? 10 : 8,
-        height: opts.selected ? 10 : 8,
-        backgroundColor: opts.selected ? colors.selectedWell : getWellColor(opts.status),
+    overlayControlsTopRight: {
+        position: "absolute",
+        top: 12,
+        right: 12,
+        zIndex: 10,
+    } as React.CSSProperties,
+    overlayControlsBottomCenter: {
+        position: "absolute",
+        left: "50%",
+        bottom: 14,
+        transform: "translateX(-50%)",
+        zIndex: 10,
+    } as React.CSSProperties,
+    markerDot: (opts: { selected: boolean; status: string; focused: boolean }) => ({
+        width: opts.selected ? 14 : 8,
+        height: opts.selected ? 14 : 8,
+        backgroundColor: getWellColor(opts.status),
         borderRadius: "50%",
         border: "1px solid rgba(0,0,0,0.3)",
         cursor: "pointer",
         outline: "none",
-        boxShadow: opts.focused ? `0 0 0 2px ${colors.accent}` : "none",
+
+        transform: opts.selected ? "scale(1.4)" : "scale(1)",
+        transition: "all 0.15s ease",
+
+        boxShadow: opts.selected
+            ? "0 0 0 4px rgba(0, 123, 255, 0.25)" // halo
+            : opts.focused
+            ? `0 0 0 2px ${colors.accent}`
+            : "none",
+
+        zIndex: opts.selected ? 10 : 1,
     }) as React.CSSProperties,
     popupBox: {
         backgroundColor: colors.panel,

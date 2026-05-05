@@ -1,19 +1,11 @@
 import {ProductionMonthly} from "@/app/types";
-import {ProductionResource, WellProductionAnomalyPeriod, AnomalyChartPoint} from "@/components/map/anomalies/types";
+import {AnomalyChartPoint, ProductionResource} from "@/components/well-analysis/anomalies/types";
 import {convertValueToUnit} from "@/utils/units";
+import {PRODUCTION_TYPES} from "@/utils/constants";
 
 const dataDateToUtcTimestamp = (dataDate: string): number => {
   const [year, month] = dataDate.split("-").map((part) => Number(part));
   return Date.UTC(year, month - 1, 1);
-};
-
-export const getAnomalyDateSet = (anomalyPeriods: WellProductionAnomalyPeriod[] | null): Set<string> => {
-  if (!anomalyPeriods || anomalyPeriods.length === 0) {
-    return new Set<string>();
-  }
-
-  const filteredPeriods = anomalyPeriods.filter((period) => period.anomaly?.is_anomaly === true);
-  return new Set(filteredPeriods.filter((period) => period.data_date != null).map((period) => period.data_date.slice(0, 7)));
 };
 
 export const buildAnomalyChartData = (
@@ -33,13 +25,12 @@ export const buildAnomalyChartData = (
   const selectedResourceField = resourceFieldByName[selectedResource];
 
   return anomalyProduction
-    .filter((r) => r.data_date != null)
     .slice()
     .sort((a, b) => a.data_date.localeCompare(b.data_date))
     .map((period) => {
       const rawValue = Number(period[selectedResourceField] || 0);
       const convertedValue =
-        selectedResource === "gas" ? rawValue : convertValueToUnit(rawValue, unit);
+        selectedResource === PRODUCTION_TYPES.gas.name ? rawValue : convertValueToUnit(rawValue, unit);
       const date = period.data_date.slice(0, 7);
 
       return {

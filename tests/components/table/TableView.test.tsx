@@ -1,12 +1,12 @@
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { TableView } from "@/components/table/TableView";
+import { TableView } from "@/components/wells/TableView";
 import { useWells } from "@/hooks/useWells";
 import { toast } from "react-toastify";
 
 jest.mock("@/hooks/useWells");
 
-jest.mock("@/components/table/WellsTable", () => ({
+jest.mock("@/components/wells/table/WellsTable", () => ({
   WellsTable: ({ data }: any) => <div>TABLE {data.length}</div>,
 }));
 
