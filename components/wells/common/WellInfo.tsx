@@ -61,7 +61,6 @@ export function WellInfo({
                 />
             )}
 
-            {!wellInfo && <p style={styles.sidePanelHint}>Seleccioná un pozo en el mapa</p>}
             {loadingWell && <p>Cargando información...</p>}
 
             {wellInfo && !loadingWell && (
@@ -132,9 +131,6 @@ const styles = {
         paddingBottom: 12,
         marginBottom: 16,
         borderBottom: "1px solid var(--color-border-subtle)",
-    } as React.CSSProperties,
-    sidePanelHint: {
-        opacity: 0.8,
     } as React.CSSProperties,
     sidePanelTitle: {
         margin: 0,
