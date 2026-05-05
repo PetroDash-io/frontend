@@ -62,6 +62,7 @@ export function ProductionPanel({
     if (!wellProduction || wellProduction.length === 0) return null;
 
     return wellProduction
+      .filter((r)=> r.data_date != null)
       .slice()
       .sort((a, b) => a.data_date.localeCompare(b.data_date))
       .map((record) => ({

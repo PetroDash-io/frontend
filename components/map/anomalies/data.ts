@@ -13,7 +13,7 @@ export const getAnomalyDateSet = (anomalyPeriods: WellProductionAnomalyPeriod[] 
   }
 
   const filteredPeriods = anomalyPeriods.filter((period) => period.anomaly?.is_anomaly === true);
-  return new Set(filteredPeriods.map((period) => period.data_date.slice(0, 7)));
+  return new Set(filteredPeriods.filter((period) => period.data_date != null).map((period) => period.data_date.slice(0, 7)));
 };
 
 export const buildAnomalyChartData = (
@@ -33,6 +33,7 @@ export const buildAnomalyChartData = (
   const selectedResourceField = resourceFieldByName[selectedResource];
 
   return anomalyProduction
+    .filter((r) => r.data_date != null)
     .slice()
     .sort((a, b) => a.data_date.localeCompare(b.data_date))
     .map((period) => {
