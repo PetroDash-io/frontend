@@ -43,7 +43,9 @@ export function WellView() {
 
   const companyFilterOptions = useMemo(() => {
     if (!allWells) return [];
-    return [...new Set(allWells.map((well) => well.company))].filter(Boolean);
+  
+    return [...new Set(allWells.map((well) => well.company))]
+      .filter((c): c is string => c !== null && c !== undefined);
   }, [allWells]);
 
   return (
