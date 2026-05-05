@@ -58,6 +58,15 @@ export function DashboardShell({children}: {children: React.ReactNode}) {
           priority
         />
         <h1 className={styles.title}>PetroDash</h1>
+        <button
+          type="button"
+          className={styles.menuButton}
+          onClick={() => setIsDrawerOpen((v) => !v)}
+          aria-label={isDrawerOpen ? "Cerrar menú" : "Abrir menú"}
+          aria-controls="dashboard-navigation"
+        >
+          {isDrawerOpen ? "✕" : "☰"}
+        </button>
       </header>
 
       <div className={`${styles.dashboardLayout} ${isDrawerOpen ? styles.dashboardLayoutExpanded : styles.dashboardLayoutCollapsed}`}>
@@ -105,6 +114,22 @@ export function DashboardShell({children}: {children: React.ReactNode}) {
           {children}
         </main>
       </div>
+
+      <nav className={styles.bottomNav} aria-label="Navegación principal">
+        {NAV_ITEMS.map(({href, label, Icon}) => {
+          const isActive = pathname === href;
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={`${styles.bottomNavLink} ${isActive ? styles.bottomNavLinkActive : ""}`}
+            >
+              <span aria-hidden="true"><Icon /></span>
+              <span>{label}</span>
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 }

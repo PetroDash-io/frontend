@@ -90,6 +90,7 @@
   --header-height:       64px;
   --drawer-width-closed: 60px;
   --drawer-width-open:   248px;
+  --bottom-nav-height:   56px;
   --duration-fast:       0.25s;
 
   /* RGBA semantic overlay tokens */
