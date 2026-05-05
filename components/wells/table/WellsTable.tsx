@@ -115,7 +115,7 @@ const styles = {
     } as React.CSSProperties,
     tableContainer: {
         background: "var(--color-bg-surface)",
-        borderRadius: 12,
+        borderRadius: "var(--radius-xl)",
         padding: 24,
         border: `1px solid ${colors.panelBorder}`,
         overflowX: "auto",

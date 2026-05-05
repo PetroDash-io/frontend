@@ -219,7 +219,7 @@ const styles = {
     gap: 16,
     minWidth: 0,
     minHeight: 0,
-    height: "min(68vh, 700px)",
+    height: "clamp(520px, 72vh, 800px)",
   } as React.CSSProperties,
   mapTopRightStack: {
     display: "flex",
@@ -257,7 +257,7 @@ const styles = {
     padding: "6px",
     borderRadius: 999,
     border: "1px solid var(--color-border-subtle)",
-    backgroundColor: "rgba(255,255,255,0.94)",
+    backgroundColor: "var(--color-surface-glass)",
     boxShadow: "0 10px 22px rgba(0,0,0,0.16)",
   } as React.CSSProperties,
   modeDockButton: (active: boolean) => ({
@@ -297,10 +297,10 @@ const styles = {
     alignItems: "center",
     gap: 8,
     padding: "8px 10px",
-    borderRadius: 12,
+    borderRadius: "var(--radius-xl)",
     border: "1px solid var(--color-border-subtle)",
-    backgroundColor: "rgba(255,255,255,0.92)",
-    boxShadow: "0 10px 22px rgba(0,0,0,0.14)",
+    backgroundColor: "var(--color-surface-glass)",
+    boxShadow: "var(--shadow-card)",
   } as React.CSSProperties,
   heatmapControlsLabel: {
     fontSize: 12,

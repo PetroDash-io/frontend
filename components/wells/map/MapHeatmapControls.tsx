@@ -46,10 +46,10 @@ const styles = {
     gap: 10,
     alignItems: "center",
     padding: "12px 16px",
-    borderRadius: 14,
+    borderRadius: "var(--radius-2xl)",
     border: `1px solid ${colors.panelBorder}`,
     backgroundColor: "rgba(255,255,255,0.95)",
-    boxShadow: "0 10px 22px rgba(0,0,0,0.14)",
+    boxShadow: "var(--shadow-card)",
     marginBottom: 12,
   } as React.CSSProperties,
   toggleLabel: {

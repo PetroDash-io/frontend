@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useState} from "react";
-import {colors} from "@/utils/constants";
+import {colors, CONTENT_MAX_WIDTH} from "@/utils/constants";
 import {InlineMessage} from "@/components/common/InlineMessage";
 import {useWellsProduction} from "@/hooks/useWellProduction";
 import {DateRangeFilters} from "@/components/common/DateRangeFilters";
@@ -280,6 +280,8 @@ const styles = {
   container: {
     padding: "24px",
     width: "100%",
+    maxWidth: CONTENT_MAX_WIDTH,
+    margin: "0 auto",
     boxSizing: "border-box",
     minWidth: 0,
     minHeight: "calc(100vh - 200px)",

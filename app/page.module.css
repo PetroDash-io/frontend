@@ -1,7 +1,6 @@
 .pageShell {
   height: 100dvh;
   background: var(--color-bg-base);
-  --header-height: 64px;
   overflow: hidden;
 }
 
@@ -39,7 +38,7 @@
   display: inline-flex;
   margin-left: auto;
   border: 1px solid var(--color-border-medium);
-  background: rgba(240, 236, 228, 0.12);
+  background: var(--color-header-btn-bg);
   color: var(--color-text-inverse);
   border-radius: var(--radius-md);
   padding: 7px 12px;
@@ -51,36 +50,36 @@
 
 .dashboardLayout {
   display: grid;
-  grid-template-columns: 60px minmax(0, 1fr);
+  grid-template-columns: var(--drawer-width-closed) minmax(0, 1fr);
   min-height: calc(100dvh - var(--header-height));
   height: calc(100dvh - var(--header-height));
   padding-top: var(--header-height);
 }
 
 .dashboardLayoutExpanded {
-  grid-template-columns: 248px minmax(0, 1fr);
+  grid-template-columns: var(--drawer-width-open) minmax(0, 1fr);
 }
 
 .dashboardLayoutCollapsed {
-  grid-template-columns: 60px minmax(0, 1fr);
+  grid-template-columns: var(--drawer-width-closed) minmax(0, 1fr);
 }
 
 .drawer {
   position: sticky;
   top: 0;
-  width: 60px;
+  width: var(--drawer-width-closed);
   height: calc(100dvh - var(--header-height));
   border-right: 1px solid var(--color-border-subtle);
   background: var(--color-bg-surface);
   padding: 16px 8px;
-  transition: width 0.25s ease;
+  transition: width var(--duration-fast) ease;
   z-index: 40;
   box-shadow: var(--shadow-md);
   overflow: hidden;
 }
 
 .drawerOpen {
-  width: 248px;
+  width: var(--drawer-width-open);
 }
 
 .drawerHeader {
@@ -94,7 +93,7 @@
   height: 42px;
   border: none;
   border-radius: var(--radius-xl);
-  background: rgba(30, 58, 30, 0.9);
+  background: var(--color-drawer-toggle);
   color: var(--color-text-inverse);
   cursor: pointer;
   display: flex;
@@ -107,7 +106,7 @@
 }
 
 .drawerToggle:hover {
-  background: rgba(30, 58, 30, 0.72);
+  background: var(--color-drawer-toggle-hover);
   transform: translateY(-1px);
 }
 
@@ -151,7 +150,7 @@
   min-height: 0;
   height: 100%;
   padding: 16px 12px 28px;
-  transition: padding 0.25s ease;
+  transition: padding var(--duration-fast) ease;
 }
 
 .drawerBackdrop {
@@ -161,10 +160,10 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(30, 58, 30, 0.2);
+  background: var(--color-overlay-dark-subtle);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s ease;
+  transition: opacity var(--duration-fast) ease;
   z-index: 30;
 }
 
@@ -206,8 +205,8 @@
     height: auto;
     z-index: 40;
     transform: translateX(-100%);
-    transition: transform 0.25s ease;
-    box-shadow: 6px 0 18px rgba(20, 25, 19, 0.14);
+    transition: transform var(--duration-fast) ease;
+    box-shadow: var(--shadow-drawer);
   }
 
   .drawerOpen {
@@ -220,7 +219,7 @@
 
 }
 
-@media (min-width: 1024px) and (max-width: 1365px) {
+@media (min-width: 1024px) and (max-width: 1279px) {
   .dashboardLayout {
     display: block;
   }
@@ -230,23 +229,17 @@
     top: var(--header-height);
     left: 0;
     bottom: 0;
-    width: 248px;
+    width: var(--drawer-width-open);
     z-index: 40;
     transform: translateX(-100%);
-    transition: transform 0.25s ease;
-    box-shadow: 6px 0 18px rgba(20, 25, 19, 0.14);
+    transition: transform var(--duration-fast) ease;
+    box-shadow: var(--shadow-drawer);
   }
 
   .drawerOpen {
     transform: translateX(0);
   }
 
-  .contentArea {
-    padding: 16px 12px 28px;
-  }
-}
-
-@media (max-width: 1280px) {
   .contentArea {
     padding: 16px 12px 28px;
   }

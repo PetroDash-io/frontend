@@ -186,7 +186,7 @@ const styles = {
     map: {
         width: "100%",
         height: "100%",
-        borderRadius: 14,
+        borderRadius: "var(--radius-2xl)",
     } as React.CSSProperties,
     overlayControlsTopRight: {
         position: "absolute",
