@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 
-export function AnomalyMethodInfoButton() {
+export function AnomalyInfoButton() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -44,9 +44,9 @@ const styles = {
     width: 24,
     height: 24,
     borderRadius: "50%",
-    border: "1px solid #9ca3af",
-    backgroundColor: "#ffffff",
-    color: "#374151",
+    border: "1px solid var(--color-border-medium)",
+    backgroundColor: "var(--color-bg-surface)",
+    color: "var(--color-text-secondary)",
     fontWeight: 700,
     cursor: "pointer",
     lineHeight: 1,
@@ -59,32 +59,32 @@ const styles = {
     maxWidth: "min(90vw, 360px)",
     zIndex: 20,
     borderRadius: 10,
-    border: "1px solid #d8cdbf",
-    backgroundColor: "#fffdf8",
+    border: "1px solid var(--color-border-subtle)",
+    backgroundColor: "var(--color-bg-surface)",
     boxShadow: "0 10px 24px rgba(0,0,0,0.12)",
     padding: 12,
   } as React.CSSProperties,
   title: {
     margin: "0 0 8px 0",
     fontSize: 14,
-    color: "#2f3e34",
+    color: "var(--color-text-primary)",
   } as React.CSSProperties,
   text: {
     margin: "0 0 8px 0",
     fontSize: 12,
-    color: "#374151",
+    color: "var(--color-text-secondary)",
     lineHeight: 1.4,
   } as React.CSSProperties,
   list: {
     margin: "0 0 8px 16px",
     padding: 0,
     fontSize: 12,
-    color: "#374151",
+    color: "var(--color-text-secondary)",
     lineHeight: 1.4,
   } as React.CSSProperties,
   footnote: {
     margin: 0,
     fontSize: 11,
-    color: "#6b7280",
+    color: "var(--color-text-muted)",
   } as React.CSSProperties,
 } as const;

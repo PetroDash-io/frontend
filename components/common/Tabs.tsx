@@ -88,17 +88,17 @@ const styles = {
 } as const;
 
 function tabButtonStyle(active: boolean): React.CSSProperties {
-    return {
+  return {
         padding: "8px 16px",
         borderRadius: 999,
         border: "none",
-        backgroundColor: active ? "#3F6B4F" : "transparent",
-        color: active ? "#F3EEE6" : "#3F6B4F",
+        backgroundColor: active ? "var(--color-brand-mid)" : "transparent",
+        color: active ? "var(--color-text-inverse)" : "var(--color-brand-mid)",
         fontSize: 14,
         fontWeight: 600,
         cursor: "pointer",
         transition: "all 0.18s ease",
-        boxShadow: active ? "0 6px 14px rgba(0,0,0,0.12)" : "none",
+        boxShadow: active ? "var(--shadow-sm)" : "none",
     };
 }
 
@@ -108,9 +108,9 @@ function tabDrawerStyle(active: boolean): React.CSSProperties {
         textAlign: "left",
         padding: "9px 12px",
         borderRadius: 8,
-        border: `1px solid ${active ? "#C9D8CE" : "transparent"}`,
-        backgroundColor: active ? "#E9F0EB" : "transparent",
-        color: active ? "#2F3E34" : "#4B2A1A",
+        border: `1px solid ${active ? "var(--color-border-medium)" : "transparent"}`,
+        backgroundColor: active ? "var(--color-bg-sunken)" : "transparent",
+        color: active ? "var(--color-text-primary)" : "var(--color-text-secondary)",
         fontSize: 14,
         fontWeight: active ? 600 : 500,
         cursor: "pointer",

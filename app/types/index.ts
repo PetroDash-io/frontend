@@ -1,43 +1,45 @@
 export interface ActiveWell {
-  id: string;
+  id: number;
   lon: number;
   lat: number;
-  company: string;
-  resource_type: string;
+  company: string | null;
+  resource_type: string | null;
+}
+
+export interface WellGeoPoint {
+  type: "Point";
+  coordinates: [number, number];
 }
 
 export interface WellDetail {
-  well_id: string;
+  well_id: number;
   watershed: string;
   province: string;
   area: string;
-  company: string;
+  company: string | null;
   field: string;
   formation: string;
   classification: string;
-  resource_type: string;
-  type: string;
+  resource_type: string | null;
+  well_type: string;
+  extraction_type: string;
   status: string;
   depth: number;
-  geojson?: string;
+  geojson?: string | WellGeoPoint;
 }
 
 export interface ProductionMonthly {
   year: number,
   month: number,
   well_id: string;
-  reported_period_date: string; // "YYYY-MM-01"
+  data_date: string; // "YYYY-MM-01"
   oil_production: number;
   gas_production: number;
   water_production: number;
+  produccion_acumulada?: number;
   water_injection?: number;
   gas_injection?: number;
   co2_injection?: number;
-
-  // Backend currently returns the misspelled fields as inyection, keep both for safety.
-  water_inyection?: number;
-  gas_inyection?: number;
-  co2_inyection?: number;
 }
 
 export interface Company {
@@ -125,10 +127,6 @@ export interface WellProductionComparisonResponse {
 }
 
 export interface WellProductionComparisonFilters {
-  inicio_anio?: number;
-  inicio_mes?: number;
-  fin_anio?: number;
-  fin_mes?: number;
   median_by?: string[];
 }
 
@@ -159,6 +157,17 @@ export interface TopProductionFilters {
   fin_anio?: number;
   fin_mes?: number;
   limit?: number;
+}
+
+export interface MapMetricsResponse {
+  source: string;
+  resource: "oil" | "gas" | "water";
+  active_wells: number;
+  stopped_wells: number;
+  inactive_wells: number;
+  not_informed_wells: number;
+  total_production_last_month: number | null;
+  last_month: string | null;
 }
 
 export type {

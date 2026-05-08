@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { WellsTable } from "../../../components/table/WellsTable";
+import { WellsTable } from "@/components/wells/table/WellsTable";
 
 test("renderiza los headers de la tabla", () => {
   render(<WellsTable data={[]} />);
@@ -20,7 +20,8 @@ const mockData = [
     field: "Campo X",
     status: "Activo",
     resource_type: "Oil",
-    type: "Vertical",
+    well_type: "Vertical",
+    extraction_type: "Surgencia Natural",
     depth: 3000,
     formation: "Vaca Muerta",
     classification: "A",

@@ -1,5 +1,3 @@
-"use client";
-
 import React, {useMemo} from "react";
 import {colors, COMPANY_COLORS} from "@/utils/constants";
 import {Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis, Pie, PieChart, Cell} from "recharts";
@@ -80,16 +78,19 @@ interface ComparisonChartProps {
 function ComparisonChart({ title, data, companies, onDownload }: ComparisonChartProps) {
   return (
     <div style={styles.chartWrapper}>
+      <div style={styles.cardHeader}>
+        <span className="card-label">Comparación</span>
+      </div>
       <div style={styles.header}>
         <h3 style={styles.title}>{title}</h3>
         <button
           onClick={onDownload}
           style={styles.downloadButton}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = "#2F5A3F";
+            e.currentTarget.style.backgroundColor = "var(--color-brand-dark)";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = "#3F6B4F";
+            e.currentTarget.style.backgroundColor = "var(--color-brand-mid)";
           }}
         >
           📊 Excel
@@ -179,6 +180,9 @@ export function CompanyComparisonCharts({
 
     return (
       <div style={styles.chartWrapper}>
+        <div style={styles.cardHeader}>
+          <span className="card-label">Distribución</span>
+        </div>
         <h3 style={styles.title}>{title}</h3>
         <div style={{ height: 350 }}>
           <ResponsiveContainer width="100%" height="100%">
@@ -190,7 +194,7 @@ export function CompanyComparisonCharts({
                 labelLine={false}
                 label={(entry) => `${entry.value.toFixed(1)}%`}
                 outerRadius={110}
-                fill="#8884d8"
+                fill="var(--color-cat-9)"
                 dataKey="value"
               >
                 {data.map((entry, index) => (
@@ -251,7 +255,13 @@ const styles = {
     borderRadius: 14,
     border: `1px solid ${colors.panelBorder}`,
     padding: 24,
-    backgroundColor: "#fff",
+    backgroundColor: "var(--color-bg-surface)",
+    boxShadow: "var(--shadow-sm)",
+  } as React.CSSProperties,
+  cardHeader: {
+    paddingBottom: 12,
+    marginBottom: 4,
+    borderBottom: "1px solid var(--color-border-subtle)",
   } as React.CSSProperties,
   header: {
     display: "flex",
@@ -265,8 +275,8 @@ const styles = {
     margin: 0,
   } as React.CSSProperties,
   downloadButton: {
-    backgroundColor: "#3F6B4F",
-    color: "white",
+    backgroundColor: "var(--color-brand-mid)",
+    color: "var(--color-text-inverse)",
     border: "none",
     borderRadius: "8px",
     padding: "8px 12px",

@@ -1,7 +1,7 @@
-import { colors, LEGEND_ITEMS } from "@/utils/constants";
-import { ActiveWell, WellDetail } from "@/app/types";
-import { LegendItem } from "@/components/map/LegendItem";
-import { getWellColor } from "@/utils/helpers";
+import {colors, LEGEND_ITEMS} from "@/utils/constants";
+import {ActiveWell, WellDetail} from "@/app/types";
+import {LegendItem} from "@/components/wells/map/LegendItem";
+import {getWellColor} from "@/utils/helpers";
 
 import Map, {Marker, Popup, Source, Layer} from "react-map-gl/mapbox";
 import type { HeatmapLayer } from "mapbox-gl";
@@ -10,15 +10,26 @@ import React, {useState} from "react";
 
 interface WellsMapProps {
   wells: WellDetail[];
-  selectedWellId: string | null;
-  onSelectWell: (id: string) => void;
+  selectedWellId: number | null;
+  onSelectWell: (id: number) => void;
   mapMode: "markers" | "heatmap";
   heatmapData?: GeoJSON.FeatureCollection | null;
   heatmapMaxValue?: number;
+  overlayControlsTopRight?: React.ReactNode;
+  overlayControlsBottomCenter?: React.ReactNode;
 }
 
-export function WellsMap({ wells, selectedWellId, onSelectWell, mapMode, heatmapData, heatmapMaxValue = 1 }: WellsMapProps) {
-    const [focusedPozoId, setFocusedPozoId] = useState<string | null>(null);
+export function WellsMap({
+    wells,
+    selectedWellId,
+    onSelectWell,
+    mapMode,
+    heatmapData,
+    heatmapMaxValue = 1,
+    overlayControlsTopRight,
+    overlayControlsBottomCenter,
+}: WellsMapProps) {
+    const [focusedPozoId, setFocusedPozoId] = useState<number | null>(null);
     const [activePozo, setActivePozo] = useState<ActiveWell | null>(null);
     const safeHeatmapMaxValue = Number.isFinite(heatmapMaxValue) && heatmapMaxValue > 0 ? heatmapMaxValue : 1;
 
@@ -29,6 +40,8 @@ export function WellsMap({ wells, selectedWellId, onSelectWell, mapMode, heatmap
                     <LegendItem key={item.label} color={item.color} label={item.label} />
                 ))}
             </div>
+            {overlayControlsTopRight ? <div style={styles.overlayControlsTopRight}>{overlayControlsTopRight}</div> : null}
+            {overlayControlsBottomCenter ? <div style={styles.overlayControlsBottomCenter}>{overlayControlsBottomCenter}</div> : null}
             <Map
                 initialViewState={{
                     longitude: -68.059167,
@@ -61,11 +74,11 @@ export function WellsMap({ wells, selectedWellId, onSelectWell, mapMode, heatmap
                                     "heatmap-color": [
                                         "interpolate", ["linear"], ["heatmap-density"],
                                         0,   "rgba(0,0,0,0)",
-                                        0.2, "#2c7bb6",
-                                        0.4, "#abd9e9",
-                                        0.6, "#ffffbf",
-                                        0.8, "#fdae61",
-                                        1,   "#d7191c",
+                                        0.2, "#5ba3cc",
+                                        0.4, "#3a7fa8",
+                                        0.6, "#e8a030",
+                                        0.8, "#c47d0e",
+                                        1,   "#c0392b",
                                     ],
                                     "heatmap-radius": [
                                         "interpolate", ["linear"], ["zoom"],
@@ -85,33 +98,38 @@ export function WellsMap({ wells, selectedWellId, onSelectWell, mapMode, heatmap
 
                     let lon: number, lat: number;
                     try {
-                        const geo = JSON.parse(item.geojson);
+                        const geo = typeof item.geojson === "string" ? JSON.parse(item.geojson) : item.geojson;
+                        if (!geo?.coordinates || !Array.isArray(geo.coordinates) || geo.coordinates.length < 2) {
+                            return null;
+                        }
                         [lon, lat] = geo.coordinates;
                     } catch {
                         return null;
                     }
 
-                    const isSelected = selectedWellId === item.well_id;
+                    const wellId = item.well_id;
+
+                    const isSelected = selectedWellId === wellId;
 
                     return (
-                        <Marker key={item.well_id} longitude={lon} latitude={lat} anchor="center">
+                        <Marker key={wellId} longitude={lon} latitude={lat} anchor="center">
                             <div
                                 role="button"
                                 tabIndex={0}
-                                aria-label={`${item.status || "Well"} ${item.well_id}`}
-                                onMouseEnter={() => setActivePozo({id: item.well_id, lon, lat, company: item.company, resource_type: item.resource_type})}
+                                aria-label={`${item.status || "Well"} ${wellId}`}
+                                onMouseEnter={() => setActivePozo({id: wellId, lon, lat, company: item.company, resource_type: item.resource_type})}
                                 onMouseLeave={() => setActivePozo(null)}
-                                onClick={() => onSelectWell(item.well_id)}
-                                onFocus={() => setFocusedPozoId(item.well_id)}
+                                onClick={() => onSelectWell(wellId)}
+                                onFocus={() => setFocusedPozoId(wellId)}
                                 onBlur={() => setFocusedPozoId(null)}
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter" || e.key === " ") {
                                         e.preventDefault();
                                         e.stopPropagation();
-                                        onSelectWell(item.well_id);
+                                        onSelectWell(wellId);
                                     }
                                 }}
-                                style={styles.markerDot({selected: isSelected, status: item.status, focused: focusedPozoId === item.well_id})}/>
+                                style={styles.markerDot({selected: isSelected, status: item.status, focused: focusedPozoId === wellId})}/>
                         </Marker>
                     );
                 })}
@@ -126,9 +144,9 @@ export function WellsMap({ wells, selectedWellId, onSelectWell, mapMode, heatmap
                         <div style={styles.popupBox}>
                             <b>Pozo:</b> {activePozo.id}
                             <br />
-                            {activePozo.company}
+                            {activePozo.company || "Sin empresa"}
                             <br />
-                            <b>{activePozo.resource_type}</b>
+                            <b>{activePozo.resource_type || "Sin recurso"}</b>
                         </div>
                     </Popup>
                 )}
@@ -141,7 +159,7 @@ export function WellsMap({ wells, selectedWellId, onSelectWell, mapMode, heatmap
 const styles = {
     mapContainer: {
         minWidth: 0,
-        height: "60vh",
+        height: "100%",
         position: "relative",
     } as React.CSSProperties,
     legendBar: {
@@ -166,24 +184,37 @@ const styles = {
         height: "100%",
         borderRadius: 14,
     } as React.CSSProperties,
+    overlayControlsTopRight: {
+        position: "absolute",
+        top: 12,
+        right: 12,
+        zIndex: 10,
+    } as React.CSSProperties,
+    overlayControlsBottomCenter: {
+        position: "absolute",
+        left: "50%",
+        bottom: 14,
+        transform: "translateX(-50%)",
+        zIndex: 10,
+    } as React.CSSProperties,
     markerDot: (opts: { selected: boolean; status: string; focused: boolean }) => ({
         width: opts.selected ? 14 : 8,
         height: opts.selected ? 14 : 8,
-        backgroundColor: getWellColor(opts.status), 
+        backgroundColor: getWellColor(opts.status),
         borderRadius: "50%",
         border: "1px solid rgba(0,0,0,0.3)",
         cursor: "pointer",
         outline: "none",
-    
+
         transform: opts.selected ? "scale(1.4)" : "scale(1)",
         transition: "all 0.15s ease",
-    
+
         boxShadow: opts.selected
             ? "0 0 0 4px rgba(0, 123, 255, 0.25)" // halo
             : opts.focused
             ? `0 0 0 2px ${colors.accent}`
             : "none",
-    
+
         zIndex: opts.selected ? 10 : 1,
     }) as React.CSSProperties,
     popupBox: {

@@ -42,7 +42,7 @@ const styles = {
     padding: "8px 12px",
     borderRadius: 12,
     border: `1px solid ${colors.secondary}`,
-    backgroundColor: "#fff",
+    backgroundColor: "var(--color-bg-surface)",
     color: colors.text,
     fontSize: 14,
   } as React.CSSProperties,

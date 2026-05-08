@@ -4,7 +4,7 @@ import {ClipLoader} from "react-spinners";
 export function LoadingState() {
     return (
         <div style={styles.wrapper} role="status" aria-live="polite">
-            <ClipLoader size={22} color="#3F6B4F"/>
+            <ClipLoader size={22} color="var(--color-brand-mid)"/>
         </div>
     );
 }

@@ -1,19 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
+import "mapbox-gl/dist/mapbox-gl.css";
 import {AppToastProvider} from "@/components/common/AppToastProvider";
 import React from "react";
-
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import {DashboardShell} from "@/components/layout/DashboardShell";
 
 export const metadata: Metadata = {
   title: "Petrodash.io",
@@ -30,8 +20,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {children}
+      <body className="antialiased">
+        <DashboardShell>{children}</DashboardShell>
         <AppToastProvider/>
       </body>
     </html>

@@ -1,5 +1,3 @@
-"use client";
-
 import React, {useEffect, useMemo, useState} from "react";
 import {colors, WATERSHED_OPTIONS} from "@/utils/constants";
 import {useCompanies} from "@/hooks/useCompanies";
@@ -204,6 +202,9 @@ const styles = {
     flexDirection: "column",
     gap: 24,
     padding: 24,
+    width: "100%",
+    boxSizing: "border-box",
+    minWidth: 0,
     backgroundColor: colors.bg,
   } as React.CSSProperties,
   heading: {
@@ -224,19 +225,19 @@ const styles = {
     margin: "0 auto",
   } as React.CSSProperties,
   chartControls: {
-    backgroundColor: "white",
+    backgroundColor: "var(--color-bg-surface)",
     borderRadius: 12,
-    padding: "16px 24px",
+    padding: "24px",
     marginBottom: 16,
-    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-    border: "1px solid #e5e7eb",
+    boxShadow: "var(--shadow-sm)",
+    border: "1px solid var(--color-border-subtle)",
     display: "flex",
     alignItems: "center",
     gap: 16,
   } as React.CSSProperties,
   sliderLabel: {
     fontSize: 14,
-    color: "#374151",
+    color: "var(--color-text-secondary)",
     minWidth: 180,
   } as React.CSSProperties,
   slider: {
@@ -251,10 +252,11 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     gap: 16,
-    padding: 20,
+    padding: 24,
     backgroundColor: colors.filtersBg,
     borderRadius: 12,
     border: `1px solid ${colors.panelBorder}`,
+    boxShadow: "var(--shadow-sm)",
   } as React.CSSProperties,
   dateRangeContainer: {
     display: "grid",
@@ -265,7 +267,7 @@ const styles = {
     padding: "8px 12px",
     borderRadius: 8,
     border: `1px solid ${colors.secondary}`,
-    backgroundColor: "#fff",
+    backgroundColor: "var(--color-bg-surface)",
     fontSize: 14,
     color: colors.text,
   } as React.CSSProperties,
@@ -277,7 +279,7 @@ const styles = {
   placeholder: {
     padding: 40,
     textAlign: "center",
-    backgroundColor: "#fff",
+    backgroundColor: "var(--color-bg-surface)",
     borderRadius: 12,
     border: `1px solid ${colors.panelBorder}`,
     color: colors.text,
@@ -285,15 +287,15 @@ const styles = {
   loading: {
     padding: 40,
     textAlign: "center",
-    backgroundColor: "#fff",
+    backgroundColor: "var(--color-bg-surface)",
     borderRadius: 12,
     border: `1px solid ${colors.panelBorder}`,
     color: colors.text,
   } as React.CSSProperties,
   error: {
     padding: 16,
-    backgroundColor: "#FEE2E2",
-    color: "#B91C1C",
+    backgroundColor: "rgba(192, 57, 43, 0.08)",
+    color: "var(--color-error)",
     borderRadius: 8,
     fontSize: 14,
   } as React.CSSProperties,
@@ -307,8 +309,8 @@ const styles = {
 export function CompanyIcon({width = 18, height = 18}: {width?: number; height?: number}) {
   return (
     <svg width={width} height={height} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M4 22V7h16v15" stroke="#2F3E34" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M9 22V12h6v10" stroke="#2F3E34" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M4 22V7h16v15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M9 22V12h6v10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
