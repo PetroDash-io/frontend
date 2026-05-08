@@ -40,7 +40,7 @@ jest.mock("@/components/wells/map/WellsMap", () => ({
   ),
 }));
 
-jest.mock("@/components/wells/common/WellInfo", () => ({
+jest.mock("@/components/wells/map/WellInfo", () => ({
   WellInfo: ({metricsItems}: {metricsItems?: Array<{label: string}>}) => (
     <div>
       WellInfo

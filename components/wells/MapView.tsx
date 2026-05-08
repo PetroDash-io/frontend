@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo} from "react";
-import {WellInfo} from "@/components/wells/common/WellInfo";
+import {WellInfo} from "@/components/wells/map/WellInfo";
 import {WellsMap} from "@/components/wells/map/WellsMap";
 import {useWells} from "@/hooks/useWells";
 import {useWell} from "@/hooks/useWell";
