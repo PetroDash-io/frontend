@@ -61,11 +61,14 @@ export function WellInfo({
                 />
             )}
 
-            {!wellInfo && <p style={styles.sidePanelHint}>Seleccioná un pozo en el mapa</p>}
             {loadingWell && <p>Cargando información...</p>}
 
             {wellInfo && !loadingWell && (
                 <>
+                    <Link href={`/analisis-pozo?wellId=${wellInfo.well_id}`} style={styles.analyzeButton}>
+                        Analizar pozo
+                    </Link>
+
                     <section style={styles.section}>
                         <span className="card-label">Ubicación</span>
                         <dl style={styles.detailGrid}>
@@ -101,10 +104,6 @@ export function WellInfo({
                             ))}
                         </dl>
                     </section>
-
-                    <Link href={`/analisis-pozo?wellId=${wellInfo.well_id}`} style={styles.analyzeButton}>
-                        Analizar pozo
-                    </Link>
                 </>
             )}
         </div>
@@ -114,7 +113,9 @@ export function WellInfo({
 
 const styles = {
     infoContainer: {
-        height: "100%",
+        height: "auto",
+        maxHeight: "100%",
+        minHeight: 0,
         borderRadius: 14,
         border: "1px solid var(--color-border-subtle)",
         padding: 24,
@@ -130,9 +131,6 @@ const styles = {
         paddingBottom: 12,
         marginBottom: 16,
         borderBottom: "1px solid var(--color-border-subtle)",
-    } as React.CSSProperties,
-    sidePanelHint: {
-        opacity: 0.8,
     } as React.CSSProperties,
     sidePanelTitle: {
         margin: 0,
@@ -169,6 +167,7 @@ const styles = {
         alignItems: "center",
         justifyContent: "center",
         width: "100%",
+        marginBottom: 14,
         border: "1px solid var(--color-brand-primary)",
         borderRadius: 8,
         padding: "10px 12px",
