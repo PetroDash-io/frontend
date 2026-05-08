@@ -1,7 +1,7 @@
 import React from "react";
 import {colors} from "@/utils/constants";
 import {WellDetail} from "@/app/types";
-import {MetricsSummary, MetricsSummaryItem} from "@/components/map/MetricsSummary";
+import {MetricsSummary, MetricsSummaryItem} from "@/components/wells/map/MetricsSummary";
 
 interface WellInfoProps {
     wellInfo: WellDetail | null;
