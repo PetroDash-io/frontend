@@ -1,13 +1,33 @@
 import type { WellDetail } from "@/app/types";
 import { colors } from "@/utils/constants";
 import React from "react";
+import { exportMultipleSheetsToExcel } from "@/utils/excel";
+import type { WellFilters } from "@/app/types/wellFilters";
 
 
 interface WellsTableProps {
   data: WellDetail[];
+  filters: WellFilters;
+  currentPage: number;
+  totalItems: number;
+  pageSize: number;
 }
 
-export function WellsTable({data}: WellsTableProps) {
+const normalizeValue = (value?: string | null) =>
+  value
+    ?.normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLowerCase();
+
+const toSlug = (value?: string | null) => {
+  const normalized = normalizeValue(value) || "";
+  return normalized
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+};
+
+export function WellsTable({data, filters, currentPage, totalItems, pageSize}: WellsTableProps) {
     const onMouseEnter = (event: React.MouseEvent<HTMLTableRowElement>) => {
         event.currentTarget.style.background = "var(--color-bg-sunken)";
     };
@@ -16,10 +36,67 @@ export function WellsTable({data}: WellsTableProps) {
         event.currentTarget.style.background = "transparent";
     };
 
+    const handleDownloadExcel = () => {
+        if (!data.length) return;
+
+        const dataToExport = data.map((pozo) => ({
+            "ID Pozo": pozo.well_id,
+            Empresa: pozo.company || "",
+            Provincia: pozo.province || "",
+            Cuenca: pozo.watershed || "",
+            Area: pozo.area || "",
+            Yacimiento: pozo.field || "",
+            Estado: pozo.status || "",
+            "Tipo de Recurso": pozo.resource_type || "",
+            "Tipo de pozo": pozo.well_type || "",
+            Profundidad: pozo.depth ?? "",
+            Formacion: pozo.formation || "",
+            Clasificacion: pozo.classification || "",
+        }));
+
+        const filterSheet = [
+            { Filtro: "Cuenca", Valor: filters.watershed || "Todas" },
+            { Filtro: "Provincia", Valor: filters.province || "Todas" },
+            { Filtro: "Estado", Valor: filters.status || "Todos" },
+            { Filtro: "Empresa", Valor: filters.company || "Todas" },
+            { Filtro: "Limite", Valor: String(pageSize) },
+            { Filtro: "Pagina", Valor: String(currentPage + 1) },
+            { Filtro: "Total", Valor: String(totalItems) },
+        ];
+
+        const today = new Date().toISOString().split("T")[0];
+        const watershedSlug = toSlug(filters.watershed) || "todas";
+        const provinceSlug = toSlug(filters.province);
+        const statusSlug = toSlug(filters.status);
+        const companySlug = toSlug(filters.company);
+
+        let fileName = `pozos-${watershedSlug}`;
+        if (provinceSlug) fileName += `-prov-${provinceSlug}`;
+        if (statusSlug) fileName += `-estado-${statusSlug}`;
+        if (companySlug) fileName += `-empresa-${companySlug}`;
+        fileName += `-pagina-${currentPage + 1}-${today}`;
+
+        exportMultipleSheetsToExcel(
+            [
+                { data: dataToExport, sheetName: "Pozos" },
+                { data: filterSheet, sheetName: "Filtros" },
+            ],
+            fileName
+        );
+    };
+
     return (
       <div style={styles.tableContainer}>
         <div style={styles.cardHeader}>
           <span className="card-label">Listado de pozos</span>
+          <button
+            type="button"
+            onClick={handleDownloadExcel}
+            style={styles.downloadButton}
+            disabled={!data.length}
+          >
+            📊 Descargar Excel
+          </button>
         </div>
         <table style={styles.table}>
           <thead>
@@ -77,9 +154,12 @@ const styles = {
         boxShadow: "var(--shadow-sm)",
     } as React.CSSProperties,
     cardHeader: {
-        paddingBottom: 12,
-        marginBottom: 8,
-        borderBottom: "1px solid var(--color-border-subtle)",
+      paddingBottom: 12,
+      marginBottom: 8,
+      borderBottom: "1px solid var(--color-border-subtle)",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
     } as React.CSSProperties,
     table: {
         width: "100%",
@@ -96,5 +176,15 @@ const styles = {
     row: {
         cursor: "pointer",
         borderBottom: "1px solid var(--color-border-subtle)",
+    } as React.CSSProperties,
+    downloadButton: {
+      backgroundColor: "var(--color-brand-mid)",
+      color: "var(--color-text-inverse)",
+      border: "none",
+      borderRadius: 8,
+      padding: "8px 14px",
+      fontSize: 13,
+      fontWeight: 600,
+      cursor: "pointer",
     } as React.CSSProperties,
 };
