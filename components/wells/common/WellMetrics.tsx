@@ -28,8 +28,7 @@ export function WellMetrics({items, loading = false, error, filters, filteredCou
     `Cuenca ${readableFilterValue(filters.watershed, "Todas")}`,
     `Provincia ${readableFilterValue(filters.province, "Todas")}`,
     `Estado ${readableFilterValue(filters.status, "Todos")}`,
-    `Empresa ${readableFilterValue(filters.company, "Todas")}`,
-    `Límite ${filters.limit}`,
+    `Empresa ${readableFilterValue(filters.company, "Todas")}`
   ].join(" · ");
 
   return (

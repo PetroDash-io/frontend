@@ -26,6 +26,7 @@ export interface WellDetail {
   status: string;
   depth: number;
   geojson?: string | WellGeoPoint;
+  first_production_activity_date?: string | null;
 }
 
 export interface ProductionMonthly {

@@ -21,7 +21,7 @@ export function DateRangeFilters({
         value={value.startYear}
         onSelect={onChange}
         filterName="startYear"
-        inputLabel="Ano inicio"
+        inputLabel="Año inicio"
         options={YEARS}
         hasError={isStartRangeIncomplete}
       />
@@ -41,7 +41,7 @@ export function DateRangeFilters({
         value={value.endYear}
         onSelect={onChange}
         filterName="endYear"
-        inputLabel="Ano fin"
+        inputLabel="Año fin"
         options={YEARS}
         hasError={isEndRangeIncomplete}
       />

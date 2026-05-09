@@ -37,6 +37,16 @@ export function WellInfo({
         ["Profundidad", `${wellInfo.depth} m`],
     ] : [];
 
+    const formatYearMonth = (value: string | null | undefined): string | null => {
+        if (!value) return null;
+        const [year, month] = value.split("-");
+        if (!year || !month) return null;
+        return `${month.padStart(2, "0")}/${year}`;
+    };
+
+    const firstRecordLabel = formatYearMonth(wellInfo?.first_production_activity_date);
+    const coverageText = firstRecordLabel || "No hay producción registrada";
+
     return (
         <div style={styles.infoContainer}>
             <div style={styles.cardHeader}>
@@ -60,7 +70,7 @@ export function WellInfo({
                 <>
                     <div style={styles.actionsRow}>
                         <Link href={`/analisis-pozo?wellId=${wellInfo.well_id}`} style={styles.analyzeButton}>
-                            Ver análisis
+                            Analizar producción
                         </Link>
                         {onDeselectWell ? (
                             <button type="button" onClick={onDeselectWell} style={styles.clearSelectionButtonRow}>
@@ -68,6 +78,11 @@ export function WellInfo({
                             </button>
                         ) : null}
                     </div>
+
+                    <section style={styles.coverageSection}>
+                        <span className="card-label">Primer registro de producción</span>
+                        <p style={styles.coverageText}>{coverageText}</p>
+                    </section>
 
                     <section style={styles.section}>
                         <span className="card-label">Ubicación</span>
@@ -205,5 +220,20 @@ const styles = {
         padding: "10px 12px",
         whiteSpace: "nowrap",
         minWidth: 126,
+    } as React.CSSProperties,
+    coverageSection: {
+        display: "flex",
+        flexDirection: "column",
+        gap: 8,
+        marginBottom: 14,
+        padding: 12,
+        borderRadius: 8,
+        backgroundColor: "#fff9ec",
+        border: "1px solid #ebdfc6",
+    } as React.CSSProperties,
+    coverageText: {
+        margin: 0,
+        color: "var(--color-text-primary)",
+        fontSize: 13,
     } as React.CSSProperties,
 } as const;

@@ -38,6 +38,7 @@ describe("WellInfo", () => {
           extraction_type: "Bombeo Mecanico",
           status: "Extracción Efectiva",
           depth: 2272,
+          first_production_activity_date: "2021-03-01",
         }}
       />
     );
@@ -45,9 +46,36 @@ describe("WellInfo", () => {
     expect(screen.getByText("Pozo 39228")).toBeInTheDocument();
     fireEvent.click(screen.getByText("Deseleccionar"));
     expect(onDeselectWell).toHaveBeenCalled();
-    expect(screen.getByText("Ver análisis")).toBeInTheDocument();
+    expect(screen.getByText("Analizar producción")).toBeInTheDocument();
     expect(screen.getByText("Ubicación")).toBeInTheDocument();
     expect(screen.getByText("Operación")).toBeInTheDocument();
+    expect(screen.getByText("03/2021")).toBeInTheDocument();
     expect(screen.getAllByText("No informado").length).toBeGreaterThan(0);
+  });
+
+  it("muestra fallback de cobertura cuando no hay historial", () => {
+    render(
+      <WellInfo
+        loadingWell={false}
+        wellInfo={{
+          well_id: 39228,
+          watershed: "cuyana",
+          province: "Mendoza",
+          area: "ATAMISQUI",
+          company: "Petroleos Sudamericanos S.A.",
+          field: "ATAMISQUI",
+          formation: "rio blanco",
+          classification: "No informado",
+          resource_type: null,
+          well_type: "Petrolifero",
+          extraction_type: "Bombeo Mecanico",
+          status: "Extracción Efectiva",
+          depth: 2272,
+          first_production_activity_date: null,
+        }}
+      />
+    );
+
+    expect(screen.getByText("No hay producción registrada")).toBeInTheDocument();
   });
 });
