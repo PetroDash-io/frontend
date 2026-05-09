@@ -90,14 +90,14 @@ describe("WellProductionComparisonView", () => {
     expect(input).toHaveValue(123);
   });
 
-  test("muestra error con ID inválido", () => {
+  test("deshabilita acción con ID inválido", () => {
     render(<WellAnalysisView />);
 
     const input = screen.getByPlaceholderText(/Ingrese ID/i);
     fireEvent.change(input, {target: {value: "-5"}});
-    fireEvent.click(screen.getByText("Ver producción"));
+    const button = screen.getByRole("button", {name: "Ver producción"});
 
-    expect(screen.getByText("Ingresá un ID de pozo válido.")).toBeInTheDocument();
+    expect(button).toBeDisabled();
   });
 
   test("muestra flujo de secciones al buscar con ID válido", () => {

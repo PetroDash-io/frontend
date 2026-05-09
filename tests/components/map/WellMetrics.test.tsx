@@ -27,7 +27,7 @@ describe("WellMetrics", () => {
     );
 
     expect(screen.getByText("Resumen de pozos filtrados")).toBeInTheDocument();
-    expect(screen.getByText("Cuenca Noroeste · Provincia Todas · Estado Todos · Empresa Todas · Límite 100")).toBeInTheDocument();
+    expect(screen.getByText("Cuenca Noroeste · Provincia Todas · Estado Todos · Empresa Todas")).toBeInTheDocument();
     expect(screen.getByText("100 pozos en mapa")).toBeInTheDocument();
     expect(screen.getByText("Pozos activos")).toBeInTheDocument();
     expect(screen.getByText("1.2K")).toBeInTheDocument();
