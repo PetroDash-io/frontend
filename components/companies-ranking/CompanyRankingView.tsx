@@ -6,6 +6,7 @@ import { colors, PIE_CHART_COLORS, AREAS_POR_PROVINCIA, WATERSHED_OPTIONS } from
 import { SelectFilter } from "@/components/common/SelectFilter";
 import {YearMonthRangeFilters} from "@/components/common/YearMonthRangeFilters";
 import { exportMultipleSheetsToExcel } from "@/utils/excel";
+import { toSlug } from "@/utils/helpers";
 
 interface PieChartData {
   name: string;
@@ -31,20 +32,6 @@ const PRODUCTION_TYPE_LABEL: Record<"oil" | "gas" | "water", string> = {
   oil: "Petróleo",
   gas: "Gas",
   water: "Agua",
-};
-
-const normalizeValue = (value?: string) =>
-  value
-    ?.normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim()
-    .toLowerCase();
-
-const toSlug = (value?: string) => {
-  const normalized = normalizeValue(value) || "";
-  return normalized
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
 };
 
 const formatYearMonth = (year?: number, month?: number) => {
