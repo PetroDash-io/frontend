@@ -17,15 +17,14 @@ interface WellProductionSectionProps {
   loading: boolean;
   error: string | null;
   data: CurveSeriesPoint[];
-  eur?: number | null;
 }
 
-export function WellProductionSection({loading, error, data, eur}: WellProductionSectionProps) {
+export function WellProductionSection({loading, error, data}: WellProductionSectionProps) {
   return (
     <>
       {loading && <LoadingState />}
       {error && <InlineMessage message={error} variant="error" />}
-      {!loading && !error && <ProductionTimeSeries data={data} eur={eur} />}
+      {!loading && !error && <ProductionTimeSeries data={data} />}
     </>
   );
 }

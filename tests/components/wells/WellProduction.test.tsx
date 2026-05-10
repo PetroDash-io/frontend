@@ -23,6 +23,10 @@ jest.mock("@/components/well-analysis/production/WellProductionSection", () => (
   WellProductionSection: () => <div>WellProductionSection</div>,
 }));
 
+jest.mock("@/components/well-analysis/production/AccumulatedProductionSection", () => ({
+  AccumulatedProductionSection: () => <div>AccumulatedProductionSection</div>,
+}));
+
 jest.mock("@/components/well-analysis/anomalies/WellAnomaliesSection", () => ({
   WellAnomaliesSection: () => <div>WellAnomaliesSection</div>,
 }));
@@ -49,7 +53,6 @@ describe("WellProductionComparisonView", () => {
 
     (useWellsProduction as jest.Mock).mockReturnValue({
       data: [],
-      eur: null,
       loading: false,
       error: null,
     });
@@ -108,6 +111,8 @@ describe("WellProductionComparisonView", () => {
     fireEvent.click(screen.getByText("Ver producción"));
 
     expect(screen.getByText("WellProductionSection")).toBeInTheDocument();
+    expect(screen.getByText("Producción acumulada")).toBeInTheDocument();
+    expect(screen.getByText("AccumulatedProductionSection")).toBeInTheDocument();
     expect(screen.getByText("Anomalías")).toBeInTheDocument();
     expect(screen.getByText("Curva de inyección")).toBeInTheDocument();
     expect(screen.getByText("Comparación")).toBeInTheDocument();
