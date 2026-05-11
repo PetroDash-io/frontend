@@ -102,7 +102,7 @@ function tabButtonStyle(active: boolean): React.CSSProperties {
     };
 }
 
-function tabDrawerStyle(active: boolean): React.CSSProperties {
+export function tabDrawerStyle(active: boolean): React.CSSProperties {
     return {
         width: "100%",
         textAlign: "left",

@@ -4,6 +4,7 @@ import React, {useState} from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {usePathname} from "next/navigation";
+import {tabDrawerStyle} from "@/components/common/Tabs";
 import {WellIcon} from "@/components/wells/WellsView";
 import {CompanyIcon} from "@/components/company/CompanyView";
 import {AnalysisIcon} from "@/components/well-analysis/WellAnalysisView";
@@ -45,6 +46,7 @@ export function DashboardShell({children}: {children: React.ReactNode}) {
   const pathname = usePathname();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const closeDrawer = () => setIsDrawerOpen(false);
+  const toggleDrawer = () => setIsDrawerOpen((v) => !v);
 
   return (
     <div className={styles.pageShell}>
@@ -61,9 +63,10 @@ export function DashboardShell({children}: {children: React.ReactNode}) {
         <button
           type="button"
           className={styles.menuButton}
-          onClick={() => setIsDrawerOpen((v) => !v)}
+          onClick={toggleDrawer}
           aria-label={isDrawerOpen ? "Cerrar menú" : "Abrir menú"}
           aria-controls="dashboard-navigation"
+          aria-expanded={isDrawerOpen}
         >
           {isDrawerOpen ? "✕" : "☰"}
         </button>
@@ -84,8 +87,10 @@ export function DashboardShell({children}: {children: React.ReactNode}) {
             <button
               type="button"
               className={styles.drawerToggle}
-              onClick={() => setIsDrawerOpen((v) => !v)}
+              onClick={toggleDrawer}
               aria-label={isDrawerOpen ? "Cerrar menú" : "Abrir menú"}
+              aria-controls="dashboard-navigation"
+              aria-expanded={isDrawerOpen}
             >
               <DrawerChevronIcon open={isDrawerOpen} />
             </button>
@@ -99,8 +104,8 @@ export function DashboardShell({children}: {children: React.ReactNode}) {
                   key={href}
                   href={href}
                   onClick={closeDrawer}
-                  className="tab-btn"
-                  style={tabDrawerStyle(isActive)}
+                  className={styles["tab-btn"]}
+                  style={{...tabDrawerStyle(isActive), textDecoration: "none"}}
                 >
                   <span className={styles.icon} aria-hidden title={label}><Icon /></span>
                   {isDrawerOpen && <span>{label}</span>}
@@ -133,24 +138,4 @@ export function DashboardShell({children}: {children: React.ReactNode}) {
       </nav>
     </div>
   );
-}
-
-function tabDrawerStyle(active: boolean): React.CSSProperties {
-  return {
-    width: "100%",
-    textAlign: "left",
-    padding: "9px 12px",
-    borderRadius: 8,
-    border: `1px solid ${active ? "var(--color-border-medium)" : "transparent"}`,
-    backgroundColor: active ? "var(--color-bg-sunken)" : "transparent",
-    color: active ? "var(--color-text-primary)" : "var(--color-text-secondary)",
-    fontSize: 14,
-    fontWeight: active ? 600 : 500,
-    cursor: "pointer",
-    transition: "background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease",
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-    textDecoration: "none",
-  };
 }
