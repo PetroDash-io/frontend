@@ -128,7 +128,7 @@ export function WellInfo({
 
 const styles = {
     infoContainer: {
-        height: "auto",
+        height: "100%",
         maxHeight: "100%",
         minHeight: 0,
         borderRadius: "var(--radius-2xl)",

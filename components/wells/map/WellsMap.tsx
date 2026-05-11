@@ -163,7 +163,7 @@ export function WellsMap({
 const styles = {
     mapContainer: {
         minWidth: 0,
-        height: "clamp(420px, 60vh, 700px)",
+        height: "100%",
         position: "relative",
     } as React.CSSProperties,
     legendBar: {
