@@ -16,6 +16,9 @@ export function useMapHeatmap({mode, resource, filters}: UseMapHeatmapParams) {
   const {geojsonData, maxValue} = useWellsHeatmap({
     resource,
     watershed: filters.watershed,
+    company: filters.company,
+    province: filters.province,
+    status: filters.status,
     limit: filters.limit
   });
 
