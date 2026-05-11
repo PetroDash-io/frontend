@@ -270,6 +270,7 @@ const styles = {
     border: "1px solid var(--color-border-subtle)",
     display: "flex",
     alignItems: "center",
+    flexWrap: "wrap",
     gap: 16,
   } as React.CSSProperties,
   sliderLabel: {
@@ -310,7 +311,7 @@ const styles = {
   } as React.CSSProperties,
   chartsContainer: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))",
+    gridTemplateColumns: "repeat(auto-fit, minmax(min(400px, 100%), 1fr))",
     gap: 24,
   } as React.CSSProperties,
   placeholder: {

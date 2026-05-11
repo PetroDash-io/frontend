@@ -367,7 +367,8 @@ const styles = {
   dateRangeInlineContainer: {
     display: "flex",
     flex: 1,
-    minWidth: "320px",
+    minWidth: 0,
+    flexWrap: "wrap",
     gap: "8px",
     alignItems: "flex-end",
   } as React.CSSProperties,

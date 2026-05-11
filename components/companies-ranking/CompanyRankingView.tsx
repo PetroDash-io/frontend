@@ -321,7 +321,7 @@ export function CompanyRankingView() {
             </button>
           </div>
 
-          <div style={styles.chartAndRankingContainer}>
+          <div className="ranking-chart-grid" style={styles.chartAndRankingContainer}>
             <div style={styles.chartWrapper}>
               <ResponsiveContainer width="100%" height={450}>
                 <PieChart>
@@ -454,6 +454,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   headerStats: {
     display: "flex",
+    flexWrap: "wrap",
     gap: 24,
   },
   headerStat: {
@@ -474,7 +475,6 @@ const styles: Record<string, React.CSSProperties> = {
   },
   chartAndRankingContainer: {
     display: "grid",
-    gridTemplateColumns: "1fr minmax(300px, 400px)",
     gap: 32,
     alignItems: "start",
   },

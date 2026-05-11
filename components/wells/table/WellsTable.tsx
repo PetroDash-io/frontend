@@ -66,6 +66,7 @@ export function WellsTable({
             📊 Descargar Excel
           </button>
         </div>
+        <div style={styles.tableScrollWrapper}>
         <table style={styles.table}>
           <thead>
             <tr>
@@ -103,11 +104,15 @@ export function WellsTable({
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     );
   }
 
 const styles = {
+    tableScrollWrapper: {
+        overflowX: "auto",
+    } as React.CSSProperties,
     cell: {
         padding: "8px",
         whiteSpace: "nowrap",
@@ -118,7 +123,6 @@ const styles = {
         borderRadius: "var(--radius-xl)",
         padding: 24,
         border: `1px solid ${colors.panelBorder}`,
-        overflowX: "auto",
         boxShadow: "var(--shadow-sm)",
     } as React.CSSProperties,
     cardHeader: {

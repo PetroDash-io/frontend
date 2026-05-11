@@ -35,7 +35,7 @@ export function WellsMap({
 
     return (
         <div style={styles.mapContainer}>
-            <div style={styles.legendBar}>
+            <div className="map-legend-bar" style={styles.legendBar}>
                 {LEGEND_ITEMS.map((item) => (
                     <LegendItem key={item.label} color={item.color} label={item.label} />
                 ))}
@@ -170,17 +170,13 @@ const styles = {
         position: "absolute",
         top: 12,
         left: 12,
-        maxWidth: "calc(65% - 24px)",
         zIndex: 10,
         display: "flex",
         flexDirection: "row",
         flexWrap: "wrap",
-        gap: "10px 14px",
         justifyContent: "flex-start",
-        padding: "8px 12px",
         borderRadius: 10,
         backgroundColor: "rgba(243,238,230,0.95)",
-        fontSize: 13,
         color: colors.text,
         boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
     } as React.CSSProperties,

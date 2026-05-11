@@ -214,3 +214,43 @@ main {
     transform: rotate(360deg);
   }
 }
+
+/* --- Responsive layout utilities --- */
+
+.map-details-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+  height: clamp(520px, 72vh, 800px);
+}
+
+@media (max-width: 768px) {
+  .map-details-grid {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+}
+
+.map-legend-bar {
+  max-width: calc(65% - 24px);
+  font-size: 13px;
+  padding: 8px 12px;
+  gap: 10px 14px;
+}
+
+@media (max-width: 640px) {
+  .map-legend-bar {
+    max-width: calc(55% - 16px);
+    font-size: 11px;
+    padding: 6px 8px;
+    gap: 6px 10px;
+  }
+}
+
+.ranking-chart-grid {
+  grid-template-columns: 1fr minmax(300px, 400px);
+}
+
+@media (max-width: 900px) {
+  .ranking-chart-grid {
+    grid-template-columns: 1fr;
+  }
+}

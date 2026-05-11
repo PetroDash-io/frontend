@@ -108,7 +108,7 @@ export function MapView({
           filters={filters}
           filteredCount={wells.length}
         />
-        <div style={styles.wellDetailsContainer}>
+        <div className="map-details-grid" style={styles.wellDetailsContainer}>
           <WellsMap
             wells={wells}
             selectedWellId={selectedWellId}
@@ -214,12 +214,10 @@ const styles = {
   } as React.CSSProperties,
   wellDetailsContainer: {
     display: "grid",
-    gridTemplateColumns: "minmax(0, 1fr) minmax(320px, 420px)",
     alignItems: "stretch",
     gap: 16,
     minWidth: 0,
     minHeight: 0,
-    height: "clamp(520px, 72vh, 800px)",
   } as React.CSSProperties,
   mapTopRightStack: {
     display: "flex",
