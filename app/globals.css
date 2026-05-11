@@ -221,10 +221,9 @@ main {
   grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .map-details-grid {
     grid-template-columns: 1fr;
-    height: auto;
   }
 }
 

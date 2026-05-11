@@ -160,29 +160,17 @@ export function WellAnalysisView() {
           <span className="card-label">Filtros</span>
         </div>
 
-        <div style={styles.filterToolbarRow}>
-          <div style={styles.wellIdFieldContainer}>
-            <label style={styles.label}>
-              ID del Pozo
-              <input
-                type="number"
-                value={wellIdInput}
-                onChange={handleWellIdChange}
-                placeholder="Ingrese ID"
-                style={styles.input}
-              />
-            </label>
-          </div>
-
-          <div style={styles.dateRangeInlineContainer}>
-            <DateRangeFilters
-              value={dateRange}
-              onChange={updateDateRange}
-              isStartRangeIncomplete={false}
-              isEndRangeIncomplete={false}
+        <div style={styles.filterMainRow}>
+          <label style={styles.label}>
+            ID del Pozo
+            <input
+              type="number"
+              value={wellIdInput}
+              onChange={handleWellIdChange}
+              placeholder="Ingrese ID"
+              style={styles.input}
             />
-          </div>
-
+          </label>
           <button
             type="button"
             style={{
@@ -194,6 +182,15 @@ export function WellAnalysisView() {
           >
             Ver producción
           </button>
+        </div>
+
+        <div style={styles.filterDateRow}>
+          <DateRangeFilters
+            value={dateRange}
+            onChange={updateDateRange}
+            isStartRangeIncomplete={false}
+            isEndRangeIncomplete={false}
+          />
         </div>
 
         {wellIdInputError && <InlineMessage message={wellIdInputError} variant="warning" />}
@@ -311,11 +308,17 @@ const styles = {
     marginBottom: "10px",
     borderBottom: "1px solid var(--color-border-subtle)",
   } as React.CSSProperties,
-  filterToolbarRow: {
+  filterMainRow: {
     display: "flex",
+    flexWrap: "wrap",
     gap: "10px",
     alignItems: "flex-end",
-    flexWrap: "wrap",
+  } as React.CSSProperties,
+  filterDateRow: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+    gap: "10px",
+    marginTop: "12px",
   } as React.CSSProperties,
   cardHeader: {
     paddingBottom: "12px",
@@ -328,9 +331,6 @@ const styles = {
     marginBottom: "12px",
     alignItems: "flex-end",
     flexWrap: "wrap",
-  } as React.CSSProperties,
-  wellIdFieldContainer: {
-    minWidth: "180px",
   } as React.CSSProperties,
   label: {
     display: "flex",
@@ -363,14 +363,6 @@ const styles = {
   searchButtonDisabled: {
     opacity: 0.55,
     cursor: "not-allowed",
-  } as React.CSSProperties,
-  dateRangeInlineContainer: {
-    display: "flex",
-    flex: 1,
-    minWidth: 0,
-    flexWrap: "wrap",
-    gap: "8px",
-    alignItems: "flex-end",
   } as React.CSSProperties,
   productionPanelWithSurface: {
     minHeight: "420px",
