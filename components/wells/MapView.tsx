@@ -1,5 +1,6 @@
 import React, {useEffect, useMemo} from "react";
 import {WellInfo} from "@/components/wells/common/WellInfo";
+import {WellMetrics} from "@/components/wells/common/WellMetrics";
 import {WellsMap} from "@/components/wells/map/WellsMap";
 import {useWells} from "@/hooks/useWells";
 import {useWell} from "@/hooks/useWell";
@@ -20,7 +21,7 @@ export type MapViewProps = {
   mode: MapViewMode;
   onChangeMode: (mode: MapViewMode) => void;
   selectedWellId: number | null;
-  onSelectWell: (wellId: number) => void;
+  onSelectWell: (wellId: number | null) => void;
   heatmapResource: HeatmapResource;
   onSelectHeatmapResource: (resource: HeatmapResource) => void;
 };
@@ -41,6 +42,7 @@ export function MapView({
     loading: loadingWell,
     error: errorGettingWellDetails,
   } = useWell({wellId: selectedWellId});
+  const displayedWellInfo = selectedWellId ? selectedWellDetails : null;
 
   const errorMessage = errorGettingWells || errorGettingWellDetails || null;
 
@@ -73,94 +75,110 @@ export function MapView({
         value: formatCompactNumber(mapMetrics.active_wells),
       },
       {
-        label: `Producción total del último mes (${productionLabel})`,
-        value: formatCompactNumber(mapMetrics.total_production_last_month),
-        subLabel: mapMetrics.last_month ? `Mes registrado: ${lastMonthLabel}` : "Sin datos",
+        label: "Pozos inactivos",
+        value: formatCompactNumber(mapMetrics.inactive_wells),
       },
       {
         label: "Pozos parados",
         value: formatCompactNumber(mapMetrics.stopped_wells),
       },
       {
-        label: "Pozos inactivos",
-        value: formatCompactNumber(mapMetrics.inactive_wells),
-      },
-      {
         label: "No informados",
         value: formatCompactNumber(mapMetrics.not_informed_wells),
+      },
+      {
+        label: `Producción total del último mes (${productionLabel})`,
+        value: formatCompactNumber(mapMetrics.total_production_last_month),
+        subLabel: mapMetrics.last_month ? `Mes registrado: ${lastMonthLabel}` : "Sin datos",
       },
     ];
   }, [mapMetrics]);
 
   return (
     <>
-      <div style={styles.wellDetailsContainer}>
-        <WellsMap
-          wells={wells || []}
-          selectedWellId={selectedWellId}
-          onSelectWell={onSelectWell}
-          mapMode={mapMode}
-          heatmapData={heatmapData}
-          heatmapMaxValue={heatmapMaxValue}
-          overlayControlsTopRight={
-            isHeatmapMode ? (
-              <div style={styles.heatmapControls}>
-                <span style={styles.heatmapControlsLabel}>Recurso</span>
-                <div style={styles.heatmapResourceButtons}>
-                  <button
-                    type="button"
-                    onClick={() => onSelectHeatmapResource("oil")}
-                    style={styles.heatmapResourceButton(heatmapResource === "oil")}
-                  >
-                    Petróleo
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onSelectHeatmapResource("gas")}
-                    style={styles.heatmapResourceButton(heatmapResource === "gas")}
-                  >
-                    Gas
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onSelectHeatmapResource("water")}
-                    style={styles.heatmapResourceButton(heatmapResource === "water")}
-                  >
-                    Agua
-                  </button>
-                </div>
+      <div style={styles.viewLayout}>
+        <WellMetrics
+          items={metricsItems}
+          loading={loadingMetrics}
+          error={errorGettingMetrics}
+          filters={filters}
+          filteredCount={(wells || []).length}
+        />
+        <div style={styles.wellDetailsContainer}>
+          <WellsMap
+            wells={wells || []}
+            selectedWellId={selectedWellId}
+            onSelectWell={onSelectWell}
+            mapMode={mapMode}
+            heatmapData={heatmapData}
+            heatmapMaxValue={heatmapMaxValue}
+            overlayControlsTopRight={
+              <div style={styles.mapTopRightStack}>
+                {selectedWellId ? (
+                  <div style={styles.selectedMapBadge}>
+                    <span>Pozo {selectedWellId} seleccionado</span>
+                    <button type="button" onClick={() => onSelectWell(null)} style={styles.selectedMapBadgeButton}>
+                      Deseleccionar
+                    </button>
+                  </div>
+                ) : null}
+                {isHeatmapMode ? (
+                  <div style={styles.heatmapControls}>
+                    <span style={styles.heatmapControlsLabel}>Recurso</span>
+                    <div style={styles.heatmapResourceButtons}>
+                      <button
+                        type="button"
+                        onClick={() => onSelectHeatmapResource("oil")}
+                        style={styles.heatmapResourceButton(heatmapResource === "oil")}
+                      >
+                        Petróleo
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onSelectHeatmapResource("gas")}
+                        style={styles.heatmapResourceButton(heatmapResource === "gas")}
+                      >
+                        Gas
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onSelectHeatmapResource("water")}
+                        style={styles.heatmapResourceButton(heatmapResource === "water")}
+                      >
+                        Agua
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
               </div>
-            ) : null
-          }
-          overlayControlsBottomCenter={
-            <div style={styles.modeDock} role="group" aria-label="Visualización del mapa">
-              <button
-                type="button"
-                style={styles.modeDockButton(mode === "pozos")}
-                onClick={() => onChangeMode("pozos")}
-              >
-                <span style={styles.modeDot(mode === "pozos")}></span>
-                Pozos
-              </button>
-              <button
-                type="button"
-                style={styles.modeDockButton(mode === "heatmap")}
-                onClick={() => onChangeMode("heatmap")}
-              >
-                <span style={styles.modeGrid(mode === "heatmap")}>#</span>
-                Heatmap
-              </button>
-            </div>
-          }
-        />
-        <WellInfo
-          wellInfo={selectedWellDetails}
-          loadingWell={loadingWell}
-          metricsItems={metricsItems}
-          metricsLoading={loadingMetrics}
-          metricsError={errorGettingMetrics}
-          metricsHint={selectedWellId ? undefined : "Seleccioná un pozo para ver el detalle."}
-        />
+            }
+            overlayControlsBottomCenter={
+              <div style={styles.modeDock} role="group" aria-label="Visualización del mapa">
+                <button
+                  type="button"
+                  style={styles.modeDockButton(mode === "pozos")}
+                  onClick={() => onChangeMode("pozos")}
+                >
+                  <span style={styles.modeDot(mode === "pozos")}></span>
+                  Pozos
+                </button>
+                <button
+                  type="button"
+                  style={styles.modeDockButton(mode === "heatmap")}
+                  onClick={() => onChangeMode("heatmap")}
+                >
+                  <span style={styles.modeGrid(mode === "heatmap")}>#</span>
+                  Heatmap
+                </button>
+              </div>
+            }
+          />
+          <WellInfo
+            wellInfo={displayedWellInfo}
+            loadingWell={loadingWell}
+            onDeselectWell={() => onSelectWell(null)}
+          />
+        </div>
       </div>
 
       {errorMessage && (
@@ -185,6 +203,10 @@ const styles = {
   loadingContainer: {
     display: "flex",
   } as React.CSSProperties,
+  viewLayout: {
+    display: "grid",
+    gap: 10,
+  } as React.CSSProperties,
   wellDetailsContainer: {
     display: "grid",
     gridTemplateColumns: "minmax(0, 1fr) minmax(320px, 420px)",
@@ -192,7 +214,36 @@ const styles = {
     gap: 16,
     minWidth: 0,
     minHeight: 0,
-    height: "min(70vh, 700px)",
+    height: "min(68vh, 700px)",
+  } as React.CSSProperties,
+  mapTopRightStack: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-end",
+    gap: 8,
+  } as React.CSSProperties,
+  selectedMapBadge: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 8,
+    padding: "6px 10px",
+    borderRadius: 10,
+    border: "1px solid var(--color-border-subtle)",
+    backgroundColor: "rgba(255,255,255,0.94)",
+    boxShadow: "0 6px 12px rgba(0,0,0,0.12)",
+    fontSize: 12,
+    fontWeight: 600,
+    color: "var(--color-text-primary)",
+  } as React.CSSProperties,
+  selectedMapBadgeButton: {
+    border: "1px solid var(--color-brand-primary)",
+    backgroundColor: "var(--color-brand-primary)",
+    color: "var(--color-text-inverse)",
+    borderRadius: 999,
+    fontSize: 12,
+    fontWeight: 800,
+    cursor: "pointer",
+    padding: "4px 10px",
   } as React.CSSProperties,
   modeDock: {
     display: "flex",
