@@ -5,6 +5,9 @@ export type HeatmapResource = "oil" | "gas" | "water";
 interface HeatmapFilters {
   resource: HeatmapResource;
   watershed?: string;
+  company?: string;
+  province?: string;
+  status?: string;
   enabled?: boolean;
   start_year?: number;
   start_month?: number;
@@ -42,6 +45,9 @@ export function useWellsHeatmap(filters: HeatmapFilters) {
         const params = new URLSearchParams();
         params.append("resource", filters.resource);
         if (filters.watershed) params.append("watershed", filters.watershed);
+        if (filters.company) params.append("company", filters.company);
+        if (filters.province) params.append("province", filters.province);
+        if (filters.status) params.append("status", filters.status);
         if (filters.limit) params.append("limit", filters.limit.toString());
         if (filters.offset) params.append("offset", filters.offset.toString());
         if (filters.start_year) params.append("start_year", filters.start_year.toString());

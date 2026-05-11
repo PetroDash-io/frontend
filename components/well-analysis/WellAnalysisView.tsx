@@ -98,8 +98,18 @@ export function WellAnalysisView() {
 
   const handleViewProduction = () => {
     const value = wellIdInput.trim();
+    if (value === "") {
+      setWellId(null);
+      setWellIdInputError(null);
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("wellId");
+      const nextQuery = params.toString();
+      router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname);
+      return;
+    }
+
     const parsed = parseInt(value, 10);
-    if (isWellIdInputValid) {
+    if (!isNaN(parsed) && parsed > 0) {
       setWellId(parsed);
       setQueryDateRange(dateRange);
       setOpenSections({

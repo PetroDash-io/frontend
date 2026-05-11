@@ -17,6 +17,9 @@ export function useMapHeatmap({mode, resource, filters}: UseMapHeatmapParams) {
     enabled: isHeatmapMode,
     resource,
     watershed: filters.watershed,
+    company: filters.company,
+    province: filters.province,
+    status: filters.status,
     limit: filters.limit
   });
 

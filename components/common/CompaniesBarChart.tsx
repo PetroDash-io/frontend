@@ -12,12 +12,13 @@ import {
   Cell,
 } from "recharts";
 import { Company } from "@/app/types";
-import { exportToExcel } from "@/utils/excel";
+import { exportMultipleSheetsToExcel } from "@/utils/excel";
 
 interface CompaniesBarChartProps {
   companies: Company[];
   title?: string;
   maxCompanies?: number;
+  watershed?: string;
 }
 
 // Paleta de colores alineada con PetroDash
@@ -98,6 +99,7 @@ export function CompaniesBarChart({
   companies,
   title = "Top 7 Empresas por Cantidad de Pozos",
   maxCompanies = 7,
+  watershed,
 }: CompaniesBarChartProps) {
   const chartData = useMemo(() => {
     if (!companies || companies.length === 0) return [];
@@ -121,12 +123,22 @@ export function CompaniesBarChart({
     }));
 
     const today = new Date().toISOString().split('T')[0];
-    const fileName = `empresas-top${maxCompanies}-${today}`;
+    const watershedSlug = watershed
+      ? watershed.replace(/[^a-zA-Z0-9]/g, "-")
+      : "todas";
+    const fileName = `empresas-top${maxCompanies}-${watershedSlug}-${today}`;
 
-    exportToExcel(
-      dataToExport,
-      fileName,
-      'Top Empresas'
+    const filterSheet = [
+      { Filtro: "Cuenca", Valor: watershed || "Todas" },
+      { Filtro: "Top", Valor: String(maxCompanies) },
+    ];
+
+    exportMultipleSheetsToExcel(
+      [
+        { data: dataToExport, sheetName: "Top Empresas" },
+        { data: filterSheet, sheetName: "Filtros" },
+      ],
+      fileName
     );
   };
 
