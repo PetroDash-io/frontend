@@ -1,26 +1,19 @@
 import React from "react";
 import {WellDetail} from "@/app/types";
 import Link from "next/link";
-import {MetricsSummary, MetricsSummaryItem} from "@/components/wells/map/MetricsSummary";
 
 interface WellInfoProps {
     wellInfo: WellDetail | null;
     loadingWell: boolean;
-    metricsItems?: MetricsSummaryItem[];
-    metricsLoading?: boolean;
-    metricsError?: string | null;
-    metricsHint?: string;
+    onDeselectWell?: () => void;
 }
 
 export function WellInfo({
     wellInfo,
     loadingWell,
-    metricsItems = [],
-    metricsLoading = false,
-    metricsError,
-    metricsHint,
+    onDeselectWell,
 }: WellInfoProps) {
-    const showMetrics = !wellInfo && !loadingWell;
+    const showEmptyState = !wellInfo && !loadingWell;
 
     const locationRows: Array<[string, string | number | null | undefined]> = wellInfo ? [
         ["ID Pozo", wellInfo.well_id],
@@ -44,30 +37,52 @@ export function WellInfo({
         ["Profundidad", `${wellInfo.depth} m`],
     ] : [];
 
+    const formatYearMonth = (value: string | null | undefined): string | null => {
+        if (!value) return null;
+        const [year, month] = value.split("-");
+        if (!year || !month) return null;
+        return `${month.padStart(2, "0")}/${year}`;
+    };
+
+    const firstRecordLabel = formatYearMonth(wellInfo?.first_production_activity_date);
+    const coverageText = firstRecordLabel || "No hay producción registrada";
+
     return (
         <div style={styles.infoContainer}>
             <div style={styles.cardHeader}>
-                <span className="card-label">Detalle de pozo</span>
-                <h3 style={styles.sidePanelTitle}>Pozo {wellInfo?.well_id ?? "-"}</h3>
+                <span className="card-label">Información del pozo</span>
+                <div style={styles.titleRow}>
+                    <h3 style={styles.sidePanelTitle}>
+                        {wellInfo ? `Pozo ${wellInfo.well_id}` : "Ningún pozo seleccionado"}
+                    </h3>
+                </div>
             </div>
 
-            {showMetrics && (
-                <MetricsSummary
-                    title="Métricas clave"
-                    items={metricsItems}
-                    loading={metricsLoading}
-                    error={metricsError}
-                    hint={metricsHint}
-                />
+            {showEmptyState && (
+                <div style={styles.emptyState}>
+                    Seleccioná un pozo en el mapa para ver su información y estado operativo.
+                </div>
             )}
 
             {loadingWell && <p>Cargando información...</p>}
 
             {wellInfo && !loadingWell && (
                 <>
-                    <Link href={`/analisis-pozo?wellId=${wellInfo.well_id}`} style={styles.analyzeButton}>
-                        Analizar pozo
-                    </Link>
+                    <div style={styles.actionsRow}>
+                        <Link href={`/analisis-pozo?wellId=${wellInfo.well_id}`} style={styles.analyzeButton}>
+                            Analizar producción
+                        </Link>
+                        {onDeselectWell ? (
+                            <button type="button" onClick={onDeselectWell} style={styles.clearSelectionButtonRow}>
+                                Deseleccionar
+                            </button>
+                        ) : null}
+                    </div>
+
+                    <section style={styles.coverageSection}>
+                        <span className="card-label">Primer registro de producción</span>
+                        <p style={styles.coverageText}>{coverageText}</p>
+                    </section>
 
                     <section style={styles.section}>
                         <span className="card-label">Ubicación</span>
@@ -137,13 +152,25 @@ const styles = {
         color: "var(--color-brand-primary)",
         fontSize: 18,
     } as React.CSSProperties,
+    titleRow: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 10,
+    } as React.CSSProperties,
+    emptyState: {
+        fontSize: 13,
+        lineHeight: 1.45,
+        color: "#4b5563",
+        padding: "2px 0 6px",
+    } as React.CSSProperties,
     section: {
         display: "flex",
         flexDirection: "column",
         gap: 10,
         marginBottom: 18,
         padding: 12,
-        borderRadius: "var(--radius-lg)",
+        borderRadius: 8,
         backgroundColor: "var(--color-surface-cream)",
         border: "1px solid var(--color-border-cream)",
     } as React.CSSProperties,
@@ -166,8 +193,7 @@ const styles = {
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
-        width: "100%",
-        marginBottom: 14,
+        flex: 1,
         border: "1px solid var(--color-brand-primary)",
         borderRadius: 8,
         padding: "10px 12px",
@@ -176,5 +202,38 @@ const styles = {
         fontSize: 13,
         fontWeight: 700,
         textDecoration: "none",
+    } as React.CSSProperties,
+    actionsRow: {
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        marginBottom: 14,
+    } as React.CSSProperties,
+    clearSelectionButtonRow: {
+        border: "1px solid var(--color-border-medium)",
+        borderRadius: 8,
+        backgroundColor: "var(--color-bg-surface)",
+        color: "var(--color-text-primary)",
+        fontSize: 13,
+        fontWeight: 700,
+        cursor: "pointer",
+        padding: "10px 12px",
+        whiteSpace: "nowrap",
+        minWidth: 126,
+    } as React.CSSProperties,
+    coverageSection: {
+        display: "flex",
+        flexDirection: "column",
+        gap: 8,
+        marginBottom: 14,
+        padding: 12,
+        borderRadius: 8,
+        backgroundColor: "#fff9ec",
+        border: "1px solid #ebdfc6",
+    } as React.CSSProperties,
+    coverageText: {
+        margin: 0,
+        color: "var(--color-text-primary)",
+        fontSize: 13,
     } as React.CSSProperties,
 } as const;

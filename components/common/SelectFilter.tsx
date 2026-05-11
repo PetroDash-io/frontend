@@ -80,9 +80,38 @@ const styles = {
         color: "var(--color-text-primary)",
         cursor: "pointer",
         minWidth: 200,
+        height: "40px",
     } as React.CSSProperties,
     selectError: {
         borderColor: "var(--color-error)",
         boxShadow: "0 0 0 1px var(--color-error)",
     } as React.CSSProperties,
 }
+
+const selectStyles = {
+  filterGroup: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 8,
+    minWidth: 220,
+    flex: 1,
+  } as React.CSSProperties,
+  label: {
+    fontSize: 13,
+    fontWeight: 500,
+    color: "var(--color-text-secondary)",
+    display: "flex",
+    flexDirection: "column",
+    gap: 6,
+  } as React.CSSProperties,
+  select: {
+    padding: "10px 14px",
+    borderRadius: 6,
+    border: "1px solid var(--color-border-medium)",
+    backgroundColor: "var(--color-bg-sunken)",
+    fontSize: 13,
+    color: "var(--color-text-primary)",
+    cursor: "pointer",
+    minWidth: 200,
+  } as React.CSSProperties,
+};

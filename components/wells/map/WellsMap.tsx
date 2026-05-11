@@ -11,7 +11,7 @@ import React, {useState} from "react";
 interface WellsMapProps {
   wells: WellDetail[];
   selectedWellId: number | null;
-  onSelectWell: (id: number) => void;
+  onSelectWell: (id: number | null) => void;
   mapMode: "markers" | "heatmap";
   heatmapData?: GeoJSON.FeatureCollection | null;
   heatmapMaxValue?: number;
@@ -35,7 +35,7 @@ export function WellsMap({
 
     return (
         <div style={styles.mapContainer}>
-            <div style={styles.legendBar}>
+            <div className="map-legend-bar" style={styles.legendBar}>
                 {LEGEND_ITEMS.map((item) => (
                     <LegendItem key={item.label} color={item.color} label={item.label} />
                 ))}
@@ -50,6 +50,7 @@ export function WellsMap({
                 }}
                 style={styles.map}
                 mapStyle="mapbox://styles/mapbox/streets-v11"
+                onClick={() => onSelectWell(null)}
                 mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}>
 
                 {/* Heatmap layer */}
@@ -119,7 +120,10 @@ export function WellsMap({
                                 aria-label={`${item.status || "Well"} ${wellId}`}
                                 onMouseEnter={() => setActivePozo({id: wellId, lon, lat, company: item.company, resource_type: item.resource_type})}
                                 onMouseLeave={() => setActivePozo(null)}
-                                onClick={() => onSelectWell(wellId)}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onSelectWell(wellId);
+                                }}
                                 onFocus={() => setFocusedPozoId(wellId)}
                                 onBlur={() => setFocusedPozoId(null)}
                                 onKeyDown={(e) => {
@@ -159,30 +163,27 @@ export function WellsMap({
 const styles = {
     mapContainer: {
         minWidth: 0,
-        height: "100%",
+        height: "clamp(420px, 60vh, 700px)",
         position: "relative",
     } as React.CSSProperties,
     legendBar: {
         position: "absolute",
         top: 12,
-        width: "30%",
         left: 12,
         zIndex: 10,
         display: "flex",
         flexDirection: "row",
-        gap: 14,
-        justifyContent: "center",
-        padding: "8px 12px",
+        flexWrap: "wrap",
+        justifyContent: "flex-start",
         borderRadius: 10,
         backgroundColor: "rgba(243,238,230,0.95)",
-        fontSize: 13,
         color: colors.text,
         boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
     } as React.CSSProperties,
     map: {
         width: "100%",
         height: "100%",
-        borderRadius: 14,
+        borderRadius: "var(--radius-2xl)",
     } as React.CSSProperties,
     overlayControlsTopRight: {
         position: "absolute",

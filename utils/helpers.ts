@@ -1,11 +1,18 @@
 import { ESTADOS_POZO, colors } from "@/utils/constants";
 
-export const normalize = (value?: string) =>
+export const normalize = (value?: string | null) =>
   value
     ?.normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .trim()
     .toLowerCase();
+
+export const toSlug = (value?: string | null) => {
+  const normalized = normalize(value) || "";
+  return normalized
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+};
 
 const NORMALIZED_ESTADOS_POZO = {
   ACTIVO: new Set(

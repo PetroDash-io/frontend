@@ -78,10 +78,48 @@
   --radius-md: 6px;
   --radius-lg: 8px;
   --radius-xl: 12px;
+  --radius-2xl: 14px;
 
   --shadow-sm: 0 1px 3px rgba(30, 58, 30, 0.08);
   --shadow-md: 0 2px 8px rgba(30, 58, 30, 0.1);
   --shadow-lg: 0 4px 16px rgba(30, 58, 30, 0.12);
+  --shadow-card: 0 10px 22px rgba(0, 0, 0, 0.14);
+  --shadow-drawer: 6px 0 18px rgba(20, 25, 19, 0.14);
+
+  /* Structural shell */
+  --header-height:       64px;
+  --drawer-width-closed: 60px;
+  --drawer-width-open:   248px;
+  --bottom-nav-height:   56px;
+  --duration-fast:       0.25s;
+
+  /* RGBA semantic overlay tokens */
+  --color-brand-subtle:        rgba(63, 107, 79, 0.18);
+  --color-brand-glow:          rgba(63, 107, 79, 0.20);
+  --color-surface-glass:       rgba(255, 255, 255, 0.92);
+  --color-surface-glass-warm:  rgba(250, 250, 249, 0.95);
+  --color-overlay-warm-subtle: rgba(243, 238, 230, 0.12);
+  --color-overlay-warm-border: rgba(243, 238, 230, 0.20);
+  --color-overlay-warm-muted:  rgba(243, 238, 230, 0.70);
+  --color-error-bg:            rgba(192, 57, 43, 0.08);
+  --color-warning-bg:          rgba(232, 160, 48, 0.08);
+  --color-error-bg-light:      rgba(254, 242, 242, 0.95);
+  --color-error-border-light:  rgba(239, 68, 68, 0.20);
+  --color-overlay-dark-subtle: rgba(30, 58, 30, 0.20);
+  --color-drawer-toggle:       rgba(30, 58, 30, 0.90);
+  --color-drawer-toggle-hover: rgba(30, 58, 30, 0.72);
+  --color-header-btn-bg:       rgba(240, 236, 228, 0.12);
+
+  /* WellInfo warm-parchment palette */
+  --color-surface-parchment: #fffdf6;
+  --color-surface-cream:     #fff9ec;
+  --color-border-cream:      #ebdfc6;
+  --color-text-label-warm:   #8a6517;
+
+  /* Grays used in MetricsSummary (outside brand palette) */
+  --color-gray-600:          #4B5563;
+  --color-gray-500:          #6B7280;
+  --color-text-error-strong: #B91C1C;
 
   --background: var(--color-bg-base);
   --foreground: var(--color-text-primary);
@@ -174,5 +212,43 @@ main {
 
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* --- Responsive layout utilities --- */
+
+.map-details-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+}
+
+@media (max-width: 900px) {
+  .map-details-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.map-legend-bar {
+  max-width: calc(65% - 24px);
+  font-size: 13px;
+  padding: 8px 12px;
+  gap: 10px 14px;
+}
+
+@media (max-width: 640px) {
+  .map-legend-bar {
+    max-width: calc(55% - 16px);
+    font-size: 11px;
+    padding: 6px 8px;
+    gap: 6px 10px;
+  }
+}
+
+.ranking-chart-grid {
+  grid-template-columns: 1fr minmax(300px, 400px);
+}
+
+@media (max-width: 900px) {
+  .ranking-chart-grid {
+    grid-template-columns: 1fr;
   }
 }

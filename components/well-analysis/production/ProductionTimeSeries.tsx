@@ -12,7 +12,7 @@ interface ProductionCurvePoint {
   water: number | null;
 }
 
-export function ProductionTimeSeries({data, eur}: {data: ProductionCurvePoint[]; eur?: number | null}) {
+export function ProductionTimeSeries({data}: {data: ProductionCurvePoint[]}) {
   const {unit, setUnit} = useUnit();
 
   const convertedData = data.map((row) => ({
@@ -23,29 +23,23 @@ export function ProductionTimeSeries({data, eur}: {data: ProductionCurvePoint[];
   }));
 
   const tooltipTextFormatter = (value?: number, name?: string)  => {
-    if (name === PRODUCTION_TYPES.gas.name) {
+    if (name?.includes(PRODUCTION_TYPES.gas.label)) {
       return [`${Number(value).toFixed(2)} ${UNITS.mm3}`, PRODUCTION_TYPES.gas.label];
     }
 
-    if (name === PRODUCTION_TYPES.oil.name) {
+    if (name?.includes(PRODUCTION_TYPES.oil.label)) {
       return [`${Number(value).toFixed(2)} ${unit}`, PRODUCTION_TYPES.oil.label];
     }
 
-    if (name === PRODUCTION_TYPES.water.name) {
+    if (name?.includes(PRODUCTION_TYPES.water.label)) {
       return [`${Number(value).toFixed(2)} ${unit}`, PRODUCTION_TYPES.water.label];
     }
   }
-
-  const eurValue = typeof eur === "number" ? convertValueToUnit(eur, unit) : null;
-  const formattedEur = eurValue != null
-    ? eurValue.toLocaleString("es-AR", {maximumFractionDigits: 2})
-    : null;
 
   return (
     <div style={styles.wrapper}>
       <div style={styles.controlsRow}>
         <UnitTabs onChange={setUnit} currentUnit={unit}/>
-        {formattedEur && <span style={styles.eurBadge}>EUR: {formattedEur} {unit}</span>}
       </div>
 
       <div style={{height: 320}}>
@@ -88,23 +82,13 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     gap: 10,
-    borderRadius: 14,
+    borderRadius: "var(--radius-2xl)",
     border: `1px solid ${colors.panelBorder}`,
     backgroundColor: "var(--color-bg-surface)",
   } as React.CSSProperties,
   controlsRow: {
     display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
     gap: 12,
     padding: "12px 24px",
-  } as React.CSSProperties,
-  eurBadge: {
-    borderRadius: 999,
-    padding: "6px 12px",
-    backgroundColor: colors.oil,
-    color: "#F3EEE6",
-    fontSize: 12,
-    fontWeight: 600,
   } as React.CSSProperties,
 };

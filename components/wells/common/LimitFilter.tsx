@@ -40,7 +40,7 @@ const styles = {
     width: "100%",
     minHeight: 42,
     padding: "8px 12px",
-    borderRadius: 12,
+    borderRadius: "var(--radius-xl)",
     border: `1px solid ${colors.secondary}`,
     backgroundColor: "var(--color-bg-surface)",
     color: colors.text,
