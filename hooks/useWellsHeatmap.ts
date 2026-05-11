@@ -8,6 +8,7 @@ interface HeatmapFilters {
   company?: string;
   province?: string;
   status?: string;
+  enabled?: boolean;
   start_year?: number;
   start_month?: number;
   end_year?: number;
@@ -30,6 +31,12 @@ export function useWellsHeatmap(filters: HeatmapFilters) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!filters.enabled || !filters.watershed) {
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
     const fetchHeatmap = async () => {
       setLoading(true);
       setError(null);
@@ -68,6 +75,7 @@ export function useWellsHeatmap(filters: HeatmapFilters) {
 
     fetchHeatmap();
   }, [
+    filters.enabled,
     filters.resource,
     filters.watershed,
     filters.limit,

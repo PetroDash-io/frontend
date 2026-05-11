@@ -6,6 +6,7 @@ import {DateRangeFilters} from "@/components/common/DateRangeFilters";
 import {DateRangeValue, DEFAULT_WELL_CHART_DATE_RANGE, getValidatedDateRange,} from "@/utils/dateRange";
 import {CollapsiblePanel} from "@/components/well-analysis/common/CollapsiblePanel";
 import {WellProductionSection} from "@/components/well-analysis/production/WellProductionSection";
+import {AccumulatedProductionSection} from "@/components/well-analysis/production/AccumulatedProductionSection";
 import {WellAnomaliesSection} from "@/components/well-analysis/anomalies/WellAnomaliesSection";
 import {WellInjectionSection} from "@/components/well-analysis/injection/WellInjectionSection";
 import {AnomalyInfoButton} from "@/components/well-analysis/anomalies/AnomalyInfoButton";
@@ -24,6 +25,7 @@ export function WellAnalysisView() {
   const [dateRange, setDateRange] = useState<DateRangeValue>(DEFAULT_WELL_CHART_DATE_RANGE);
   const [queryDateRange, setQueryDateRange] = useState<DateRangeValue>(DEFAULT_WELL_CHART_DATE_RANGE);
   const [openSections, setOpenSections] = useState({
+    accumulated: true,
     anomalies: false,
     injection: false,
     comparison: false,
@@ -49,7 +51,6 @@ export function WellAnalysisView() {
 
   const {
     data: wellProduction,
-    eur,
     loading: loadingWellProduction,
     error: errorInWellProduction,
   } = useWellsProduction({wellId, dateRange: validatedDateRange});
@@ -79,13 +80,40 @@ export function WellAnalysisView() {
       }));
   }, [wellProduction]);
 
+  const accumulatedSeriesData = useMemo(() => {
+    if (!wellProduction || wellProduction.length === 0) {
+      return [];
+    }
+
+    return wellProduction
+      .slice()
+      .sort((a, b) => a.data_date.localeCompare(b.data_date))
+      .map((record) => ({
+        date: record.data_date.slice(0, 7),
+        cumulative_oil_production: record.cumulative_oil_production ?? null,
+        cumulative_gas_production: record.cumulative_gas_production ?? null,
+        cumulative_water_production: record.cumulative_water_production ?? null,
+      }));
+  }, [wellProduction]);
+
   const handleViewProduction = () => {
     const value = wellIdInput.trim();
+    if (value === "") {
+      setWellId(null);
+      setWellIdInputError(null);
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("wellId");
+      const nextQuery = params.toString();
+      router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname);
+      return;
+    }
+
     const parsed = parseInt(value, 10);
-    if (isWellIdInputValid) {
+    if (!isNaN(parsed) && parsed > 0) {
       setWellId(parsed);
       setQueryDateRange(dateRange);
       setOpenSections({
+        accumulated: true,
         anomalies: false,
         injection: false,
         comparison: false,
@@ -110,7 +138,7 @@ export function WellAnalysisView() {
     return value !== "" && !isNaN(parsed) && parsed > 0;
   })();
 
-  const toggleSection = (sectionName: "anomalies" | "injection" | "comparison") => {
+  const toggleSection = (sectionName: "accumulated" | "anomalies" | "injection" | "comparison") => {
     setOpenSections((previous) => ({...previous, [sectionName]: !previous[sectionName]}));
   };
 
@@ -191,11 +219,22 @@ export function WellAnalysisView() {
               loading={loadingWellProduction}
               error={errorInWellProduction}
               data={curveSeriesData}
-              eur={eur}
             />
           </div>
 
           <div style={styles.collapsibleStack}>
+            <CollapsiblePanel
+              title="Producción acumulada"
+              isOpen={openSections.accumulated}
+              onToggle={() => toggleSection("accumulated")}
+            >
+              <AccumulatedProductionSection
+                loading={loadingWellProduction}
+                error={errorInWellProduction}
+                data={accumulatedSeriesData}
+              />
+            </CollapsiblePanel>
+
             <CollapsiblePanel
               title="Anomalías"
               isOpen={openSections.anomalies}

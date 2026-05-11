@@ -10,7 +10,6 @@ interface useWellProductionParams {
 
 export function useWellsProduction({wellId, dateRange}: useWellProductionParams) {
     const [data, setData] = useState<ProductionMonthly[] | null>(null);
-    const [eur, setEur] = useState<number | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const previousWellId = useRef<number | null>(null);
@@ -18,7 +17,6 @@ export function useWellsProduction({wellId, dateRange}: useWellProductionParams)
     useEffect(() => {
         if (!wellId) {
             setData(null);
-            setEur(null);
             setLoading(false);
             setError(null);
             return;
@@ -33,7 +31,6 @@ export function useWellsProduction({wellId, dateRange}: useWellProductionParams)
 
             if (hasWellChanged) {
                 setData(null);
-                setEur(null);
             }
 
             try {
@@ -66,11 +63,9 @@ export function useWellsProduction({wellId, dateRange}: useWellProductionParams)
 
                 const json: ProductionMonthlyResponse = await response.json();
                 setData(json.data);
-                setEur(typeof json.eur === "number" ? json.eur : null);
             } catch (err) {
                 setError(err instanceof Error ? err.message : "Unexpected error");
                 setData(null);
-                setEur(null);
             } finally {
                 setLoading(false);
             }
@@ -78,5 +73,5 @@ export function useWellsProduction({wellId, dateRange}: useWellProductionParams)
 
         fetchWellProduction();
     }, [wellId, dateRange?.startYear, dateRange?.startMonth, dateRange?.endYear, dateRange?.endMonth]);
-    return {data, eur, loading, error};
+    return {data, loading, error};
 }

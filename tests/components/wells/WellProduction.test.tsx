@@ -23,6 +23,10 @@ jest.mock("@/components/well-analysis/production/WellProductionSection", () => (
   WellProductionSection: () => <div>WellProductionSection</div>,
 }));
 
+jest.mock("@/components/well-analysis/production/AccumulatedProductionSection", () => ({
+  AccumulatedProductionSection: () => <div>AccumulatedProductionSection</div>,
+}));
+
 jest.mock("@/components/well-analysis/anomalies/WellAnomaliesSection", () => ({
   WellAnomaliesSection: () => <div>WellAnomaliesSection</div>,
 }));
@@ -49,7 +53,27 @@ describe("WellProductionComparisonView", () => {
 
     (useWellsProduction as jest.Mock).mockReturnValue({
       data: [],
-      eur: null,
+      loading: false,
+      error: null,
+    });
+
+    (useWell as jest.Mock).mockReturnValue({
+      data: {
+        well_id: 123,
+        watershed: "NEUQUINA",
+        province: "Neuquen",
+        area: "Loma",
+        company: "YPF",
+        field: "Campo",
+        formation: "Formacion",
+        classification: "No informado",
+        resource_type: "oil",
+        well_type: "Productor",
+        extraction_type: "Bombeo",
+        status: "Activo",
+        depth: 1000,
+        first_production_activity_date: "2021-03-01",
+      },
       loading: false,
       error: null,
     });
@@ -108,6 +132,8 @@ describe("WellProductionComparisonView", () => {
     fireEvent.click(screen.getByText("Ver producción"));
 
     expect(screen.getByText("WellProductionSection")).toBeInTheDocument();
+    expect(screen.getByText("Producción acumulada")).toBeInTheDocument();
+    expect(screen.getByText("AccumulatedProductionSection")).toBeInTheDocument();
     expect(screen.getByText("Anomalías")).toBeInTheDocument();
     expect(screen.getByText("Curva de inyección")).toBeInTheDocument();
     expect(screen.getByText("Comparación")).toBeInTheDocument();

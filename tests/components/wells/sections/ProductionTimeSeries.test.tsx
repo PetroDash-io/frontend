@@ -26,8 +26,3 @@ test("renderiza sin romper con datos vacíos", () => {
   render(<ProductionTimeSeries data={[]} />);
   expect(screen.getByText("m³")).toBeInTheDocument();
 });
-
-test("muestra badge de EUR cuando está disponible", () => {
-  render(<ProductionTimeSeries data={mockData} eur={1500} />);
-  expect(screen.getByText(/EUR:/i)).toBeInTheDocument();
-});

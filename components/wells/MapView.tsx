@@ -2,7 +2,6 @@ import React, {useEffect, useMemo} from "react";
 import {WellInfo} from "@/components/wells/common/WellInfo";
 import {WellMetrics} from "@/components/wells/common/WellMetrics";
 import {WellsMap} from "@/components/wells/map/WellsMap";
-import {useWells} from "@/hooks/useWells";
 import {useWell} from "@/hooks/useWell";
 import type {HeatmapResource} from "@/hooks/useWellsHeatmap";
 import {useMapHeatmap} from "@/hooks/useMapHeatmap";
@@ -10,6 +9,7 @@ import {LoadingState} from "@/components/common/LoadingState";
 import {InlineMessage} from "@/components/common/InlineMessage";
 import {toast} from "react-toastify";
 import {WellFilters} from "@/app/types/wellFilters";
+import {WellDetail} from "@/app/types";
 import {colors, PRODUCTION_TYPES} from "@/utils/constants";
 import {useMapMetrics} from "@/hooks/useMapMetrics";
 import {formatCompactNumber} from "@/utils/helpers";
@@ -18,6 +18,9 @@ export type MapViewMode = "pozos" | "heatmap";
 
 export type MapViewProps = {
   filters: WellFilters;
+  wells: WellDetail[];
+  loadingWells: boolean;
+  errorGettingWells: string | null;
   mode: MapViewMode;
   onChangeMode: (mode: MapViewMode) => void;
   selectedWellId: number | null;
@@ -28,6 +31,9 @@ export type MapViewProps = {
 
 export function MapView({
   filters,
+  wells,
+  loadingWells,
+  errorGettingWells,
   mode,
   onChangeMode,
   selectedWellId,
@@ -35,8 +41,6 @@ export function MapView({
   heatmapResource,
   onSelectHeatmapResource,
 }: MapViewProps) {
-  const {data: wells, loading: loadingWells, error: errorGettingWells} = useWells({filters});
-
   const {
     data: selectedWellDetails,
     loading: loadingWell,
@@ -51,7 +55,7 @@ export function MapView({
     toast.error(errorMessage || "Unexpected error", {toastId: errorMessage || "Unexpected error"});
   }, [errorMessage]);
 
-  const {isHeatmapMode, mapMode, heatmapData, heatmapMaxValue} = useMapHeatmap({
+  const {isHeatmapMode, mapMode, heatmapData, heatmapMaxValue, loadingHeatmap} = useMapHeatmap({
     mode,
     resource: heatmapResource,
     filters,
@@ -102,11 +106,11 @@ export function MapView({
           loading={loadingMetrics}
           error={errorGettingMetrics}
           filters={filters}
-          filteredCount={(wells || []).length}
+          filteredCount={wells.length}
         />
         <div style={styles.wellDetailsContainer}>
           <WellsMap
-            wells={wells || []}
+            wells={wells}
             selectedWellId={selectedWellId}
             onSelectWell={onSelectWell}
             mapMode={mapMode}
@@ -148,6 +152,7 @@ export function MapView({
                         Agua
                       </button>
                     </div>
+                    {loadingHeatmap ? <span style={styles.heatmapLoadingLabel}>Cargando heatmap...</span> : null}
                   </div>
                 ) : null}
               </div>
@@ -306,6 +311,12 @@ const styles = {
   heatmapResourceButtons: {
     display: "flex",
     gap: 6,
+  } as React.CSSProperties,
+  heatmapLoadingLabel: {
+    fontSize: 12,
+    fontWeight: 600,
+    color: "var(--color-text-secondary)",
+    marginLeft: 6,
   } as React.CSSProperties,
   heatmapResourceButton: (active: boolean) => ({
     padding: "6px 10px",
