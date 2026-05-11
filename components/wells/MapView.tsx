@@ -218,6 +218,7 @@ const styles = {
     gap: 16,
     minWidth: 0,
     minHeight: 0,
+    height: "clamp(520px, 72vh, 800px)",
   } as React.CSSProperties,
   mapTopRightStack: {
     display: "flex",
