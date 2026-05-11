@@ -294,9 +294,7 @@ export function CompanyRankingView() {
                 Top 10 Empresas - {PRODUCTION_TYPE_LABEL[filters.tipo || "oil"]}
               </h3>
             </div>
-            <h3 style={styles.chartTitle}>
-              Top 10 Empresas - {PRODUCTION_TYPE_LABEL[filters.tipo || "oil"]}
-            </h3>
+
             {data && (
               <div style={styles.headerStats}>
                 <div style={styles.headerStat}>
