@@ -123,6 +123,7 @@ export function DashboardShell({children}: {children: React.ReactNode}) {
               key={href}
               href={href}
               className={`${styles.bottomNavLink} ${isActive ? styles.bottomNavLinkActive : ""}`}
+              aria-current={isActive ? "page" : undefined}
             >
               <span aria-hidden="true"><Icon /></span>
               <span>{label}</span>
