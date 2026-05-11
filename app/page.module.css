@@ -288,7 +288,8 @@
 
 @media (max-width: 639px) {
   .drawer,
-  .drawerBackdrop {
+  .drawerBackdrop,
+  .menuButton {
     display: none !important;
   }
 
