@@ -1,13 +1,33 @@
 import type { WellDetail } from "@/app/types";
 import { colors } from "@/utils/constants";
 import React from "react";
-
+import { exportMultipleSheetsToExcel } from "@/utils/excel";
+import type { WellFilters } from "@/app/types/wellFilters";
+import { buildWellsExcelExport } from "@/components/wells/table/wellsExport";
 
 interface WellsTableProps {
   data: WellDetail[];
+  filters?: WellFilters;
+  currentPage?: number;
+  totalItems?: number;
+  pageSize?: number;
 }
 
-export function WellsTable({data}: WellsTableProps) {
+const EMPTY_FILTERS: WellFilters = {
+  watershed: "",
+  province: "",
+  status: "",
+  company: "",
+  limit: 0,
+};
+
+export function WellsTable({
+  data,
+  filters = EMPTY_FILTERS,
+  currentPage = 0,
+  totalItems = data.length,
+  pageSize = data.length,
+}: WellsTableProps) {
     const onMouseEnter = (event: React.MouseEvent<HTMLTableRowElement>) => {
         event.currentTarget.style.background = "var(--color-bg-sunken)";
     };
@@ -16,10 +36,35 @@ export function WellsTable({data}: WellsTableProps) {
         event.currentTarget.style.background = "transparent";
     };
 
+    const handleDownloadExcel = () => {
+        if (!data.length) return;
+
+        const { sheets, fileName } = buildWellsExcelExport({
+          data,
+          filters,
+          currentPage,
+          totalItems,
+          pageSize,
+        });
+
+        exportMultipleSheetsToExcel(
+            sheets,
+            fileName
+        );
+    };
+
     return (
       <div style={styles.tableContainer}>
         <div style={styles.cardHeader}>
           <span className="card-label">Listado de pozos</span>
+          <button
+            type="button"
+            onClick={handleDownloadExcel}
+            style={styles.downloadButton}
+            disabled={!data.length}
+          >
+            📊 Descargar Excel
+          </button>
         </div>
         <table style={styles.table}>
           <thead>
@@ -77,9 +122,12 @@ const styles = {
         boxShadow: "var(--shadow-sm)",
     } as React.CSSProperties,
     cardHeader: {
-        paddingBottom: 12,
-        marginBottom: 8,
-        borderBottom: "1px solid var(--color-border-subtle)",
+      paddingBottom: 12,
+      marginBottom: 8,
+      borderBottom: "1px solid var(--color-border-subtle)",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
     } as React.CSSProperties,
     table: {
         width: "100%",
@@ -96,5 +144,15 @@ const styles = {
     row: {
         cursor: "pointer",
         borderBottom: "1px solid var(--color-border-subtle)",
+    } as React.CSSProperties,
+    downloadButton: {
+      backgroundColor: "var(--color-brand-mid)",
+      color: "var(--color-text-inverse)",
+      border: "none",
+      borderRadius: 8,
+      padding: "8px 14px",
+      fontSize: 13,
+      fontWeight: 600,
+      cursor: "pointer",
     } as React.CSSProperties,
 };

@@ -59,12 +59,41 @@ export function CompanyView() {
     setWatershed(String(value))
   }
 
+  const parseFilterValue = (filterName: string, value: unknown) => {
+    if (value === "" || value === null || value === undefined) {
+      return undefined;
+    }
+
+    if (filterName.endsWith("_anio") || filterName.endsWith("_mes")) {
+      const numericValue = Number(value);
+      return Number.isFinite(numericValue) ? numericValue : undefined;
+    }
+
+    return String(value);
+  };
+
   const updateProductionFilters = (filterName: string, value: unknown) => {
-    setFilters((previousValues) => ({...previousValues, [filterName]: value}));
+    setFilters((previousValues) => {
+      const parsedValue = parseFilterValue(filterName, value);
+      if (parsedValue === undefined) {
+        const nextValues = {...previousValues};
+        delete nextValues[filterName as keyof ProductionAggregatesFilters];
+        return nextValues;
+      }
+      return {...previousValues, [filterName]: parsedValue};
+    });
   }
 
   const updateComparisonFilters = (filterName: string, value: unknown) => {
-    setComparisonFilters((previousValues) => ({...previousValues, [filterName]: value}));
+    setComparisonFilters((previousValues) => {
+      const parsedValue = parseFilterValue(filterName, value);
+      if (parsedValue === undefined) {
+        const nextValues = {...previousValues};
+        delete nextValues[filterName as keyof ComparisonFilters];
+        return nextValues;
+      }
+      return {...previousValues, [filterName]: parsedValue};
+    });
   }
 
   const companyFilterOptions = useMemo(() => {
@@ -107,6 +136,7 @@ export function CompanyView() {
               companies={companies}
               title={`Top ${maxCompanies} Empresas por Cantidad de Pozos`}
               maxCompanies={maxCompanies}
+              watershed={watershed}
           />
         </div>
 
@@ -153,6 +183,8 @@ export function CompanyView() {
                 empresa={filters.empresa}
                 fechaInicio={filters.inicio_anio && filters.inicio_mes ? `${filters.inicio_anio}-${filters.inicio_mes.toString().padStart(2, '0')}` : filters.inicio_anio?.toString()}
                 fechaFin={filters.fin_anio && filters.fin_mes ? `${filters.fin_anio}-${filters.fin_mes.toString().padStart(2, '0')}` : filters.fin_anio?.toString()}
+                unit={unit}
+                watershed={watershed}
               />
               <ProductionBarChart 
                 data={avgChartData} 
@@ -160,6 +192,8 @@ export function CompanyView() {
                 empresa={filters.empresa}
                 fechaInicio={filters.inicio_anio && filters.inicio_mes ? `${filters.inicio_anio}-${filters.inicio_mes.toString().padStart(2, '0')}` : filters.inicio_anio?.toString()}
                 fechaFin={filters.fin_anio && filters.fin_mes ? `${filters.fin_anio}-${filters.fin_mes.toString().padStart(2, '0')}` : filters.fin_anio?.toString()}
+                unit={unit}
+                watershed={watershed}
               />
             </div>
         )}
@@ -190,6 +224,7 @@ export function CompanyView() {
               unit={unit}
               fechaInicio={comparisonFilters.inicio_anio && comparisonFilters.inicio_mes ? `${comparisonFilters.inicio_anio}-${comparisonFilters.inicio_mes.toString().padStart(2, '0')}` : comparisonFilters.inicio_anio?.toString()}
               fechaFin={comparisonFilters.fin_anio && comparisonFilters.fin_mes ? `${comparisonFilters.fin_anio}-${comparisonFilters.fin_mes.toString().padStart(2, '0')}` : comparisonFilters.fin_anio?.toString()}
+              watershed={watershed}
             />
         )}
       </div>
