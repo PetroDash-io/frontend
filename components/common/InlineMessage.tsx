@@ -24,7 +24,7 @@ function messageStyle(variant: MessageVariant): React.CSSProperties {
         return {
             ...base,
             color: "var(--color-error)",
-            background: "rgba(192, 57, 43, 0.08)",
+            background: "var(--color-error-bg)",
             borderColor: "var(--color-error)",
         };
     }
@@ -33,7 +33,7 @@ function messageStyle(variant: MessageVariant): React.CSSProperties {
         return {
             ...base,
             color: "var(--color-warning)",
-            background: "rgba(232, 160, 48, 0.08)",
+            background: "var(--color-warning-bg)",
             borderColor: "var(--color-warning)",
         };
     }

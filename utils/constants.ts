@@ -1,5 +1,7 @@
 export const MAX_WELLS = 32817;
 
+export const CONTENT_MAX_WIDTH = "1400px";
+
 
 export const PRODUCTION_TYPES = {
   oil: {

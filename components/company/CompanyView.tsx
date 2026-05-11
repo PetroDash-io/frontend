@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useState} from "react";
-import {colors, WATERSHED_OPTIONS} from "@/utils/constants";
+import {colors, CONTENT_MAX_WIDTH, WATERSHED_OPTIONS} from "@/utils/constants";
 import {useCompanies} from "@/hooks/useCompanies";
 import {useProductionAggregates} from "@/hooks/useProductionAggregates";
 import {useCompanyComparison} from "@/hooks/useCompanyComparison";
@@ -238,6 +238,8 @@ const styles = {
     gap: 24,
     padding: 24,
     width: "100%",
+    maxWidth: CONTENT_MAX_WIDTH,
+    margin: "0 auto",
     boxSizing: "border-box",
     minWidth: 0,
     backgroundColor: colors.bg,
@@ -261,13 +263,14 @@ const styles = {
   } as React.CSSProperties,
   chartControls: {
     backgroundColor: "var(--color-bg-surface)",
-    borderRadius: 12,
+    borderRadius: "var(--radius-xl)",
     padding: "24px",
     marginBottom: 16,
     boxShadow: "var(--shadow-sm)",
     border: "1px solid var(--color-border-subtle)",
     display: "flex",
     alignItems: "center",
+    flexWrap: "wrap",
     gap: 16,
   } as React.CSSProperties,
   sliderLabel: {
@@ -289,7 +292,7 @@ const styles = {
     gap: 16,
     padding: 24,
     backgroundColor: colors.filtersBg,
-    borderRadius: 12,
+    borderRadius: "var(--radius-xl)",
     border: `1px solid ${colors.panelBorder}`,
     boxShadow: "var(--shadow-sm)",
   } as React.CSSProperties,
@@ -308,14 +311,14 @@ const styles = {
   } as React.CSSProperties,
   chartsContainer: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))",
+    gridTemplateColumns: "repeat(auto-fit, minmax(min(400px, 100%), 1fr))",
     gap: 24,
   } as React.CSSProperties,
   placeholder: {
     padding: 40,
     textAlign: "center",
     backgroundColor: "var(--color-bg-surface)",
-    borderRadius: 12,
+    borderRadius: "var(--radius-xl)",
     border: `1px solid ${colors.panelBorder}`,
     color: colors.text,
   } as React.CSSProperties,
@@ -323,7 +326,7 @@ const styles = {
     padding: 40,
     textAlign: "center",
     backgroundColor: "var(--color-bg-surface)",
-    borderRadius: 12,
+    borderRadius: "var(--radius-xl)",
     border: `1px solid ${colors.panelBorder}`,
     color: colors.text,
   } as React.CSSProperties,

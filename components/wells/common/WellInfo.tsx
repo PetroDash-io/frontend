@@ -131,10 +131,10 @@ const styles = {
         height: "auto",
         maxHeight: "100%",
         minHeight: 0,
-        borderRadius: 14,
+        borderRadius: "var(--radius-2xl)",
         border: "1px solid var(--color-border-subtle)",
         padding: 24,
-        backgroundColor: "#fffdf6",
+        backgroundColor: "var(--color-surface-parchment)",
         color: "var(--color-text-primary)",
         overflowY: "auto",
         boxShadow: "var(--shadow-sm)",
@@ -171,8 +171,8 @@ const styles = {
         marginBottom: 18,
         padding: 12,
         borderRadius: 8,
-        backgroundColor: "#fff9ec",
-        border: "1px solid #ebdfc6",
+        backgroundColor: "var(--color-surface-cream)",
+        border: "1px solid var(--color-border-cream)",
     } as React.CSSProperties,
     detailGrid: {
         display: "grid",
@@ -182,7 +182,7 @@ const styles = {
         fontSize: 13,
     } as React.CSSProperties,
     detailLabel: {
-        color: "#8a6517",
+        color: "var(--color-text-label-warm)",
         fontWeight: 600,
     } as React.CSSProperties,
     detailValue: {

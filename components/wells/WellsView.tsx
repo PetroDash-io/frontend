@@ -4,7 +4,7 @@ import {TableView} from "@/components/wells/TableView";
 import {LimitFilter} from "@/components/wells/common/LimitFilter";
 import {WellFilters} from "@/app/types/wellFilters";
 import {SELECT_DEFAULT_VALUE, SelectFilter} from "@/components/common/SelectFilter";
-import {colors, WATERSHED_OPTIONS} from "@/utils/constants";
+import {colors, CONTENT_MAX_WIDTH, WATERSHED_OPTIONS} from "@/utils/constants";
 import {useWells} from "@/hooks/useWells";
 
 const DEFAULT_FILTERS = {
@@ -138,14 +138,14 @@ const styles = {
         gap: 16,
         padding: "16px",
         marginBottom: 18,
-        borderRadius: 14,
-        border: "1px solid rgba(63, 107, 79, 0.18)",
-        backgroundColor: "rgba(255,255,255,0.92)",
+        borderRadius: "var(--radius-2xl)",
+        border: "1px solid var(--color-brand-subtle)",
+        backgroundColor: "var(--color-surface-glass)",
         boxShadow: "0 10px 22px rgba(0,0,0,0.05)",
     } as React.CSSProperties,
     viewShell: {
         width: "100%",
-        maxWidth: 1480,
+        maxWidth: CONTENT_MAX_WIDTH,
         margin: "0 auto",
     } as React.CSSProperties,
     tabBar: {
@@ -184,7 +184,7 @@ const styles = {
         fontWeight: 700,
         fontSize: 13,
         transition: "all 0.18s ease",
-        boxShadow: active ? "0 4px 10px rgba(63, 107, 79, 0.2)" : "none",
+        boxShadow: active ? `0 4px 10px var(--color-brand-glow)` : "none",
     }) as React.CSSProperties,
 } as const;
 
