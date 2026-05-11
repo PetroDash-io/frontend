@@ -11,7 +11,7 @@ import React, {useState} from "react";
 interface WellsMapProps {
   wells: WellDetail[];
   selectedWellId: number | null;
-  onSelectWell: (id: number) => void;
+  onSelectWell: (id: number | null) => void;
   mapMode: "markers" | "heatmap";
   heatmapData?: GeoJSON.FeatureCollection | null;
   heatmapMaxValue?: number;
@@ -50,6 +50,7 @@ export function WellsMap({
                 }}
                 style={styles.map}
                 mapStyle="mapbox://styles/mapbox/streets-v11"
+                onClick={() => onSelectWell(null)}
                 mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}>
 
                 {/* Heatmap layer */}
@@ -107,7 +108,7 @@ export function WellsMap({
                         return null;
                     }
 
-                    const wellId = Number(item.well_id);
+                    const wellId = item.well_id;
 
                     const isSelected = selectedWellId === wellId;
 
@@ -119,7 +120,10 @@ export function WellsMap({
                                 aria-label={`${item.status || "Well"} ${wellId}`}
                                 onMouseEnter={() => setActivePozo({id: wellId, lon, lat, company: item.company, resource_type: item.resource_type})}
                                 onMouseLeave={() => setActivePozo(null)}
-                                onClick={() => onSelectWell(wellId)}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onSelectWell(wellId);
+                                }}
                                 onFocus={() => setFocusedPozoId(wellId)}
                                 onBlur={() => setFocusedPozoId(null)}
                                 onKeyDown={(e) => {

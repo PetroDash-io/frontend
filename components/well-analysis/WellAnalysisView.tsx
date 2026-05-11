@@ -11,6 +11,8 @@ import {WellInjectionSection} from "@/components/well-analysis/injection/WellInj
 import {AnomalyInfoButton} from "@/components/well-analysis/anomalies/AnomalyInfoButton";
 import {WellComparisonSection} from "@/components/well-analysis/comparison/WellComparisonSection";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
+import {useWell} from "@/hooks/useWell";
+import {WellSummaryChips} from "@/components/well-analysis/WellSummaryChips";
 
 export function WellAnalysisView() {
   const router = useRouter();
@@ -20,13 +22,14 @@ export function WellAnalysisView() {
   const [wellIdInput, setWellIdInput] = useState("");
   const [wellIdInputError, setWellIdInputError] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState<DateRangeValue>(DEFAULT_WELL_CHART_DATE_RANGE);
+  const [queryDateRange, setQueryDateRange] = useState<DateRangeValue>(DEFAULT_WELL_CHART_DATE_RANGE);
   const [openSections, setOpenSections] = useState({
     anomalies: false,
     injection: false,
     comparison: false,
   });
 
-  const validatedDateRange = useMemo(() => getValidatedDateRange(dateRange), [dateRange]);
+  const validatedDateRange = useMemo(() => getValidatedDateRange(queryDateRange), [queryDateRange]);
 
   useEffect(() => {
     const queryWellId = searchParams.get("wellId");
@@ -51,6 +54,12 @@ export function WellAnalysisView() {
     error: errorInWellProduction,
   } = useWellsProduction({wellId, dateRange: validatedDateRange});
 
+  const {
+    data: wellDetails,
+    loading: loadingWellDetails,
+    error: errorGettingWellDetails,
+  } = useWell({wellId});
+
   const curveSeriesData = useMemo(() => {
     if (!wellProduction || wellProduction.length === 0) {
       return [];
@@ -70,21 +79,17 @@ export function WellAnalysisView() {
       }));
   }, [wellProduction]);
 
-  const handleApplyWellId = () => {
+  const handleViewProduction = () => {
     const value = wellIdInput.trim();
-    if (value === "") {
-      setWellId(null);
-      setWellIdInputError(null);
-      const params = new URLSearchParams(searchParams.toString());
-      params.delete("wellId");
-      const nextQuery = params.toString();
-      router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname);
-      return;
-    }
-
     const parsed = parseInt(value, 10);
-    if (!isNaN(parsed) && parsed > 0) {
+    if (isWellIdInputValid) {
       setWellId(parsed);
+      setQueryDateRange(dateRange);
+      setOpenSections({
+        anomalies: false,
+        injection: false,
+        comparison: false,
+      });
       setWellIdInputError(null);
       const params = new URLSearchParams(searchParams.toString());
       params.set("wellId", String(parsed));
@@ -99,9 +104,22 @@ export function WellAnalysisView() {
     setDateRange((previousValues) => ({...previousValues, [filterName]: value}));
   };
 
+  const isWellIdInputValid = (() => {
+    const value = wellIdInput.trim();
+    const parsed = parseInt(value, 10);
+    return value !== "" && !isNaN(parsed) && parsed > 0;
+  })();
+
   const toggleSection = (sectionName: "anomalies" | "injection" | "comparison") => {
     setOpenSections((previous) => ({...previous, [sectionName]: !previous[sectionName]}));
   };
+
+  const handleWellIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setWellIdInput(e.target.value);
+    if (wellIdInputError) {
+      setWellIdInputError(null);
+    }
+  }
 
   return (
     <div style={styles.container}>
@@ -110,49 +128,47 @@ export function WellAnalysisView() {
       </div>
 
       <div style={styles.filtersContainer}>
-        <div style={styles.cardHeader}>
+        <div style={styles.compactFilterHeaderRow}>
           <span className="card-label">Filtros</span>
         </div>
 
-        <div style={styles.filterRow}>
+        <div style={styles.filterToolbarRow}>
           <div style={styles.wellIdFieldContainer}>
             <label style={styles.label}>
-              ID del Pozo:
+              ID del Pozo
               <input
                 type="number"
                 value={wellIdInput}
-                onChange={(e) => {
-                  setWellIdInput(e.target.value);
-                  if (wellIdInputError) {
-                    setWellIdInputError(null);
-                  }
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleApplyWellId();
-                  }
-                }}
-                placeholder="Ingrese ID del pozo"
+                onChange={handleWellIdChange}
+                placeholder="Ingrese ID"
                 style={styles.input}
               />
             </label>
           </div>
-          <button type="button" style={styles.searchButton} onClick={handleApplyWellId}>
-            Buscar
+
+          <div style={styles.dateRangeInlineContainer}>
+            <DateRangeFilters
+              value={dateRange}
+              onChange={updateDateRange}
+              isStartRangeIncomplete={false}
+              isEndRangeIncomplete={false}
+            />
+          </div>
+
+          <button
+            type="button"
+            style={{
+              ...styles.searchButton,
+              ...(isWellIdInputValid ? {} : styles.searchButtonDisabled),
+            }}
+            onClick={handleViewProduction}
+            disabled={!isWellIdInputValid}
+          >
+            Ver producción
           </button>
         </div>
 
         {wellIdInputError && <InlineMessage message={wellIdInputError} variant="warning" />}
-
-        <div style={styles.filterRow}>
-          <DateRangeFilters
-            value={dateRange}
-            onChange={updateDateRange}
-            isStartRangeIncomplete={false}
-            isEndRangeIncomplete={false}
-          />
-        </div>
       </div>
 
       {!wellId && (
@@ -161,7 +177,13 @@ export function WellAnalysisView() {
 
       {wellId && (
         <>
-          <div style={styles.stablePanelWithSurface}>
+          <WellSummaryChips
+            wellDetails={wellDetails}
+            loading={loadingWellDetails}
+            error={errorGettingWellDetails}
+          />
+
+          <div style={styles.productionPanelWithSurface}>
             <div style={styles.cardHeader}>
               <span className="card-label">Curva de producción</span>
             </div>
@@ -237,11 +259,22 @@ const styles = {
   } as React.CSSProperties,
   filtersContainer: {
     backgroundColor: colors.filtersBg,
-    padding: "24px",
+    padding: "14px 16px",
     borderRadius: "8px",
-    marginBottom: "24px",
+    marginBottom: "16px",
     border: `1px solid ${colors.panelBorder}`,
     boxShadow: "var(--shadow-sm)",
+  } as React.CSSProperties,
+  compactFilterHeaderRow: {
+    paddingBottom: "8px",
+    marginBottom: "10px",
+    borderBottom: "1px solid var(--color-border-subtle)",
+  } as React.CSSProperties,
+  filterToolbarRow: {
+    display: "flex",
+    gap: "10px",
+    alignItems: "flex-end",
+    flexWrap: "wrap",
   } as React.CSSProperties,
   cardHeader: {
     paddingBottom: "12px",
@@ -256,39 +289,48 @@ const styles = {
     flexWrap: "wrap",
   } as React.CSSProperties,
   wellIdFieldContainer: {
-    flex: 1,
-    minWidth: "150px",
+    minWidth: "180px",
   } as React.CSSProperties,
   label: {
     display: "flex",
     flexDirection: "column",
-    gap: "6px",
-    fontSize: "14px",
+    gap: "4px",
+    fontSize: "12px",
     fontWeight: 500,
     color: colors.text,
-    flex: "1",
-    minWidth: "150px",
+    minWidth: "140px",
   } as React.CSSProperties,
   input: {
-    padding: "8px 12px",
+    padding: "8px 10px",
     borderRadius: "4px",
     border: `1px solid ${colors.panelBorder}`,
-    fontSize: "14px",
-    minWidth: "120px",
+    fontSize: "13px",
+    minWidth: "130px",
+    height: "40px",
   } as React.CSSProperties,
   searchButton: {
     border: "none",
-    borderRadius: "8px",
-    padding: "9px 14px",
+    borderRadius: "6px",
+    padding: "8px 12px",
     height: "40px",
     backgroundColor: "var(--color-brand-primary)",
     color: "var(--color-text-inverse)",
     fontSize: "13px",
     fontWeight: 600,
     cursor: "pointer",
-    alignSelf: "flex-end",
   } as React.CSSProperties,
-  stablePanelWithSurface: {
+  searchButtonDisabled: {
+    opacity: 0.55,
+    cursor: "not-allowed",
+  } as React.CSSProperties,
+  dateRangeInlineContainer: {
+    display: "flex",
+    flex: 1,
+    minWidth: "320px",
+    gap: "8px",
+    alignItems: "flex-end",
+  } as React.CSSProperties,
+  productionPanelWithSurface: {
     minHeight: "420px",
     marginTop: "24px",
     backgroundColor: "var(--color-bg-surface)",

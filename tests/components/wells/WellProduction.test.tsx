@@ -2,10 +2,15 @@ import {fireEvent, render, screen} from "@testing-library/react";
 import "@testing-library/jest-dom";
 import {WellAnalysisView} from "@/components/well-analysis/WellAnalysisView";
 import {useWellsProduction} from "@/hooks/useWellProduction";
+import {useWell} from "@/hooks/useWell";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
 
 jest.mock("@/hooks/useWellProduction", () => ({
   useWellsProduction: jest.fn(),
+}));
+
+jest.mock("@/hooks/useWell", () => ({
+  useWell: jest.fn(),
 }));
 
 jest.mock("next/navigation", () => ({
@@ -48,6 +53,27 @@ describe("WellProductionComparisonView", () => {
       loading: false,
       error: null,
     });
+
+    (useWell as jest.Mock).mockReturnValue({
+      data: {
+        well_id: 123,
+        watershed: "NEUQUINA",
+        province: "Neuquen",
+        area: "Loma",
+        company: "YPF",
+        field: "Campo",
+        formation: "Formacion",
+        classification: "No informado",
+        resource_type: "oil",
+        well_type: "Productor",
+        extraction_type: "Bombeo",
+        status: "Activo",
+        depth: 1000,
+        first_production_activity_date: "2021-03-01",
+      },
+      loading: false,
+      error: null,
+    });
   });
 
   test("muestra mensaje inicial sin pozo", () => {
@@ -58,41 +84,74 @@ describe("WellProductionComparisonView", () => {
   test("permite ingresar ID de pozo", () => {
     render(<WellAnalysisView />);
 
-    const input = screen.getByPlaceholderText(/Ingrese ID del pozo/i);
+    const input = screen.getByPlaceholderText(/Ingrese ID/i);
     fireEvent.change(input, {target: {value: "123"}});
 
     expect(input).toHaveValue(123);
   });
 
-  test("muestra error con ID inválido", () => {
+  test("deshabilita acción con ID inválido", () => {
     render(<WellAnalysisView />);
 
-    const input = screen.getByPlaceholderText(/Ingrese ID del pozo/i);
+    const input = screen.getByPlaceholderText(/Ingrese ID/i);
     fireEvent.change(input, {target: {value: "-5"}});
-    fireEvent.click(screen.getByText("Buscar"));
+    const button = screen.getByRole("button", {name: "Ver producción"});
 
-    expect(screen.getByText("Ingresá un ID de pozo válido.")).toBeInTheDocument();
+    expect(button).toBeDisabled();
   });
 
   test("muestra flujo de secciones al buscar con ID válido", () => {
     render(<WellAnalysisView />);
 
-    const input = screen.getByPlaceholderText(/Ingrese ID del pozo/i);
+    const input = screen.getByPlaceholderText(/Ingrese ID/i);
     fireEvent.change(input, {target: {value: "123"}});
-    fireEvent.click(screen.getByText("Buscar"));
+    fireEvent.click(screen.getByText("Ver producción"));
 
     expect(screen.getByText("WellProductionSection")).toBeInTheDocument();
     expect(screen.getByText("Anomalías")).toBeInTheDocument();
     expect(screen.getByText("Curva de inyección")).toBeInTheDocument();
     expect(screen.getByText("Comparación")).toBeInTheDocument();
+    expect(screen.getByText("Resumen del pozo")).toBeInTheDocument();
+    expect(screen.getByText("03/2021")).toBeInTheDocument();
+  });
+
+  test("muestra fallback cuando no hay historial de producción", () => {
+    (useWell as jest.Mock).mockReturnValue({
+      data: {
+        well_id: 123,
+        watershed: "NEUQUINA",
+        province: "Neuquen",
+        area: "Loma",
+        company: "YPF",
+        field: "Campo",
+        formation: "Formacion",
+        classification: "No informado",
+        resource_type: "oil",
+        well_type: "Productor",
+        extraction_type: "Bombeo",
+        status: "Activo",
+        depth: 1000,
+        first_production_activity_date: null,
+      },
+      loading: false,
+      error: null,
+    });
+
+    render(<WellAnalysisView />);
+
+    const input = screen.getByPlaceholderText(/Ingrese ID/i);
+    fireEvent.change(input, {target: {value: "123"}});
+    fireEvent.click(screen.getByText("Ver producción"));
+
+    expect(screen.getByText("No hay producción registrada")).toBeInTheDocument();
   });
 
   test("expande sección de comparación al togglear", () => {
     render(<WellAnalysisView />);
 
-    const input = screen.getByPlaceholderText(/Ingrese ID del pozo/i);
+    const input = screen.getByPlaceholderText(/Ingrese ID/i);
     fireEvent.change(input, {target: {value: "123"}});
-    fireEvent.click(screen.getByText("Buscar"));
+    fireEvent.click(screen.getByText("Ver producción"));
 
     expect(screen.queryByText("WellComparisonSection")).not.toBeInTheDocument();
     fireEvent.click(screen.getByText("Comparación").closest("div")!.querySelector("button")!);
@@ -102,9 +161,9 @@ describe("WellProductionComparisonView", () => {
   test("actualiza la URL al buscar con ID válido", () => {
     render(<WellAnalysisView />);
 
-    const input = screen.getByPlaceholderText(/Ingrese ID del pozo/i);
+    const input = screen.getByPlaceholderText(/Ingrese ID/i);
     fireEvent.change(input, {target: {value: "123"}});
-    fireEvent.click(screen.getByText("Buscar"));
+    fireEvent.click(screen.getByText("Ver producción"));
 
     expect(replaceMock).toHaveBeenCalledWith("/analisis-pozo?wellId=123");
   });

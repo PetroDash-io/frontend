@@ -12,7 +12,7 @@ export interface WellGeoPoint {
 }
 
 export interface WellDetail {
-  well_id: string | number;
+  well_id: number;
   watershed: string;
   province: string;
   area: string;
@@ -26,6 +26,7 @@ export interface WellDetail {
   status: string;
   depth: number;
   geojson?: string | WellGeoPoint;
+  first_production_activity_date?: string | null;
 }
 
 export interface ProductionMonthly {

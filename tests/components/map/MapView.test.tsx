@@ -28,7 +28,7 @@ jest.mock("@/components/wells/map/WellsMap", () => ({
     overlayControlsTopRight,
     overlayControlsBottomCenter,
   }: {
-    onSelectWell: (wellId: number) => void;
+    onSelectWell: (wellId: number | null) => void;
     overlayControlsTopRight?: React.ReactNode;
     overlayControlsBottomCenter?: React.ReactNode;
   }) => (
@@ -41,10 +41,21 @@ jest.mock("@/components/wells/map/WellsMap", () => ({
 }));
 
 jest.mock("@/components/wells/common/WellInfo", () => ({
-  WellInfo: ({metricsItems}: {metricsItems?: Array<{label: string}>}) => (
+  WellInfo: ({onDeselectWell, wellInfo}: {onDeselectWell?: () => void; wellInfo?: {well_id?: number} | null}) => (
     <div>
       WellInfo
-      {metricsItems && metricsItems.length > 0 ? <span>MetricsLoaded</span> : null}
+      {wellInfo ? <span>{`WellInfo-${wellInfo.well_id}`}</span> : <span>WellInfo-Empty</span>}
+      <button onClick={() => onDeselectWell?.()}>Deseleccionar</button>
+    </div>
+  ),
+}));
+
+jest.mock("@/components/wells/common/WellMetrics", () => ({
+  WellMetrics: ({items}: {items?: Array<{label: string}>}) => (
+    <div>
+      WellMetrics
+      <span>Resumen de pozos filtrados</span>
+      {items && items.length > 0 ? <span>MetricsLoaded</span> : null}
     </div>
   ),
 }));
@@ -142,17 +153,47 @@ describe("MapView", () => {
     expect(onSelectHeatmapResource).toHaveBeenCalledWith("gas");
   });
 
-  it("renderiza WellInfo y permite seleccionar pozo", () => {
+  it("renderiza WellMetrics y WellInfo, y permite seleccionar pozo", () => {
     const onSelectWell = jest.fn();
     render(<MapView {...defaultProps} mode="pozos" onSelectWell={onSelectWell} />);
 
+    expect(screen.getByText("WellMetrics")).toBeInTheDocument();
+    expect(screen.getByText("Resumen de pozos filtrados")).toBeInTheDocument();
     expect(screen.getByText("WellInfo")).toBeInTheDocument();
+    expect(screen.getByText("WellInfo-Empty")).toBeInTheDocument();
     fireEvent.click(screen.getByText("Select Well"));
     expect(onSelectWell).toHaveBeenCalledWith(1);
     expect(screen.getByText("WellInfo")).toBeInTheDocument();
   });
 
-  it("pasa métricas a WellInfo cuando hay datos iniciales", () => {
+  it("permite deseleccionar pozo desde WellInfo", () => {
+    const onSelectWell = jest.fn();
+    render(<MapView {...defaultProps} mode="pozos" onSelectWell={onSelectWell} />);
+
+    fireEvent.click(screen.getByText("Deseleccionar"));
+    expect(onSelectWell).toHaveBeenCalledWith(null);
+  });
+
+  it("muestra estado de pozo seleccionado en el mapa", () => {
+    render(<MapView {...defaultProps} mode="pozos" selectedWellId={533} />);
+
+    expect(screen.getByText("Pozo 533 seleccionado")).toBeInTheDocument();
+  });
+
+  it("limpia WellInfo si no hay selectedWellId aunque exista detalle previo", () => {
+    (useWell as jest.Mock).mockReturnValue({
+      data: {well_id: 999},
+      loading: false,
+      error: null,
+    });
+
+    render(<MapView {...defaultProps} mode="pozos" selectedWellId={null} />);
+
+    expect(screen.getByText("WellInfo-Empty")).toBeInTheDocument();
+    expect(screen.queryByText("WellInfo-999")).not.toBeInTheDocument();
+  });
+
+  it("pasa métricas a WellMetrics cuando hay datos iniciales", () => {
     (useMapMetrics as jest.Mock).mockReturnValue({
       data: {
         source: "db",

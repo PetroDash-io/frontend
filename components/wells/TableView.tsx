@@ -36,7 +36,13 @@ export function TableView({filters, currentPage, onChangePage}: TableViewProps) 
 
     return (
         <>
-            <WellsTable data={wells || []}/>
+            <WellsTable
+                data={wells || []}
+                filters={filters}
+                currentPage={currentPage}
+                totalItems={totalItems}
+                pageSize={pageSize}
+            />
 
             <div style={styles.paginationContainer}>
                 <button
