@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { TopProductionFilters } from "@/app/types";
 import { useTopProduction } from "@/hooks/useTopProduction";
-import { colors, PIE_CHART_COLORS, AREAS_POR_PROVINCIA, WATERSHED_OPTIONS } from "@/utils/constants";
+import { colors, CONTENT_MAX_WIDTH, PIE_CHART_COLORS, AREAS_POR_PROVINCIA, WATERSHED_OPTIONS } from "@/utils/constants";
 import { SelectFilter } from "@/components/common/SelectFilter";
 import {YearMonthRangeFilters} from "@/components/common/YearMonthRangeFilters";
 import { exportMultipleSheetsToExcel } from "@/utils/excel";
@@ -321,7 +321,7 @@ export function CompanyRankingView() {
             </button>
           </div>
 
-          <div style={styles.chartAndRankingContainer}>
+          <div className="ranking-chart-grid" style={styles.chartAndRankingContainer}>
             <div style={styles.chartWrapper}>
               <ResponsiveContainer width="100%" height={450}>
                 <PieChart>
@@ -393,6 +393,8 @@ const styles: Record<string, React.CSSProperties> = {
     gap: 24,
     padding: 24,
     width: "100%",
+    maxWidth: CONTENT_MAX_WIDTH,
+    margin: "0 auto",
     boxSizing: "border-box",
     minWidth: 0,
     backgroundColor: colors.bg,
@@ -408,7 +410,7 @@ const styles: Record<string, React.CSSProperties> = {
     gap: 16,
     padding: 24,
     backgroundColor: colors.filtersBg,
-    borderRadius: 12,
+    borderRadius: "var(--radius-xl)",
     border: `1px solid ${colors.panelBorder}`,
     boxShadow: "var(--shadow-sm)",
   },
@@ -424,7 +426,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   mainChartContainer: {
     backgroundColor: "var(--color-bg-surface)",
-    borderRadius: 12,
+    borderRadius: "var(--radius-xl)",
     padding: 24,
     border: "1px solid var(--color-border-subtle)",
     boxShadow: "var(--shadow-sm)",
@@ -452,6 +454,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   headerStats: {
     display: "flex",
+    flexWrap: "wrap",
     gap: 24,
   },
   headerStat: {
@@ -472,7 +475,6 @@ const styles: Record<string, React.CSSProperties> = {
   },
   chartAndRankingContainer: {
     display: "grid",
-    gridTemplateColumns: "1fr 400px",
     gap: 32,
     alignItems: "start",
   },
@@ -482,7 +484,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   rankingContainer: {
     backgroundColor: "var(--color-bg-surface)",
-    borderRadius: 12,
+    borderRadius: "var(--radius-xl)",
     padding: 24,
     height: 450,
     overflowY: "auto",
@@ -506,7 +508,7 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     gap: 12,
     padding: 12,
-    backgroundColor: "white",
+    backgroundColor: "var(--color-bg-surface)",
     borderRadius: 8,
     border: "1px solid var(--color-border-subtle)",
     transition: "all 0.2s ease",
@@ -522,7 +524,7 @@ const styles: Record<string, React.CSSProperties> = {
     width: 32,
     height: 32,
     borderRadius: "50%",
-    color: "white",
+    color: "var(--color-text-inverse)",
     fontWeight: 700,
     fontSize: 14,
   },
@@ -564,7 +566,7 @@ const styles: Record<string, React.CSSProperties> = {
     padding: 40,
     fontSize: 16,
     color: "var(--color-error)",
-    backgroundColor: "rgba(192, 57, 43, 0.08)",
+    backgroundColor: "var(--color-error-bg)",
     borderRadius: 8,
   },
   noData: {
@@ -572,11 +574,11 @@ const styles: Record<string, React.CSSProperties> = {
     padding: 60,
     color: "var(--color-text-muted)",
     fontSize: 16,
-    backgroundColor: "white",
-    borderRadius: 12,
+    backgroundColor: "var(--color-bg-surface)",
+    borderRadius: "var(--radius-xl)",
   },
   tooltip: {
-    backgroundColor: "white",
+    backgroundColor: "var(--color-bg-surface)",
     border: "1px solid var(--color-border-subtle)",
     borderRadius: 8,
     padding: 12,

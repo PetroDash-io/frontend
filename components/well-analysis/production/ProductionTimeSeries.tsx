@@ -82,7 +82,7 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     gap: 10,
-    borderRadius: 14,
+    borderRadius: "var(--radius-2xl)",
     border: `1px solid ${colors.panelBorder}`,
     backgroundColor: "var(--color-bg-surface)",
   } as React.CSSProperties,

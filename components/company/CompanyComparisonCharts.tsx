@@ -281,7 +281,7 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     gap: 16,
-    borderRadius: 14,
+    borderRadius: "var(--radius-2xl)",
     border: `1px solid ${colors.panelBorder}`,
     padding: 24,
     backgroundColor: "var(--color-bg-surface)",

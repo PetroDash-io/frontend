@@ -74,7 +74,7 @@ const styles = {
     gap: 16,
     padding: 24,
     backgroundColor: colors.filtersBg,
-    borderRadius: 12,
+    borderRadius: "var(--radius-xl)",
     border: `1px solid ${colors.panelBorder}`,
     boxShadow: "var(--shadow-sm)",
   } as React.CSSProperties,
