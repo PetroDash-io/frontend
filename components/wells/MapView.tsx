@@ -181,7 +181,9 @@ export function MapView({
           <WellInfo
             wellInfo={displayedWellInfo}
             loadingWell={loadingWell}
-            onDeselectWell={() => onSelectWell(null)}
+            metricsItems={metricsItems}
+            metricsLoading={loadingMetrics}
+            metricsError={errorGettingMetrics}
           />
         </div>
       </div>
