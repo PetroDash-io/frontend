@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo} from "react";
-import {WellInfo} from "@/components/wells/map/WellInfo";
+import {WellInfo} from "@/components/wells/common/WellInfo";
 import {WellMetrics} from "@/components/wells/common/WellMetrics";
 import {WellsMap} from "@/components/wells/map/WellsMap";
 import {useWell} from "@/hooks/useWell";
@@ -181,9 +181,7 @@ export function MapView({
           <WellInfo
             wellInfo={displayedWellInfo}
             loadingWell={loadingWell}
-            metricsItems={metricsItems}
-            metricsLoading={loadingMetrics}
-            metricsError={errorGettingMetrics}
+            onDeselectWell={() => onSelectWell(null)}
           />
         </div>
       </div>
@@ -216,10 +214,12 @@ const styles = {
   } as React.CSSProperties,
   wellDetailsContainer: {
     display: "grid",
+    gridTemplateColumns: "minmax(0, 1fr) minmax(320px, 420px)",
     alignItems: "stretch",
     gap: 16,
     minWidth: 0,
     minHeight: 0,
+    height: "clamp(420px, 60vh, 700px)",
   } as React.CSSProperties,
   mapTopRightStack: {
     display: "flex",

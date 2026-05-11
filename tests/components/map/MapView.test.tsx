@@ -35,7 +35,7 @@ jest.mock("@/components/wells/map/WellsMap", () => ({
   ),
 }));
 
-jest.mock("@/components/wells/map/WellInfo", () => ({
+jest.mock("@/components/wells/common/WellInfo", () => ({
   WellInfo: ({onDeselectWell, wellInfo}: {onDeselectWell?: () => void; wellInfo?: {well_id?: number} | null}) => (
     <div>
       WellInfo
