@@ -32,7 +32,7 @@ test("renderiza la tabla con datos", () => {
       error: null,
     });
   
-    render(<TableView filters={{} as any} />);
+    render(<TableView filters={{} as any} currentPage={0} onChangePage={jest.fn()} />);
   
     expect(screen.getByText("TABLE 2")).toBeInTheDocument();
   });
@@ -45,7 +45,7 @@ test("dispara toast cuando hay error", () => {
     error: "Error grave",
   });
 
-  render(<TableView filters={{} as any} />);
+  render(<TableView filters={{} as any} currentPage={0} onChangePage={jest.fn()} />);
 
   expect(toast.error).toHaveBeenCalledWith(
     "Error grave",

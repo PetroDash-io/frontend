@@ -6,6 +6,7 @@ import {MetricsSummary, MetricsSummaryItem} from "@/components/wells/map/Metrics
 interface WellInfoProps {
     wellInfo: WellDetail | null;
     loadingWell: boolean;
+    onDeselectWell?: () => void;
     metricsItems?: MetricsSummaryItem[];
     metricsLoading?: boolean;
     metricsError?: string | null;
@@ -15,6 +16,7 @@ interface WellInfoProps {
 export function WellInfo({
     wellInfo,
     loadingWell,
+    onDeselectWell,
     metricsItems = [],
     metricsLoading = false,
     metricsError,
@@ -65,9 +67,16 @@ export function WellInfo({
 
             {wellInfo && !loadingWell && (
                 <>
-                    <Link href={`/analisis-pozo?wellId=${wellInfo.well_id}`} style={styles.analyzeButton}>
-                        Analizar pozo
-                    </Link>
+                    <div style={styles.actionsRow}>
+                        <Link href={`/analisis-pozo?wellId=${wellInfo.well_id}`} style={styles.analyzeButton}>
+                            Analizar pozo
+                        </Link>
+                        {onDeselectWell ? (
+                            <button type="button" onClick={onDeselectWell} style={styles.clearSelectionButtonRow}>
+                                Deseleccionar
+                            </button>
+                        ) : null}
+                    </div>
 
                     <section style={styles.section}>
                         <span className="card-label">Ubicación</span>
@@ -166,8 +175,7 @@ const styles = {
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
-        width: "100%",
-        marginBottom: 14,
+        flex: 1,
         border: "1px solid var(--color-brand-primary)",
         borderRadius: 8,
         padding: "10px 12px",
@@ -176,5 +184,21 @@ const styles = {
         fontSize: 13,
         fontWeight: 700,
         textDecoration: "none",
+    } as React.CSSProperties,
+    actionsRow: {
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        marginBottom: 14,
+    } as React.CSSProperties,
+    clearSelectionButtonRow: {
+        border: "1px solid var(--color-border-medium)",
+        borderRadius: 8,
+        backgroundColor: "var(--color-bg-surface)",
+        color: "var(--color-text-primary)",
+        fontSize: 13,
+        fontWeight: 700,
+        cursor: "pointer",
+        padding: "10px 12px",
     } as React.CSSProperties,
 } as const;

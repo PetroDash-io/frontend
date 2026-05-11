@@ -12,7 +12,7 @@ test("renderiza los headers de la tabla", () => {
 
 const mockData = [
   {
-    well_id: "123",
+    well_id: 123,
     company: "YPF",
     province: "Neuquén",
     watershed: "Neuquina",
