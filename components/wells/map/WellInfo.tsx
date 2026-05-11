@@ -2,7 +2,6 @@ import React from "react";
 import {WellDetail} from "@/app/types";
 import Link from "next/link";
 import {MetricsSummary, MetricsSummaryItem} from "@/components/wells/map/MetricsSummary";
-import {colors} from "@/utils/constants";
 
 interface WellInfoProps {
     wellInfo: WellDetail | null;
@@ -118,10 +117,10 @@ const styles = {
         maxHeight: "100%",
         minHeight: 0,
         borderRadius: "var(--radius-2xl)",
-        border: `1px solid ${colors.panelBorder}`,
-        padding: 18,
-        backgroundColor: colors.panel,
-        color: colors.textLight,
+        border: "1px solid var(--color-border-subtle)",
+        padding: 24,
+        backgroundColor: "var(--color-surface-parchment)",
+        color: "var(--color-text-primary)",
         overflowY: "auto",
         boxShadow: "var(--shadow-sm)",
     } as React.CSSProperties,
@@ -144,9 +143,9 @@ const styles = {
         gap: 10,
         marginBottom: 18,
         padding: 12,
-        borderRadius: 8,
-        backgroundColor: "#fff9ec",
-        border: "1px solid #ebdfc6",
+        borderRadius: "var(--radius-lg)",
+        backgroundColor: "var(--color-surface-cream)",
+        border: "1px solid var(--color-border-cream)",
     } as React.CSSProperties,
     detailGrid: {
         display: "grid",
@@ -156,7 +155,7 @@ const styles = {
         fontSize: 13,
     } as React.CSSProperties,
     detailLabel: {
-        color: "#8a6517",
+        color: "var(--color-text-label-warm)",
         fontWeight: 600,
     } as React.CSSProperties,
     detailValue: {
