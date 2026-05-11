@@ -28,7 +28,7 @@ export function WellsView() {
     const [view, setView] = useState<"map" | "table">("map");
     const [dataMode, setDataMode] = useState<"pozos" | "heatmap">("pozos");
     const [heatmapResource, setHeatmapResource] = useState<"oil" | "gas" | "water">("oil");
-    const {data: allWells} = useWells({filters});
+    const {data: allWells, loading: loadingWells, error: errorGettingWells} = useWells({filters});
 
     const provinceFilterOptions = useMemo(() => {
         if (!allWells) return [];
@@ -100,6 +100,9 @@ export function WellsView() {
                 <>
                     <MapView
                         filters={filters}
+                        wells={allWells || []}
+                        loadingWells={loadingWells}
+                        errorGettingWells={errorGettingWells}
                         mode={dataMode}
                         onChangeMode={setDataMode}
                         selectedWellId={selectedWellId}

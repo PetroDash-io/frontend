@@ -1,14 +1,9 @@
 import {fireEvent, render, screen} from "@testing-library/react";
 import "@testing-library/jest-dom";
 import {MapView} from "@/components/wells/MapView";
-import {useWells} from "@/hooks/useWells";
 import {useWell} from "@/hooks/useWell";
 import {useMapHeatmap} from "@/hooks/useMapHeatmap";
 import {useMapMetrics} from "@/hooks/useMapMetrics";
-
-jest.mock("@/hooks/useWells", () => ({
-  useWells: jest.fn(),
-}));
 
 jest.mock("@/hooks/useWell", () => ({
   useWell: jest.fn(),
@@ -68,6 +63,9 @@ const defaultProps = {
     company: "",
     limit: 0,
   },
+  wells: [],
+  loadingWells: false,
+  errorGettingWells: null,
   mode: "pozos" as const,
   onChangeMode: jest.fn(),
   selectedWellId: null,
@@ -77,12 +75,6 @@ const defaultProps = {
 };
 
 beforeEach(() => {
-  (useWells as jest.Mock).mockReturnValue({
-    data: [],
-    loading: false,
-    error: null,
-  });
-
   (useWell as jest.Mock).mockReturnValue({
     data: null,
     loading: false,
@@ -215,24 +207,12 @@ describe("MapView", () => {
   });
 
   it("muestra mensaje de error si falla useWells", () => {
-    (useWells as jest.Mock).mockReturnValue({
-      data: null,
-      loading: false,
-      error: "Error cargando pozos",
-    });
-
-    render(<MapView {...defaultProps} mode="pozos" />);
+    render(<MapView {...defaultProps} mode="pozos" errorGettingWells="Error cargando pozos" />);
     expect(screen.getByText("Error cargando pozos")).toBeInTheDocument();
   });
 
   it("muestra loading mientras carga wells", () => {
-    (useWells as jest.Mock).mockReturnValue({
-      data: null,
-      loading: true,
-      error: null,
-    });
-
-    render(<MapView {...defaultProps} mode="pozos" />);
+    render(<MapView {...defaultProps} mode="pozos" loadingWells={true} />);
     expect(screen.getByRole("status")).toBeInTheDocument();
   });
 });
