@@ -14,6 +14,7 @@ import {WellComparisonSection} from "@/components/well-analysis/comparison/WellC
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {useWell} from "@/hooks/useWell";
 import {WellSummaryChips} from "@/components/well-analysis/WellSummaryChips";
+import { MonthlyAggregatedSection } from "@/components/well-analysis/production/MonthlyAggregatedSection";
 
 export function WellAnalysisView() {
   const router = useRouter();
@@ -29,6 +30,7 @@ export function WellAnalysisView() {
     anomalies: false,
     injection: false,
     comparison: false,
+    aggregated: false,
   });
 
   const validatedDateRange = useMemo(() => getValidatedDateRange(queryDateRange), [queryDateRange]);
@@ -67,6 +69,7 @@ export function WellAnalysisView() {
     }
 
     return wellProduction
+      .filter((r) => r.data_date)
       .slice()
       .sort((a, b) => a.data_date.localeCompare(b.data_date))
       .map((record) => ({
@@ -86,6 +89,7 @@ export function WellAnalysisView() {
     }
 
     return wellProduction
+      .filter((r) => r.data_date)
       .slice()
       .sort((a, b) => a.data_date.localeCompare(b.data_date))
       .map((record) => ({
@@ -117,6 +121,7 @@ export function WellAnalysisView() {
         anomalies: false,
         injection: false,
         comparison: false,
+        aggregated: false,
       });
       setWellIdInputError(null);
       const params = new URLSearchParams(searchParams.toString());
@@ -138,7 +143,7 @@ export function WellAnalysisView() {
     return value !== "" && !isNaN(parsed) && parsed > 0;
   })();
 
-  const toggleSection = (sectionName: "accumulated" | "anomalies" | "injection" | "comparison") => {
+  const toggleSection = (sectionName: "accumulated" | "anomalies" | "injection" | "comparison" | "aggregated") => {
     setOpenSections((previous) => ({...previous, [sectionName]: !previous[sectionName]}));
   };
 
@@ -268,6 +273,15 @@ export function WellAnalysisView() {
               onToggle={() => toggleSection("comparison")}
             >
               <WellComparisonSection wellId={wellId} dateRange={validatedDateRange} />
+            </CollapsiblePanel>
+
+
+            <CollapsiblePanel
+              title="Curva agregada"
+              isOpen={openSections.aggregated}
+              onToggle={() => toggleSection("aggregated")}
+            >
+              <MonthlyAggregatedSection />
             </CollapsiblePanel>
           </div>
         </>
