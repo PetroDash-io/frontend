@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { WellsTable } from "../../../components/table/WellsTable";
+import { WellsTable } from "@/components/wells/table/WellsTable";
 
 test("renderiza los headers de la tabla", () => {
   render(<WellsTable data={[]} />);
@@ -12,7 +12,7 @@ test("renderiza los headers de la tabla", () => {
 
 const mockData = [
   {
-    well_id: "123",
+    well_id: 123,
     company: "YPF",
     province: "Neuquén",
     watershed: "Neuquina",

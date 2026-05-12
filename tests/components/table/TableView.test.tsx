@@ -1,12 +1,12 @@
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { TableView } from "@/components/table/TableView";
+import { TableView } from "@/components/wells/TableView";
 import { useWells } from "@/hooks/useWells";
 import { toast } from "react-toastify";
 
 jest.mock("@/hooks/useWells");
 
-jest.mock("@/components/table/WellsTable", () => ({
+jest.mock("@/components/wells/table/WellsTable", () => ({
   WellsTable: ({ data }: any) => <div>TABLE {data.length}</div>,
 }));
 
@@ -32,7 +32,7 @@ test("renderiza la tabla con datos", () => {
       error: null,
     });
   
-    render(<TableView filters={{} as any} />);
+    render(<TableView filters={{} as any} currentPage={0} onChangePage={jest.fn()} />);
   
     expect(screen.getByText("TABLE 2")).toBeInTheDocument();
   });
@@ -45,7 +45,7 @@ test("dispara toast cuando hay error", () => {
     error: "Error grave",
   });
 
-  render(<TableView filters={{} as any} />);
+  render(<TableView filters={{} as any} currentPage={0} onChangePage={jest.fn()} />);
 
   expect(toast.error).toHaveBeenCalledWith(
     "Error grave",

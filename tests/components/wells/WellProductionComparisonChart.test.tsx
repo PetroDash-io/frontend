@@ -1,20 +1,24 @@
-// WellProductionComparisonChart.test.tsx
+// WellProductionComparisonView.test.tsx
 
 import { fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { WellProductionComparisonChart} from "../../../components/wells/WellProductionComparisonChart";
+import { WellProductionComparisonView} from "../../../components/wells/WellProductionComparisonView";
 
 import { useWellProductionComparison } from "@/hooks/useWellProductionComparison";
+import { useMonthlyAggregatedProduction } from "@/hooks/useMonthlyAggregatedProduction";
 
 jest.mock("@/hooks/useWellProductionComparison");
+jest.mock("@/hooks/useMonthlyAggregatedProduction");
+
 const mockHook = (value: any) => {
     (useWellProductionComparison as jest.Mock).mockReturnValue(value);
+    (useMonthlyAggregatedProduction as jest.Mock).mockReturnValue({ data: null, loading: false });
   };
   
 test("muestra mensaje inicial sin pozo", () => {
     mockHook({ data: null, loading: false, error: null });
   
-    render(<WellProductionComparisonChart />);
+    render(<WellProductionComparisonView />);
   
     expect(screen.getByText(/Ingrese un ID de pozo/i)).toBeInTheDocument();
   });
@@ -23,7 +27,7 @@ test("muestra mensaje inicial sin pozo", () => {
 test("permite ingresar ID de pozo", () => {
     mockHook({ data: null, loading: false, error: null });
   
-    render(<WellProductionComparisonChart />);
+    render(<WellProductionComparisonView />);
   
     const input = screen.getByPlaceholderText(/Ingrese ID del pozo/i);
   
@@ -50,7 +54,7 @@ test("permite ingresar ID de pozo", () => {
       }
     });
   
-    render(<WellProductionComparisonChart />);
+    render(<WellProductionComparisonView />);
   
     expect(screen.getByText(/YPF/i)).toBeInTheDocument();
     expect(screen.getByText(/Neuquén/i)).toBeInTheDocument();
@@ -70,7 +74,7 @@ test("muestra botón de descarga solo con datos", () => {
     }
   });
 
-  render(<WellProductionComparisonChart />);
+  render(<WellProductionComparisonView />);
 
   expect(screen.getByText(/Descargar Excel/i)).toBeInTheDocument();
 });
@@ -90,7 +94,7 @@ test("muestra botón de descarga solo con datos", () => {
     }
   });
 
-  render(<WellProductionComparisonChart />);
+  render(<WellProductionComparisonView />);
 
   expect(screen.getByText(/Descargar Excel/i)).toBeInTheDocument();
 });

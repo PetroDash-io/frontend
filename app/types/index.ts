@@ -1,5 +1,5 @@
 export interface ActiveWell {
-  id: string;
+  id: number;
   lon: number;
   lat: number;
   company: string | null;
@@ -12,7 +12,7 @@ export interface WellGeoPoint {
 }
 
 export interface WellDetail {
-  well_id: string | number;
+  well_id: number;
   watershed: string;
   province: string;
   area: string;
@@ -26,6 +26,7 @@ export interface WellDetail {
   status: string;
   depth: number;
   geojson?: string | WellGeoPoint;
+  first_production_activity_date?: string | null;
 }
 
 export interface ProductionMonthly {
@@ -36,6 +37,9 @@ export interface ProductionMonthly {
   oil_production: number;
   gas_production: number;
   water_production: number;
+  cumulative_oil_production?: number;
+  cumulative_gas_production?: number;
+  cumulative_water_production?: number;
   water_injection?: number;
   gas_injection?: number;
   co2_injection?: number;
@@ -126,10 +130,6 @@ export interface WellProductionComparisonResponse {
 }
 
 export interface WellProductionComparisonFilters {
-  inicio_anio?: number;
-  inicio_mes?: number;
-  fin_anio?: number;
-  fin_mes?: number;
   median_by?: string[];
 }
 
@@ -160,6 +160,17 @@ export interface TopProductionFilters {
   fin_anio?: number;
   fin_mes?: number;
   limit?: number;
+}
+
+export interface MapMetricsResponse {
+  source: string;
+  resource: "oil" | "gas" | "water";
+  active_wells: number;
+  stopped_wells: number;
+  inactive_wells: number;
+  not_informed_wells: number;
+  total_production_last_month: number | null;
+  last_month: string | null;
 }
 
 export type {

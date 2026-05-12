@@ -1,17 +1,16 @@
-"use client";
-
 import React, {useMemo} from "react";
 import {colors, COMPANY_COLORS} from "@/utils/constants";
 import {Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis, Pie, PieChart, Cell} from "recharts";
 import {CompanyProductionData} from "@/app/types";
 import {convertValueToUnit} from "@/utils/units";
-import {exportToExcel} from "@/utils/excel";
+import {exportMultipleSheetsToExcel} from "@/utils/excel";
 
 interface CompanyComparisonChartsProps {
   companies: CompanyProductionData[];
   unit: string;
   fechaInicio?: string;
   fechaFin?: string;
+  watershed?: string;
 }
 
 const RESOURCE_NAMES = ["Petróleo", "Gas", "Agua"] as const;
@@ -128,7 +127,14 @@ export function CompanyComparisonCharts({
   unit,
   fechaInicio,
   fechaFin,
+  watershed,
 }: CompanyComparisonChartsProps) {
+
+  const unitLabel = unit || "m³";
+  const unitSlug = unitLabel === "m³" ? "m3" : unitLabel.toLowerCase();
+  const watershedSlug = watershed
+    ? watershed.replace(/[^a-zA-Z0-9]/g, "-")
+    : "todas";
 
   const generateFileName = (prefix: string) => {
     const today = new Date().toISOString().split('T')[0];
@@ -136,6 +142,8 @@ export function CompanyComparisonCharts({
     let fileName = `${prefix}-${companyNames}`;
     if (fechaInicio) fileName += `-desde-${fechaInicio}`;
     if (fechaFin) fileName += `-hasta-${fechaFin}`;
+    fileName += `-cuenca-${watershedSlug}`;
+    fileName += `-unidad-${unitSlug}`;
     fileName += `-${today}`;
     return fileName;
   };
@@ -160,7 +168,26 @@ export function CompanyComparisonCharts({
       });
       return formatted;
     });
-    exportToExcel(formattedData, generateFileName(prefix), sheetName);
+
+    const filterSheet = [
+      {
+        Filtro: "Empresas",
+        Valor: companies.length ? companies.map(c => c.company).join(" vs ") : "Sin empresas",
+      },
+      { Filtro: "Cuenca", Valor: watershed || "Todas" },
+      { Filtro: "Fecha inicio", Valor: fechaInicio || "Todas" },
+      { Filtro: "Fecha fin", Valor: fechaFin || "Todas" },
+      { Filtro: "Unidad", Valor: unitLabel },
+      { Filtro: "Metrica", Valor: sheetName },
+    ];
+
+    exportMultipleSheetsToExcel(
+      [
+        { data: formattedData, sheetName },
+        { data: filterSheet, sheetName: "Filtros" },
+      ],
+      generateFileName(prefix)
+    );
   };
 
   // Datos para los gráficos de torta (porcentajes)
@@ -254,7 +281,7 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     gap: 16,
-    borderRadius: 14,
+    borderRadius: "var(--radius-2xl)",
     border: `1px solid ${colors.panelBorder}`,
     padding: 24,
     backgroundColor: "var(--color-bg-surface)",

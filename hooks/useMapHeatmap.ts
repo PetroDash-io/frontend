@@ -13,9 +13,13 @@ type UseMapHeatmapParams = {
 export function useMapHeatmap({mode, resource, filters}: UseMapHeatmapParams) {
   const isHeatmapMode = mode === "heatmap";
 
-  const {geojsonData, maxValue} = useWellsHeatmap({
+  const {geojsonData, maxValue, loading, error} = useWellsHeatmap({
+    enabled: isHeatmapMode,
     resource,
     watershed: filters.watershed,
+    company: filters.company,
+    province: filters.province,
+    status: filters.status,
     limit: filters.limit
   });
 
@@ -28,8 +32,10 @@ export function useMapHeatmap({mode, resource, filters}: UseMapHeatmapParams) {
         mapMode,
         heatmapData: isHeatmapMode ? geojsonData : null,
         heatmapMaxValue: isHeatmapMode ? maxValue : 1,
+        loadingHeatmap: loading,
+        errorHeatmap: error,
       };
     },
-    [geojsonData, isHeatmapMode, maxValue]
+    [error, geojsonData, isHeatmapMode, loading, maxValue]
   );
 }

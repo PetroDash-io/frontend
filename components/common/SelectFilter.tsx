@@ -80,6 +80,7 @@ const styles = {
         color: "var(--color-text-primary)",
         cursor: "pointer",
         minWidth: 200,
+        height: "40px",
     } as React.CSSProperties,
     selectError: {
         borderColor: "var(--color-error)",

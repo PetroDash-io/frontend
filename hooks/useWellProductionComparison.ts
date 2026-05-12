@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { WellProductionComparisonResponse, WellProductionComparisonFilters } from "@/app/types";
+import {DateRangeValue} from "@/utils/dateRange";
 
 interface UseWellProductionComparisonResult {
   data: WellProductionComparisonResponse | null;
@@ -9,7 +10,8 @@ interface UseWellProductionComparisonResult {
 
 export function useWellProductionComparison(
   wellId: number | null,
-  filters: Partial<WellProductionComparisonFilters>
+  filters: Partial<WellProductionComparisonFilters>,
+  dateRange: DateRangeValue
 ): UseWellProductionComparisonResult {
   const [data, setData] = useState<WellProductionComparisonResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -31,17 +33,17 @@ export function useWellProductionComparison(
       try {
         const params = new URLSearchParams();
 
-        if (filters.inicio_anio) {
-          params.append("inicio_anio", filters.inicio_anio.toString());
+        if (dateRange.startYear) {
+          params.append("inicio_anio", dateRange.startYear.toString());
         }
-        if (filters.inicio_mes) {
-          params.append("inicio_mes", filters.inicio_mes.toString());
+        if (dateRange.startMonth) {
+          params.append("inicio_mes", dateRange.startMonth.toString());
         }
-        if (filters.fin_anio) {
-          params.append("fin_anio", filters.fin_anio.toString());
+        if (dateRange.endYear) {
+          params.append("fin_anio", dateRange.endYear.toString());
         }
-        if (filters.fin_mes) {
-          params.append("fin_mes", filters.fin_mes.toString());
+        if (dateRange.endMonth) {
+          params.append("fin_mes", dateRange.endMonth.toString());
         }
         if (filters.median_by && filters.median_by.length > 0) {
           filters.median_by.forEach(value => {
@@ -71,7 +73,7 @@ export function useWellProductionComparison(
     };
 
     fetchData();
-  }, [wellId, filters.inicio_anio, filters.inicio_mes, filters.fin_anio, filters.fin_mes, filters.median_by]);
+  }, [wellId, dateRange, filters]);
 
   return { data, loading, error };
 }

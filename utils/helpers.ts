@@ -1,11 +1,18 @@
 import { ESTADOS_POZO, colors } from "@/utils/constants";
 
-export const normalize = (value?: string) =>
+export const normalize = (value?: string | null) =>
   value
     ?.normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .trim()
     .toLowerCase();
+
+export const toSlug = (value?: string | null) => {
+  const normalized = normalize(value) || "";
+  return normalized
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+};
 
 const NORMALIZED_ESTADOS_POZO = {
   ACTIVO: new Set(
@@ -56,3 +63,14 @@ export const toNumber = (value: unknown): number | null => {
   }
   return null;
 }
+
+export const formatCompactNumber = (value?: number | null): string => {
+  if (value === null || value === undefined || !Number.isFinite(value)) {
+    return "-";
+  }
+
+  return new Intl.NumberFormat("en-US", {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(value);
+};

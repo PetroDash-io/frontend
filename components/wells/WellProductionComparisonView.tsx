@@ -13,6 +13,7 @@ import {
 import { useWellProductionComparison } from "@/hooks/useWellProductionComparison";
 import { WellProductionComparisonFilters } from "@/app/types";
 import { exportMultipleSheetsToExcel } from "@/utils/excel";
+import { EMPTY_DATE_RANGE, DateRangeValue } from "@/utils/dateRange";
 import { toast } from "react-toastify";
 import { LoadingState } from "@/components/common/LoadingState";
 import { InlineMessage } from "@/components/common/InlineMessage";
@@ -40,6 +41,7 @@ const formatTooltip = (value: number | string | undefined) => {
 export function WellProductionComparisonView() {
   const [wellId, setWellId] = useState<number | null>(null);
   const [filters, setFilters] = useState<Partial<WellProductionComparisonFilters>>({median_by: []});
+  const [dateRange, setDateRange] = useState<DateRangeValue>(EMPTY_DATE_RANGE);
   const [aggParams, setAggParams] = useState({
     group_by: "company",
     metric: "sum",
@@ -47,7 +49,7 @@ export function WellProductionComparisonView() {
   });
 
   const { data: aggData, loading: aggLoading } = useMonthlyAggregatedProduction(aggParams);
-  const { data, loading, error } = useWellProductionComparison(wellId, filters);
+  const { data, loading, error } = useWellProductionComparison(wellId, filters, dateRange);
   const errorMessage = error || null;
 
   const [selectedGroup, setSelectedGroup] = useState<string>("");
@@ -81,18 +83,29 @@ export function WellProductionComparisonView() {
   };
 
   const handleMedianByChange = (value: string, checked: boolean) => {
-    setFilters((prev) => {
+    setFilters((prev: any) => {
       const currentMedianBy = prev.median_by || [];
       if (checked) {
         return { ...prev, median_by: [...currentMedianBy, value] };
       } else {
-        return { ...prev, median_by: currentMedianBy.filter((v) => v !== value) };
+        return { ...prev, median_by: currentMedianBy.filter((v: any) => v !== value) };
       }
     });
   };
 
+  const dateRangeFieldMap: Record<string, keyof DateRangeValue> = {
+    inicio_anio: "startYear",
+    inicio_mes: "startMonth",
+    fin_anio: "endYear",
+    fin_mes: "endMonth",
+  };
+
   const updateFilters = (filterName: string, value: unknown) => {
-    setFilters((previousValues) => ({...previousValues, [filterName]: value}));
+    if (filterName in dateRangeFieldMap) {
+      setDateRange((prev: any) => ({ ...prev, [dateRangeFieldMap[filterName]]: String(value ?? "") }));
+    } else {
+      setFilters((previousValues: any) => ({...previousValues, [filterName]: value}));
+    }
   };
 
   const oilData = data?.data?.[0]
@@ -174,10 +187,10 @@ export function WellProductionComparisonView() {
         <div style={styles.filterRow}>
           <YearMonthRangeFilters
             onSelect={updateFilters}
-            startYearValue={filters.inicio_anio || ""}
-            startMonthValue={filters.inicio_mes || ""}
-            endYearValue={filters.fin_anio || ""}
-            endMonthValue={filters.fin_mes || ""}
+            startYearValue={dateRange.startYear}
+            startMonthValue={dateRange.startMonth}
+            endYearValue={dateRange.endYear}
+            endMonthValue={dateRange.endMonth}
           />
         </div>
         <div style={styles.filterRow}>

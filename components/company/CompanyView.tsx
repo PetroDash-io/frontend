@@ -1,7 +1,5 @@
-"use client";
-
 import React, {useEffect, useMemo, useState} from "react";
-import {colors, WATERSHED_OPTIONS} from "@/utils/constants";
+import {colors, CONTENT_MAX_WIDTH, WATERSHED_OPTIONS} from "@/utils/constants";
 import {useCompanies} from "@/hooks/useCompanies";
 import {useProductionAggregates} from "@/hooks/useProductionAggregates";
 import {useCompanyComparison} from "@/hooks/useCompanyComparison";
@@ -61,12 +59,41 @@ export function CompanyView() {
     setWatershed(String(value))
   }
 
+  const parseFilterValue = (filterName: string, value: unknown) => {
+    if (value === "" || value === null || value === undefined) {
+      return undefined;
+    }
+
+    if (filterName.endsWith("_anio") || filterName.endsWith("_mes")) {
+      const numericValue = Number(value);
+      return Number.isFinite(numericValue) ? numericValue : undefined;
+    }
+
+    return String(value);
+  };
+
   const updateProductionFilters = (filterName: string, value: unknown) => {
-    setFilters((previousValues) => ({...previousValues, [filterName]: value}));
+    setFilters((previousValues) => {
+      const parsedValue = parseFilterValue(filterName, value);
+      if (parsedValue === undefined) {
+        const nextValues = {...previousValues};
+        delete nextValues[filterName as keyof ProductionAggregatesFilters];
+        return nextValues;
+      }
+      return {...previousValues, [filterName]: parsedValue};
+    });
   }
 
   const updateComparisonFilters = (filterName: string, value: unknown) => {
-    setComparisonFilters((previousValues) => ({...previousValues, [filterName]: value}));
+    setComparisonFilters((previousValues) => {
+      const parsedValue = parseFilterValue(filterName, value);
+      if (parsedValue === undefined) {
+        const nextValues = {...previousValues};
+        delete nextValues[filterName as keyof ComparisonFilters];
+        return nextValues;
+      }
+      return {...previousValues, [filterName]: parsedValue};
+    });
   }
 
   const companyFilterOptions = useMemo(() => {
@@ -109,6 +136,7 @@ export function CompanyView() {
               companies={companies}
               title={`Top ${maxCompanies} Empresas por Cantidad de Pozos`}
               maxCompanies={maxCompanies}
+              watershed={watershed}
           />
         </div>
 
@@ -155,6 +183,8 @@ export function CompanyView() {
                 empresa={filters.empresa}
                 fechaInicio={filters.inicio_anio && filters.inicio_mes ? `${filters.inicio_anio}-${filters.inicio_mes.toString().padStart(2, '0')}` : filters.inicio_anio?.toString()}
                 fechaFin={filters.fin_anio && filters.fin_mes ? `${filters.fin_anio}-${filters.fin_mes.toString().padStart(2, '0')}` : filters.fin_anio?.toString()}
+                unit={unit}
+                watershed={watershed}
               />
               <ProductionBarChart 
                 data={avgChartData} 
@@ -162,6 +192,8 @@ export function CompanyView() {
                 empresa={filters.empresa}
                 fechaInicio={filters.inicio_anio && filters.inicio_mes ? `${filters.inicio_anio}-${filters.inicio_mes.toString().padStart(2, '0')}` : filters.inicio_anio?.toString()}
                 fechaFin={filters.fin_anio && filters.fin_mes ? `${filters.fin_anio}-${filters.fin_mes.toString().padStart(2, '0')}` : filters.fin_anio?.toString()}
+                unit={unit}
+                watershed={watershed}
               />
             </div>
         )}
@@ -192,6 +224,7 @@ export function CompanyView() {
               unit={unit}
               fechaInicio={comparisonFilters.inicio_anio && comparisonFilters.inicio_mes ? `${comparisonFilters.inicio_anio}-${comparisonFilters.inicio_mes.toString().padStart(2, '0')}` : comparisonFilters.inicio_anio?.toString()}
               fechaFin={comparisonFilters.fin_anio && comparisonFilters.fin_mes ? `${comparisonFilters.fin_anio}-${comparisonFilters.fin_mes.toString().padStart(2, '0')}` : comparisonFilters.fin_anio?.toString()}
+              watershed={watershed}
             />
         )}
       </div>
@@ -204,6 +237,11 @@ const styles = {
     flexDirection: "column",
     gap: 24,
     padding: 24,
+    width: "100%",
+    maxWidth: CONTENT_MAX_WIDTH,
+    margin: "0 auto",
+    boxSizing: "border-box",
+    minWidth: 0,
     backgroundColor: colors.bg,
   } as React.CSSProperties,
   heading: {
@@ -225,13 +263,14 @@ const styles = {
   } as React.CSSProperties,
   chartControls: {
     backgroundColor: "var(--color-bg-surface)",
-    borderRadius: 12,
+    borderRadius: "var(--radius-xl)",
     padding: "24px",
     marginBottom: 16,
     boxShadow: "var(--shadow-sm)",
     border: "1px solid var(--color-border-subtle)",
     display: "flex",
     alignItems: "center",
+    flexWrap: "wrap",
     gap: 16,
   } as React.CSSProperties,
   sliderLabel: {
@@ -253,7 +292,7 @@ const styles = {
     gap: 16,
     padding: 24,
     backgroundColor: colors.filtersBg,
-    borderRadius: 12,
+    borderRadius: "var(--radius-xl)",
     border: `1px solid ${colors.panelBorder}`,
     boxShadow: "var(--shadow-sm)",
   } as React.CSSProperties,
@@ -272,14 +311,14 @@ const styles = {
   } as React.CSSProperties,
   chartsContainer: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))",
+    gridTemplateColumns: "repeat(auto-fit, minmax(min(400px, 100%), 1fr))",
     gap: 24,
   } as React.CSSProperties,
   placeholder: {
     padding: 40,
     textAlign: "center",
     backgroundColor: "var(--color-bg-surface)",
-    borderRadius: 12,
+    borderRadius: "var(--radius-xl)",
     border: `1px solid ${colors.panelBorder}`,
     color: colors.text,
   } as React.CSSProperties,
@@ -287,7 +326,7 @@ const styles = {
     padding: 40,
     textAlign: "center",
     backgroundColor: "var(--color-bg-surface)",
-    borderRadius: 12,
+    borderRadius: "var(--radius-xl)",
     border: `1px solid ${colors.panelBorder}`,
     color: colors.text,
   } as React.CSSProperties,

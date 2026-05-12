@@ -1,5 +1,7 @@
 export const MAX_WELLS = 32817;
 
+export const CONTENT_MAX_WIDTH = "1400px";
+
 
 export const PRODUCTION_TYPES = {
   oil: {
@@ -33,6 +35,7 @@ export const PRODUCTION_TYPES = {
     defaultColor: "var(--color-inj-co2)"
   },
 };
+
 export const colors = {
   bg: "var(--color-bg-base)",
   panel: "var(--color-bg-overlay)",

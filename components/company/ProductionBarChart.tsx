@@ -10,7 +10,7 @@ import {
     Tooltip,
     Legend,
 } from "recharts";
-import { exportToExcel } from "@/utils/excel";
+import { exportMultipleSheetsToExcel } from "@/utils/excel";
 
 interface ProductionBarChartData {
   name: string;
@@ -25,6 +25,8 @@ interface ProductionBarChartProps {
   empresa?: string;
   fechaInicio?: string;
   fechaFin?: string;
+    unit?: string;
+    watershed?: string;
 }
 
 const formatYAxis = (value: number) => {
@@ -43,13 +45,27 @@ const formatTooltip = (value: number | string | undefined) => {
   return value;
 };
 
-export function ProductionBarChart({ data, title, empresa, fechaInicio, fechaFin }: ProductionBarChartProps) {
+export function ProductionBarChart({
+  data,
+  title,
+  empresa,
+  fechaInicio,
+  fechaFin,
+  unit,
+  watershed,
+}: ProductionBarChartProps) {
     const handleDownloadExcel = () => {
+        const unitLabel = unit || "m³";
+        const unitSlug = unitLabel === "m³" ? "m3" : unitLabel.toLowerCase();
+        const watershedSlug = watershed
+          ? watershed.replace(/[^a-zA-Z0-9]/g, "-")
+          : "";
+
         const dataToExport = data.map((item) => ({
             Periodo: item.name,
-            'Petróleo (m³)': item.oil,
-            'Gas (miles m³)': item.gas,
-            'Agua (m³)': item.water,
+            [`Petróleo (${unitLabel})`]: item.oil,
+            [`Gas (${unitLabel})`]: item.gas,
+            [`Agua (${unitLabel})`]: item.water,
         }));
 
         const today = new Date().toISOString().split('T')[0];
@@ -57,12 +73,25 @@ export function ProductionBarChart({ data, title, empresa, fechaInicio, fechaFin
         if (empresa) fileName += `-${empresa.replace(/[^a-zA-Z0-9]/g, '-')}`;
         if (fechaInicio) fileName += `-desde-${fechaInicio}`;
         if (fechaFin) fileName += `-hasta-${fechaFin}`;
+        if (watershedSlug) fileName += `-cuenca-${watershedSlug}`;
+        fileName += `-unidad-${unitSlug}`;
         fileName += `-${today}`;
 
-        exportToExcel(
-            dataToExport,
-            fileName,
-            'Producción'
+        const filterSheet = [
+            { Filtro: "Empresa", Valor: empresa || "Sin empresa" },
+            { Filtro: "Cuenca", Valor: watershed || "Todas" },
+            { Filtro: "Tipo", Valor: title },
+            { Filtro: "Fecha inicio", Valor: fechaInicio || "Todas" },
+            { Filtro: "Fecha fin", Valor: fechaFin || "Todas" },
+            { Filtro: "Unidad", Valor: unitLabel },
+        ];
+
+        exportMultipleSheetsToExcel(
+            [
+                { data: dataToExport, sheetName: "Producción" },
+                { data: filterSheet, sheetName: "Filtros" },
+            ],
+            fileName
         );
     };
 
@@ -109,7 +138,7 @@ const styles = {
         display: "flex",
         flexDirection: "column",
         gap: 16,
-        borderRadius: 14,
+        borderRadius: "var(--radius-2xl)",
         border: `1px solid ${colors.panelBorder}`,
         padding: 24,
         backgroundColor: "var(--color-bg-surface)",
