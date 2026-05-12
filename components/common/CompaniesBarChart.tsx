@@ -21,7 +21,6 @@ interface CompaniesBarChartProps {
   watershed?: string;
 }
 
-// Paleta de colores alineada con PetroDash
 const COLORS = [
   "var(--color-cat-1)",
   "var(--color-cat-2)",
@@ -174,46 +173,47 @@ export function CompaniesBarChart({
           📊 Descargar Excel
         </button>
       </div>
-      <ResponsiveContainer width="100%" height={500}>
-        <BarChart
-          data={chartData}
-          layout="vertical"   
-          margin={{ top: 20, right: 130, left: 20, bottom: 50 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-subtle)" />
-
-          {/* Eje X ahora es numérico (horizontal) */}
-          <XAxis
-            type="number"
-            tickFormatter={formatXAxis}
-            tick={{ fill: "var(--color-text-secondary)", fontSize: 12 }}
-          />
-
-          <YAxis
-            type="category"
-            dataKey="name"
-            width={280}
-            tick={{ fill: "var(--color-text-secondary)", fontSize: 12 }}
-          />
-
-          <Tooltip formatter={formatTooltipValue} contentStyle={styles.tooltip} />
-
-          <Bar
-              dataKey="pozos"
-              radius={[0, 8, 8, 0]}
-              barSize={35}
-              label={renderBarLabel}
+      <div style={styles.chartScrollContainer}>
+          <ResponsiveContainer width="100%" height={500} minWidth={540}>
+            <BarChart
+              data={chartData}
+              layout="vertical"
+              margin={{ top: 20, right: 130, left: 20, bottom: 50 }}
             >
-              {chartData.map((_, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
-                />
-              ))}
-            </Bar>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-subtle)" />
 
-        </BarChart>
-      </ResponsiveContainer>
+              <XAxis
+                type="number"
+                tickFormatter={formatXAxis}
+                tick={{ fill: "var(--color-text-secondary)", fontSize: 12 }}
+              />
+
+              <YAxis
+                type="category"
+                dataKey="name"
+                width={280}
+                tick={{ fill: "var(--color-text-secondary)", fontSize: 12 }}
+              />
+
+              <Tooltip formatter={formatTooltipValue} contentStyle={styles.tooltip} />
+
+              <Bar
+                dataKey="pozos"
+                radius={[0, 8, 8, 0]}
+                barSize={35}
+                label={renderBarLabel}
+              >
+                {chartData.map((_, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
+                ))}
+              </Bar>
+
+            </BarChart>
+          </ResponsiveContainer>
+      </div>
     </div>
   );
 }
@@ -269,5 +269,9 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: "8px",
     padding: "12px",
     boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+  },
+  chartScrollContainer: {
+    overflowX: "auto",
+    width: "100%",
   },
 };

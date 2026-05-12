@@ -39,8 +39,8 @@ export function AccumulatedProductionTimeSeries({data}: {data: AccumulatedCurveP
   };
 
   return (
-    <div style={styles.wrapper}>
-      <div style={styles.controlsRow}>
+    <div className="time-series-wrapper">
+      <div className="time-series-controls-row">
         <UnitTabs onChange={setUnit} currentUnit={unit} />
       </div>
 
@@ -81,18 +81,3 @@ export function AccumulatedProductionTimeSeries({data}: {data: AccumulatedCurveP
   );
 }
 
-const styles = {
-  wrapper: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 10,
-    borderRadius: 14,
-    border: `1px solid ${colors.panelBorder}`,
-    backgroundColor: "var(--color-bg-surface)",
-  } as React.CSSProperties,
-  controlsRow: {
-    display: "flex",
-    gap: 12,
-    padding: "12px 24px",
-  } as React.CSSProperties,
-};

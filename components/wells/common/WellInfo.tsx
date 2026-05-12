@@ -1,6 +1,7 @@
 import React from "react";
 import {WellDetail} from "@/app/types";
 import Link from "next/link";
+import {formatYearMonth} from "@/utils/formatters";
 
 interface WellInfoProps {
     wellInfo: WellDetail | null;
@@ -36,13 +37,6 @@ export function WellInfo({
         ["Extracción", wellInfo.extraction_type],
         ["Profundidad", `${wellInfo.depth} m`],
     ] : [];
-
-    const formatYearMonth = (value: string | null | undefined): string | null => {
-        if (!value) return null;
-        const [year, month] = value.split("-");
-        if (!year || !month) return null;
-        return `${month.padStart(2, "0")}/${year}`;
-    };
 
     const firstRecordLabel = formatYearMonth(wellInfo?.first_production_activity_date);
     const coverageText = firstRecordLabel || "No hay producción registrada";
@@ -161,7 +155,7 @@ const styles = {
     emptyState: {
         fontSize: 13,
         lineHeight: 1.45,
-        color: "#4b5563",
+        color: "var(--color-text-secondary)",
         padding: "2px 0 6px",
     } as React.CSSProperties,
     section: {
@@ -228,8 +222,8 @@ const styles = {
         marginBottom: 14,
         padding: 12,
         borderRadius: 8,
-        backgroundColor: "#fff9ec",
-        border: "1px solid #ebdfc6",
+        backgroundColor: "var(--color-surface-cream)",
+        border: "1px solid var(--color-border-cream)",
     } as React.CSSProperties,
     coverageText: {
         margin: 0,

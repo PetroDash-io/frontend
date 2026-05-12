@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {colors} from "@/utils/constants";
+import {formatTooltip, formatYAxis} from "@/utils/formatters";
 import {
   ResponsiveContainer,
   BarChart,
@@ -22,21 +23,6 @@ import { useMonthlyAggregatedProduction } from "@/hooks/useMonthlyAggregatedProd
 import { MonthlyAggregatedChart } from "@/components/production/MonthlyAggregatedChart";
 
 
-const formatYAxis = (value: number) => {
-  if (value >= 1000000) {
-    return `${(value / 1000000).toFixed(1)}M`;
-  } else if (value >= 1000) {
-    return `${(value / 1000).toFixed(1)}K`;
-  }
-  return value.toFixed(0);
-};
-
-const formatTooltip = (value: number | string | undefined) => {
-  if (typeof value === "number") {
-    return value.toLocaleString("es-AR", { maximumFractionDigits: 2 });
-  }
-  return value;
-};
 
 export function WellProductionComparisonView() {
   const [wellId, setWellId] = useState<number | null>(null);
