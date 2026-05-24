@@ -83,12 +83,12 @@ export function WellProductionComparisonView() {
   };
 
   const handleMedianByChange = (value: string, checked: boolean) => {
-    setFilters((prev) => {
+    setFilters((prev: any) => {
       const currentMedianBy = prev.median_by || [];
       if (checked) {
         return { ...prev, median_by: [...currentMedianBy, value] };
       } else {
-        return { ...prev, median_by: currentMedianBy.filter((v) => v !== value) };
+        return { ...prev, median_by: currentMedianBy.filter((v: any) => v !== value) };
       }
     });
   };
@@ -102,9 +102,9 @@ export function WellProductionComparisonView() {
 
   const updateFilters = (filterName: string, value: unknown) => {
     if (filterName in dateRangeFieldMap) {
-      setDateRange((prev) => ({ ...prev, [dateRangeFieldMap[filterName]]: String(value ?? "") }));
+      setDateRange((prev: any) => ({ ...prev, [dateRangeFieldMap[filterName]]: String(value ?? "") }));
     } else {
-      setFilters((previousValues) => ({...previousValues, [filterName]: value}));
+      setFilters((previousValues: any) => ({...previousValues, [filterName]: value}));
     }
   };
 

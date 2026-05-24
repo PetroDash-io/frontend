@@ -19,7 +19,7 @@ export function AnomaliesTimeSeries({production, anomalyPeriods, resource}: Anom
 
   const chartData = useMemo(() => {
     const convertedAnomalyPeriods = new Set(
-        anomalyPeriods.map(period => period.data_date.slice(0, 7))
+        anomalyPeriods.filter((r) => r.data_date != null).map(period => period.data_date.slice(0, 7))
     );
     return buildAnomalyChartData(production, resource, unit, convertedAnomalyPeriods);
   }, [production, resource, unit, anomalyPeriods]);
