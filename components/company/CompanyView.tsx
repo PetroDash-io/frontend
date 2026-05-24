@@ -111,13 +111,15 @@ export function CompanyView() {
       <div style={styles.container}>
         <h2 style={styles.heading}>Análisis de Empresas y Producción</h2>
         <div style={styles.filtersContainer}>
+          <div style={styles.cardHeader}>
+            <span className="card-label">Cuenca</span>
+          </div>
           <SelectFilter value={watershed}
                         onSelect={updateWatershedFilter}
                         filterName="watershed"
                         options={WATERSHED_OPTIONS}
                         inputLabel="Cuenca"/>
         </div>
-        {/* Bar Chart Section */}
         <div style={styles.pieChartSection}>
           <div style={styles.chartControls}>
             <label style={styles.sliderLabel}>
@@ -145,13 +147,16 @@ export function CompanyView() {
         <h3 style={styles.subHeading}>Análisis de Producción por Empresa</h3>
 
         <div style={styles.filtersContainer}>
+          <div style={styles.cardHeader}>
+            <span className="card-label">Filtros</span>
+          </div>
           <SelectFilter value={filters.empresa || ""}
                         onSelect={updateProductionFilters}
                         filterName="empresa"
                         options={companyFilterOptions}
                         inputLabel="Empresa"
                         defaultOptionLabel="Seleccione una empresa"/>
-
+          <span style={styles.filterSectionLabel}>Rango de fechas</span>
           <div style={styles.dateRangeContainer}>
             <YearMonthRangeFilters
               onSelect={updateProductionFilters}
@@ -290,15 +295,27 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     gap: 16,
-    padding: 24,
+    padding: 16,
     backgroundColor: colors.filtersBg,
     borderRadius: "var(--radius-xl)",
     border: `1px solid ${colors.panelBorder}`,
     boxShadow: "var(--shadow-sm)",
   } as React.CSSProperties,
+  cardHeader: {
+    paddingBottom: 10,
+    marginBottom: 4,
+    borderBottom: "1px solid var(--color-border-subtle)",
+  } as React.CSSProperties,
+  filterSectionLabel: {
+    fontSize: 12,
+    fontWeight: 600,
+    color: "var(--color-text-secondary)",
+    textTransform: "uppercase" as const,
+    letterSpacing: "0.04em",
+  } as React.CSSProperties,
   dateRangeContainer: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+    gridTemplateColumns: "repeat(2, 1fr)",
     gap: 16,
   } as React.CSSProperties,
   input: {

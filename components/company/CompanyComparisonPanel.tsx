@@ -87,12 +87,12 @@ const styles = {
   } as React.CSSProperties,
   companiesRow: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+    gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
     gap: 16,
   } as React.CSSProperties,
   dateRangeContainer: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+    gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
     gap: 16,
   } as React.CSSProperties
 };

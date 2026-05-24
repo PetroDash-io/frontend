@@ -136,7 +136,7 @@ const styles = {
     } as React.CSSProperties,
     filterPanel: {
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+        gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
         alignItems: "end",
         gap: 16,
         padding: "16px",

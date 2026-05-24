@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {colors} from "@/utils/constants";
+import {formatTooltip, formatYAxis} from "@/utils/formatters";
 import {
   ResponsiveContainer,
   BarChart,
@@ -22,21 +23,6 @@ import { useMonthlyAggregatedProduction } from "@/hooks/useMonthlyAggregatedProd
 import { MonthlyAggregatedChart } from "@/components/production/MonthlyAggregatedChart";
 
 
-const formatYAxis = (value: number) => {
-  if (value >= 1000000) {
-    return `${(value / 1000000).toFixed(1)}M`;
-  } else if (value >= 1000) {
-    return `${(value / 1000).toFixed(1)}K`;
-  }
-  return value.toFixed(0);
-};
-
-const formatTooltip = (value: number | string | undefined) => {
-  if (typeof value === "number") {
-    return value.toLocaleString("es-AR", { maximumFractionDigits: 2 });
-  }
-  return value;
-};
 
 export function WellProductionComparisonView() {
   const [wellId, setWellId] = useState<number | null>(null);
@@ -83,12 +69,12 @@ export function WellProductionComparisonView() {
   };
 
   const handleMedianByChange = (value: string, checked: boolean) => {
-    setFilters((prev) => {
+    setFilters((prev: any) => {
       const currentMedianBy = prev.median_by || [];
       if (checked) {
         return { ...prev, median_by: [...currentMedianBy, value] };
       } else {
-        return { ...prev, median_by: currentMedianBy.filter((v) => v !== value) };
+        return { ...prev, median_by: currentMedianBy.filter((v: any) => v !== value) };
       }
     });
   };
@@ -102,9 +88,9 @@ export function WellProductionComparisonView() {
 
   const updateFilters = (filterName: string, value: unknown) => {
     if (filterName in dateRangeFieldMap) {
-      setDateRange((prev) => ({ ...prev, [dateRangeFieldMap[filterName]]: String(value ?? "") }));
+      setDateRange((prev: any) => ({ ...prev, [dateRangeFieldMap[filterName]]: String(value ?? "") }));
     } else {
-      setFilters((previousValues) => ({...previousValues, [filterName]: value}));
+      setFilters((previousValues: any) => ({...previousValues, [filterName]: value}));
     }
   };
 
