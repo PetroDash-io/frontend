@@ -14,6 +14,8 @@ import {WellComparisonSection} from "@/components/well-analysis/comparison/WellC
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {useWell} from "@/hooks/useWell";
 import {WellSummaryChips} from "@/components/well-analysis/WellSummaryChips";
+import { useNearbyWells } from "@/hooks/useNearbyWells";
+import { NearbyWellsSection } from "@/components/well-analysis/NearbyWellsSection";
 
 export function WellAnalysisView() {
   const router = useRouter();
@@ -29,6 +31,7 @@ export function WellAnalysisView() {
     anomalies: false,
     injection: false,
     comparison: false,
+    nearbyWells: false,
   });
 
   const validatedDateRange = useMemo(() => getValidatedDateRange(queryDateRange), [queryDateRange]);
@@ -60,6 +63,12 @@ export function WellAnalysisView() {
     loading: loadingWellDetails,
     error: errorGettingWellDetails,
   } = useWell({wellId});
+
+  const {
+    data: nearbyWells,
+    loading: loadingNearby,
+    error: errorNearby,
+  } = useNearbyWells(wellId ? { wellId } : { wellId: null });
 
   const curveSeriesData = useMemo(() => {
     if (!wellProduction || wellProduction.length === 0) {
@@ -117,6 +126,7 @@ export function WellAnalysisView() {
         anomalies: false,
         injection: false,
         comparison: false,
+        nearbyWells: false,
       });
       setWellIdInputError(null);
       const params = new URLSearchParams(searchParams.toString());
@@ -138,7 +148,7 @@ export function WellAnalysisView() {
     return value !== "" && !isNaN(parsed) && parsed > 0;
   })();
 
-  const toggleSection = (sectionName: "accumulated" | "anomalies" | "injection" | "comparison") => {
+  const toggleSection = (sectionName: "accumulated" | "anomalies" | "injection" | "comparison" | "nearbyWells") => {
     setOpenSections((previous) => ({...previous, [sectionName]: !previous[sectionName]}));
   };
 
@@ -210,7 +220,7 @@ export function WellAnalysisView() {
             loading={loadingWellDetails}
             error={errorGettingWellDetails}
           />
-
+          
           <div style={styles.productionPanelWithSurface}>
             <div style={styles.cardHeader}>
               <span className="card-label">Curva de producción</span>
@@ -223,6 +233,19 @@ export function WellAnalysisView() {
           </div>
 
           <div style={styles.collapsibleStack}>
+
+            <CollapsiblePanel
+              title="Pozos cercanos"
+              isOpen={openSections.nearbyWells}
+              onToggle={() => toggleSection("nearbyWells")}
+            >
+                <NearbyWellsSection
+                      wells={nearbyWells}
+                      loading={loadingNearby}
+                      error={errorNearby}
+                    />
+            </CollapsiblePanel>
+
             <CollapsiblePanel
               title="Producción acumulada"
               isOpen={openSections.accumulated}
