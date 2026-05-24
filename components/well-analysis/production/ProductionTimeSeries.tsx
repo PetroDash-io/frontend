@@ -1,5 +1,5 @@
 import React from "react";
-import {colors, PRODUCTION_TYPES} from "@/utils/constants";
+import {PRODUCTION_TYPES} from "@/utils/constants";
 import {CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
 import {useUnit} from "@/hooks/useUnit";
 import {UnitTabs} from "@/components/common/UnitTabs";
@@ -37,8 +37,8 @@ export function ProductionTimeSeries({data}: {data: ProductionCurvePoint[]}) {
   }
 
   return (
-    <div style={styles.wrapper}>
-      <div style={styles.controlsRow}>
+    <div className="time-series-wrapper">
+      <div className="time-series-controls-row">
         <UnitTabs onChange={setUnit} currentUnit={unit}/>
       </div>
 
@@ -77,18 +77,3 @@ export function ProductionTimeSeries({data}: {data: ProductionCurvePoint[]}) {
   );
 }
 
-const styles = {
-  wrapper: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 10,
-    borderRadius: "var(--radius-2xl)",
-    border: `1px solid ${colors.panelBorder}`,
-    backgroundColor: "var(--color-bg-surface)",
-  } as React.CSSProperties,
-  controlsRow: {
-    display: "flex",
-    gap: 12,
-    padding: "12px 24px",
-  } as React.CSSProperties,
-};

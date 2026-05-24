@@ -68,7 +68,14 @@ export interface ProductionAggregates {
   water: AggregationData;
 }
 
-export interface ProductionAggregatesFilters {
+export interface DateRangeFilter {
+  inicio_anio?: number;
+  inicio_mes?: number;
+  fin_anio?: number;
+  fin_mes?: number;
+}
+
+export interface ProductionAggregatesFilters extends DateRangeFilter {
   empresa: string;
   watershed?: string;
   inicio_anio: number;
@@ -91,14 +98,10 @@ export interface CompanyComparisonResponse {
   companies: CompanyProductionData[];
 }
 
-export interface ComparisonFilters {
+export interface ComparisonFilters extends DateRangeFilter {
   empresa_1: string;
   empresa_2: string;
   watershed?: string;
-  inicio_anio?: number;
-  inicio_mes?: number;
-  fin_anio?: number;
-  fin_mes?: number;
 }
 
 export interface WellProductionComparisonData {
@@ -150,15 +153,11 @@ export interface TopProductionResponse {
   data: TopProductionData[];
 }
 
-export interface TopProductionFilters {
+export interface TopProductionFilters extends DateRangeFilter {
   tipo: "oil" | "gas" | "water";
   watershed?: string;
   provincia?: string;
   area?: string;
-  inicio_anio?: number;
-  inicio_mes?: number;
-  fin_anio?: number;
-  fin_mes?: number;
   limit?: number;
 }
 
