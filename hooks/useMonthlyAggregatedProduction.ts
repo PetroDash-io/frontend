@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import {useEffect, useState} from "react";
 
 type Params = {
   group_by: string;
@@ -19,10 +19,13 @@ export function useMonthlyAggregatedProduction(params: Params) {
 
     setLoading(true);
     setError(null);
+    const controller = new AbortController();
+    let isCancelled = false;
 
     const query = new URLSearchParams(params as any).toString();
 
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/produccion/mensual-agregada?${query}`, {
+        signal: controller.signal,
         headers: {
           "X-API-Key": process.env.NEXT_PUBLIC_API_KEY || "",
         },
@@ -32,8 +35,22 @@ export function useMonthlyAggregatedProduction(params: Params) {
         return res.json();
       })
       .then((data) => setData(data))
-      .catch(() => setError("Error cargando producción agregada"))
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        if (err instanceof DOMException && err.name === "AbortError") {
+          return;
+        }
+        setError("Error cargando producción agregada");
+      })
+      .finally(() => {
+        if (!isCancelled) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+      controller.abort();
+    };
 
   }, [paramsKey]); // <-- string estable, no el objeto
 

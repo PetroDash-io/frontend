@@ -16,8 +16,13 @@ export function useTopProduction(filters: Partial<TopProductionFilters>): UseTop
     // Only fetch if tipo is provided (required parameter)
     if (!filters.tipo) {
       setData(null);
+      setLoading(false);
+      setError(null);
       return;
     }
+
+    const controller = new AbortController();
+    let isCancelled = false;
 
     const fetchTopProduction = async () => {
       setLoading(true);
@@ -60,6 +65,7 @@ export function useTopProduction(filters: Partial<TopProductionFilters>): UseTop
         const url = `${process.env.NEXT_PUBLIC_API_URL}/empresas/produccion/top?${params.toString()}`;
 
         const response = await fetch(url, {
+          signal: controller.signal,
           headers: {
             "X-API-Key": process.env.NEXT_PUBLIC_API_KEY || "",
           },
@@ -72,13 +78,23 @@ export function useTopProduction(filters: Partial<TopProductionFilters>): UseTop
         const json = await response.json();
         setData(json);
       } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") {
+          return;
+        }
         setError(err instanceof Error ? err.message : "Unexpected error");
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
     };
 
     fetchTopProduction();
+
+    return () => {
+      isCancelled = true;
+      controller.abort();
+    };
   }, [
     filters.tipo,
     filters.watershed,

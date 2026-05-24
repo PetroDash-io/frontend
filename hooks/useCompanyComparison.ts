@@ -31,6 +31,9 @@ export function useCompanyComparison(
       return;
     }
 
+    const controller = new AbortController();
+    let isCancelled = false;
+
     const fetchData = async () => {
       setLoading(true);
       setError(null);
@@ -63,6 +66,7 @@ export function useCompanyComparison(
         const url = `${process.env.NEXT_PUBLIC_API_URL}/empresas/produccion/comparacion?${params.toString()}`;
 
         const response = await fetch(url, {
+          signal: controller.signal,
           headers: {
             "X-API-Key": process.env.NEXT_PUBLIC_API_KEY || "",
           },
@@ -75,14 +79,24 @@ export function useCompanyComparison(
         const json = await response.json();
         setData(json);
       } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") {
+          return;
+        }
         setError(err instanceof Error ? err.message : "Unexpected error");
         setData(null);
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
     };
 
     fetchData();
+
+    return () => {
+      isCancelled = true;
+      controller.abort();
+    };
   }, [
     filters.empresa_1,
     filters.empresa_2,

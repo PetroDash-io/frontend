@@ -21,6 +21,9 @@ export function useMapMetrics(filters: WellFilters): UseMapMetricsResult {
       return;
     }
 
+    const controller = new AbortController();
+    let isCancelled = false;
+
     const fetchMetrics = async () => {
       setLoading(true);
       setError(null);
@@ -43,6 +46,7 @@ export function useMapMetrics(filters: WellFilters): UseMapMetricsResult {
 
         const url = `${process.env.NEXT_PUBLIC_API_URL}/pozos/resumen-mapa?${params.toString()}`;
         const response = await fetch(url, {
+          signal: controller.signal,
           headers: {
             "X-API-Key": process.env.NEXT_PUBLIC_API_KEY || "",
           },
@@ -55,14 +59,24 @@ export function useMapMetrics(filters: WellFilters): UseMapMetricsResult {
         const json = await response.json();
         setData(json as MapMetricsResponse);
       } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") {
+          return;
+        }
         setError(err instanceof Error ? err.message : "Unexpected error");
         setData(null);
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
     };
 
     fetchMetrics();
+
+    return () => {
+      isCancelled = true;
+      controller.abort();
+    };
   }, [filters.watershed, filters.company, filters.province, filters.status]);
 
   return {data, loading, error};
