@@ -314,7 +314,7 @@ export function WellProductionComparisonView() {
           <div style={styles.chartWrapper}>
             <div style={styles.cardHeader}><span className="card-label">Comparación</span></div>
             <h3 style={styles.chartTitle}>Producción de Petróleo</h3>
-            <ResponsiveContainer  width="100%" height={300}>
+            <ResponsiveContainer  width="100%" height={400}>
               <BarChart data={oilData} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
@@ -331,7 +331,7 @@ export function WellProductionComparisonView() {
           <div style={styles.chartWrapper}>
             <div style={styles.cardHeader}><span className="card-label">Comparación</span></div>
             <h3 style={styles.chartTitle}>Producción de Gas</h3>
-            <ResponsiveContainer  width="100%" height={300}>
+            <ResponsiveContainer  width="100%" height={400}>
               <BarChart data={gasData} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
@@ -348,7 +348,7 @@ export function WellProductionComparisonView() {
           <div style={styles.chartWrapper}>
             <div style={styles.cardHeader}><span className="card-label">Comparación</span></div>
             <h3 style={styles.chartTitle}>Producción de Agua</h3>
-            <ResponsiveContainer  width="100%" height={300}>
+            <ResponsiveContainer  width="100%" height={400}>
               <BarChart data={waterData} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
