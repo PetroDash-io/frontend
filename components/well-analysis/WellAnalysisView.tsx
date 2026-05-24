@@ -14,6 +14,7 @@ import {WellComparisonSection} from "@/components/well-analysis/comparison/WellC
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {useWell} from "@/hooks/useWell";
 import {WellSummaryChips} from "@/components/well-analysis/WellSummaryChips";
+import { MonthlyAggregatedSection } from "@/components/well-analysis/production/MonthlyAggregatedSection";
 
 export function WellAnalysisView() {
   const router = useRouter();
@@ -29,6 +30,7 @@ export function WellAnalysisView() {
     anomalies: false,
     injection: false,
     comparison: false,
+    aggregated: false,
   });
 
   const validatedDateRange = useMemo(() => getValidatedDateRange(queryDateRange), [queryDateRange]);
@@ -67,6 +69,7 @@ export function WellAnalysisView() {
     }
 
     return wellProduction
+      .filter((r) => r.data_date)
       .slice()
       .sort((a, b) => a.data_date.localeCompare(b.data_date))
       .map((record) => ({
@@ -86,6 +89,7 @@ export function WellAnalysisView() {
     }
 
     return wellProduction
+      .filter((r) => r.data_date)
       .slice()
       .sort((a, b) => a.data_date.localeCompare(b.data_date))
       .map((record) => ({
@@ -117,6 +121,7 @@ export function WellAnalysisView() {
         anomalies: false,
         injection: false,
         comparison: false,
+        aggregated: false,
       });
       setWellIdInputError(null);
       const params = new URLSearchParams(searchParams.toString());
@@ -138,7 +143,7 @@ export function WellAnalysisView() {
     return value !== "" && !isNaN(parsed) && parsed > 0;
   })();
 
-  const toggleSection = (sectionName: "accumulated" | "anomalies" | "injection" | "comparison") => {
+  const toggleSection = (sectionName: "accumulated" | "anomalies" | "injection" | "comparison" | "aggregated") => {
     setOpenSections((previous) => ({...previous, [sectionName]: !previous[sectionName]}));
   };
 
@@ -160,29 +165,17 @@ export function WellAnalysisView() {
           <span className="card-label">Filtros</span>
         </div>
 
-        <div style={styles.filterToolbarRow}>
-          <div style={styles.wellIdFieldContainer}>
-            <label style={styles.label}>
-              ID del Pozo
-              <input
-                type="number"
-                value={wellIdInput}
-                onChange={handleWellIdChange}
-                placeholder="Ingrese ID"
-                style={styles.input}
-              />
-            </label>
-          </div>
-
-          <div style={styles.dateRangeInlineContainer}>
-            <DateRangeFilters
-              value={dateRange}
-              onChange={updateDateRange}
-              isStartRangeIncomplete={false}
-              isEndRangeIncomplete={false}
+        <div style={styles.filterMainRow}>
+          <label style={styles.label}>
+            ID del Pozo
+            <input
+              type="number"
+              value={wellIdInput}
+              onChange={handleWellIdChange}
+              placeholder="Ingrese ID"
+              style={styles.input}
             />
-          </div>
-
+          </label>
           <button
             type="button"
             style={{
@@ -194,6 +187,15 @@ export function WellAnalysisView() {
           >
             Ver producción
           </button>
+        </div>
+
+        <div style={styles.filterDateRow}>
+          <DateRangeFilters
+            value={dateRange}
+            onChange={updateDateRange}
+            isStartRangeIncomplete={false}
+            isEndRangeIncomplete={false}
+          />
         </div>
 
         {wellIdInputError && <InlineMessage message={wellIdInputError} variant="warning" />}
@@ -269,6 +271,15 @@ export function WellAnalysisView() {
             >
               <WellComparisonSection wellId={wellId} dateRange={validatedDateRange} />
             </CollapsiblePanel>
+
+
+            <CollapsiblePanel
+              title="Curva agregada"
+              isOpen={openSections.aggregated}
+              onToggle={() => toggleSection("aggregated")}
+            >
+              <MonthlyAggregatedSection />
+            </CollapsiblePanel>
           </div>
         </>
       )}
@@ -311,22 +322,17 @@ const styles = {
     marginBottom: "10px",
     borderBottom: "1px solid var(--color-border-subtle)",
   } as React.CSSProperties,
-  filterToolbarRow: {
+  filterMainRow: {
     display: "flex",
-    gap: "10px",
-    alignItems: "flex-end",
     flexWrap: "wrap",
-  } as React.CSSProperties,
-  wellIdFieldContainer: {
-    minWidth: 180,
-  } as React.CSSProperties,
-  dateRangeInlineContainer: {
-    display: "flex",
-    alignItems: "flex-end",
     gap: "10px",
-    flexWrap: "nowrap",
-    flex: 1,
-    minWidth: 420,
+    alignItems: "flex-end",
+  } as React.CSSProperties,
+  filterDateRow: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+    gap: "10px",
+    marginTop: "12px",
   } as React.CSSProperties,
   cardHeader: {
     paddingBottom: "12px",

@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { TopProductionFilters } from "@/app/types";
 import { useTopProduction } from "@/hooks/useTopProduction";
-import { colors, CONTENT_MAX_WIDTH, PIE_CHART_COLORS, AREAS_POR_PROVINCIA, WATERSHED_OPTIONS } from "@/utils/constants";
+import { colors, CONTENT_MAX_WIDTH, PIE_CHART_COLORS, AREAS_POR_PROVINCIA, WATERSHED_OPTIONS, PRODUCTION_OPTIONS, PROVINCE_OPTIONS } from "@/utils/constants";
 import { SelectFilter } from "@/components/common/SelectFilter";
 import {YearMonthRangeFilters} from "@/components/common/YearMonthRangeFilters";
 import { exportMultipleSheetsToExcel } from "@/utils/excel";
@@ -14,19 +14,6 @@ interface PieChartData {
   percentage: number;
 }
 
-const PRODUCTION_OPTIONS = [
-  {value: "oil", label: "Petróleo"},
-  {value: "gas", label: "Gas"},
-  {value: "water", label: "Agua"},
-];
-
-const PROVINCE_OPTIONS = [
-  {value: "Neuquen", label: "Neuquén"},
-  {value: "Chubut", label: "Chubut"},
-  {value: "Mendoza", label: "Mendoza"},
-  {value: "La Pampa", label: "La Pampa"},
-  {value: "Rio Negro", label: "Río Negro"},
-];
 
 const PRODUCTION_TYPE_LABEL: Record<"oil" | "gas" | "water", string> = {
   oil: "Petróleo",
@@ -416,12 +403,12 @@ const styles: Record<string, React.CSSProperties> = {
   },
   topFiltersRow: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+    gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
     gap: 16,
   },
   dateRangeContainer: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+    gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
     gap: 16,
   },
   mainChartContainer: {

@@ -1,5 +1,6 @@
 import React, {useMemo} from "react";
 import {colors, COMPANY_COLORS} from "@/utils/constants";
+import {formatTooltip, formatYAxis} from "@/utils/formatters";
 import {Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis, Pie, PieChart, Cell} from "recharts";
 import {CompanyProductionData} from "@/app/types";
 import {convertValueToUnit} from "@/utils/units";
@@ -53,21 +54,6 @@ function buildResourceChartData(
   });
 }
 
-const formatYAxis = (value: number) => {
-  if (value >= 1000000) {
-    return `${(value / 1000000).toFixed(1)}M`;
-  } else if (value >= 1000) {
-    return `${(value / 1000).toFixed(1)}K`;
-  }
-  return value.toFixed(0);
-};
-
-const formatTooltip = (value: number | string | undefined) => {
-  if (typeof value === "number") {
-    return value.toLocaleString("es-AR", { maximumFractionDigits: 2 });
-  }
-  return value;
-};
 
 interface ComparisonChartProps {
   title: string;

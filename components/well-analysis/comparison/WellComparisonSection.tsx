@@ -1,5 +1,6 @@
 import React, {useMemo, useState} from "react";
 import {colors} from "@/utils/constants";
+import {formatTooltip, formatYAxis} from "@/utils/formatters";
 import {ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell} from "recharts";
 import {WellProductionComparisonFilters} from "@/app/types";
 import {DateRangeValue} from "@/utils/dateRange";
@@ -12,18 +13,6 @@ interface WellComparisonSectionProps {
   dateRange: DateRangeValue;
 }
 
-const formatYAxis = (value: number) => {
-  if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
-  if (value >= 1000) return `${(value / 1000).toFixed(1)}K`;
-  return value.toFixed(0);
-};
-
-const formatTooltip = (value: number | string | undefined) => {
-  if (typeof value === "number") {
-    return value.toLocaleString("es-AR", {maximumFractionDigits: 2});
-  }
-  return value;
-};
 
 export function WellComparisonSection({wellId, dateRange}: WellComparisonSectionProps) {
   const [filters, setFilters] = useState<Partial<WellProductionComparisonFilters>>({median_by: []});
@@ -177,7 +166,7 @@ const styles = {
   } as React.CSSProperties,
   chartsContainer: {
     display: "grid",
-    gridTemplateColumns: "repeat(3, 1fr)",
+    gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))",
     gap: "20px",
     width: "100%",
   } as React.CSSProperties,

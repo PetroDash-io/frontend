@@ -2,6 +2,7 @@ import React from "react";
 import {InlineMessage} from "@/components/common/InlineMessage";
 import {WellDetail} from "@/app/types";
 import {colors} from "@/utils/constants";
+import {formatYearMonth} from "@/utils/formatters";
 
 type WellSummaryChipsProps = {
   wellDetails: WellDetail | null | undefined;
@@ -10,13 +11,6 @@ type WellSummaryChipsProps = {
 };
 
 export function WellSummaryChips({wellDetails, loading, error}: WellSummaryChipsProps) {
-  const formatYearMonth = (value: string | null | undefined): string | null => {
-    if (!value) return null;
-    const [year, month] = value.split("-");
-    if (!year || !month) return null;
-    return `${month.padStart(2, "0")}/${year}`;
-  };
-
   const formatChipValue = (value: string | null | undefined): string => {
     if (!value) return "No informado";
     return value

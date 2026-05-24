@@ -36,6 +36,20 @@ export const PRODUCTION_TYPES = {
   },
 };
 
+export const PRODUCTION_OPTIONS: { value: "oil" | "gas" | "water"; label: string }[] = [
+  { value: "oil", label: PRODUCTION_TYPES.oil.label },
+  { value: "gas", label: PRODUCTION_TYPES.gas.label },
+  { value: "water", label: PRODUCTION_TYPES.water.label },
+];
+
+export const PROVINCE_OPTIONS = [
+  { value: "Neuquen", label: "Neuquén" },
+  { value: "Chubut", label: "Chubut" },
+  { value: "Mendoza", label: "Mendoza" },
+  { value: "La Pampa", label: "La Pampa" },
+  { value: "Rio Negro", label: "Río Negro" },
+];
+
 export const colors = {
   bg: "var(--color-bg-base)",
   panel: "var(--color-bg-overlay)",
