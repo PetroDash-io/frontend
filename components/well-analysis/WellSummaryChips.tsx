@@ -53,6 +53,10 @@ export function WellSummaryChips({wellDetails, loading, error}: WellSummaryChips
             <span style={styles.summaryChipLabel}>Estado</span>
             <span style={styles.summaryChipValue}>{formatChipValue(wellDetails.status)}</span>
           </div>
+          <div style={styles.summaryChip}>
+            <span style={styles.summaryChipLabel}>Tipo de recurso</span>
+            <span style={styles.summaryChipValue}>{formatChipValue(wellDetails.resource_type)}</span>
+          </div>
           <div style={styles.summaryCoverageChip}>
             <span style={styles.summaryChipLabel}>Primer registro de producción</span>
             <span style={styles.summaryChipValue}>{coverageText}</span>
