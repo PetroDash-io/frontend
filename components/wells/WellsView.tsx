@@ -1,7 +1,8 @@
-import React, {useState, useMemo} from "react";
+import React, {useState, useMemo, useEffect} from "react";
 import {MapView} from "@/components/wells/MapView";
 import {TableView} from "@/components/wells/TableView";
 import {LimitFilter} from "@/components/wells/common/LimitFilter";
+import {ClassificationFilter} from "@/components/wells/common/ClassificationFilter";
 import {WellFilters} from "@/app/types/wellFilters";
 import {SELECT_DEFAULT_VALUE, SelectFilter} from "@/components/common/SelectFilter";
 import {colors, CONTENT_MAX_WIDTH, WATERSHED_OPTIONS} from "@/utils/constants";
@@ -13,6 +14,7 @@ const DEFAULT_FILTERS = {
     status: SELECT_DEFAULT_VALUE,
     company: SELECT_DEFAULT_VALUE,
     limit: 100,
+    classification: "all" as const,
 };
 
 export function WellsView() {
@@ -47,6 +49,13 @@ export function WellsView() {
         if (!allWells) return [];
         return [...new Set(allWells.map((well) => well.company))].filter((value): value is string => Boolean(value));
     }, [allWells]);
+
+    useEffect(() => {
+        if (selectedWellId === null || !allWells) return;
+        if (!allWells.find((w) => w.well_id === selectedWellId)) {
+            setSelectedWellId(null);
+        }
+    }, [allWells, selectedWellId]);
 
     return (
         <div style={styles.viewShell}>
@@ -91,6 +100,11 @@ export function WellsView() {
                     onSelect={updateFilters}
                     options={companyFilterOptions}
                     defaultOptionLabel="Todas las empresas"
+                />
+
+                <ClassificationFilter
+                    value={filters.classification}
+                    onChange={(v) => updateFilters("classification", v)}
                 />
 
                 <LimitFilter

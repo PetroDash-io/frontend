@@ -43,6 +43,12 @@ export function useMapMetrics(filters: WellFilters): UseMapMetricsResult {
         if (filters.status) {
           params.append("status", filters.status);
         }
+        if (filters.classification === "conv") {
+          params.append("resource_type", "CONVENCIONAL");
+        }
+        if (filters.classification === "no_conv") {
+          params.append("resource_type", "NO CONVENCIONAL");
+        }
 
         const url = `${process.env.NEXT_PUBLIC_API_URL}/pozos/resumen-mapa?${params.toString()}`;
         const response = await fetch(url, {
@@ -77,7 +83,7 @@ export function useMapMetrics(filters: WellFilters): UseMapMetricsResult {
       isCancelled = true;
       controller.abort();
     };
-  }, [filters.watershed, filters.company, filters.province, filters.status]);
+  }, [filters.watershed, filters.company, filters.province, filters.status, filters.classification]);
 
   return {data, loading, error};
 }

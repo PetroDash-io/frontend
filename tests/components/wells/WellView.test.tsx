@@ -23,6 +23,10 @@ jest.mock("@/components/wells/common/LimitFilter", () => ({
     LimitFilter: () => <div data-testid="limit-filter" />,
 }));
 
+jest.mock("@/components/wells/common/ClassificationFilter", () => ({
+    ClassificationFilter: () => <div data-testid="classification-filter" />,
+}));
+
 test("renderiza vista mapa por default", () => {
     const { useWells } = require("@/hooks/useWells");
     useWells.mockReturnValue({ data: [] });
@@ -59,6 +63,15 @@ test("genera opciones de filtros desde los datos", () => {
     // no vemos los selects reales, pero verificamos que no crashea
     expect(screen.getAllByTestId("select-filter").length).toBeGreaterThan(0);
   });
+
+test("renderiza el filtro de clasificación", () => {
+    const { useWells } = require("@/hooks/useWells");
+    useWells.mockReturnValue({ data: [] });
+
+    render(<WellsView />);
+
+    expect(screen.getByTestId("classification-filter")).toBeInTheDocument();
+});
 
 test("mantiene solo control primario de vista", () => {
     const { useWells } = require("@/hooks/useWells");
