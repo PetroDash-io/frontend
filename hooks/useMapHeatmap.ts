@@ -20,6 +20,10 @@ export function useMapHeatmap({mode, resource, filters}: UseMapHeatmapParams) {
     company: filters.company,
     province: filters.province,
     status: filters.status,
+    resource_type:
+      filters.classification === "conv" ? "CONVENCIONAL" :
+      filters.classification === "no_conv" ? "NO CONVENCIONAL" :
+      undefined,
     limit: filters.limit
   });
 

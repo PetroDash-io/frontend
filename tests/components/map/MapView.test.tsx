@@ -62,6 +62,7 @@ const defaultProps = {
     status: "",
     company: "",
     limit: 0,
+    classification: "all" as const,
   },
   wells: [],
   loadingWells: false,

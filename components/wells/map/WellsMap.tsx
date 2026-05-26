@@ -158,7 +158,7 @@ export function WellsMap({
                             <div
                                 role="button"
                                 tabIndex={0}
-                                aria-label={`${item.status || "Well"} ${wellId} ${isUnconventional(item) ? "no convencional" : "convencional"}`}
+                                aria-label={`${item.status || "Well"} ${wellId} ${isUnconventional(item) ? "no convencional" : item.resource_type ? "convencional" : "sin clasificar"}`}
                                 onMouseEnter={() => setActivePozo({id: wellId, lon, lat, company: item.company, resource_type: item.resource_type})}
                                 onMouseLeave={() => setActivePozo(null)}
                                 onClick={(e) => {

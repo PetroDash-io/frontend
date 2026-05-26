@@ -159,6 +159,7 @@ const styles = {
         border: "1px solid var(--color-brand-subtle)",
         backgroundColor: "var(--color-surface-glass)",
         boxShadow: "0 10px 22px rgba(0,0,0,0.05)",
+        overflow: "hidden",
     } as React.CSSProperties,
     viewShell: {
         width: "100%",

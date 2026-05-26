@@ -37,6 +37,7 @@ export const buildWellsExcelExport = ({
     { Filtro: "Provincia", Valor: filters.province || "Todas" },
     { Filtro: "Estado", Valor: filters.status || "Todos" },
     { Filtro: "Empresa", Valor: filters.company || "Todas" },
+    { Filtro: "Tipo de recurso", Valor: filters.classification === "conv" ? "Convencional" : filters.classification === "no_conv" ? "No convencional" : "Todos" },
     { Filtro: "Limite", Valor: String(pageSize) },
     { Filtro: "Pagina", Valor: String(currentPage + 1) },
     { Filtro: "Total", Valor: String(totalItems) },

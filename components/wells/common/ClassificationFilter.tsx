@@ -39,7 +39,6 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     gap: 6,
-    gridColumn: "span 2",
   } as React.CSSProperties,
   label: {
     fontSize: "11px",
@@ -49,13 +48,13 @@ const styles = {
     textTransform: "uppercase",
   } as React.CSSProperties,
   pill: {
-    display: "inline-flex",
+    display: "flex",
+    flexWrap: "wrap",
     alignItems: "center",
     padding: 4,
     borderRadius: 999,
     border: "1px solid var(--color-border-subtle)",
     backgroundColor: "var(--color-bg-surface)",
-    height: 40,
     boxSizing: "border-box",
     alignSelf: "flex-start",
   } as React.CSSProperties,

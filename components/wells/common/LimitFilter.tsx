@@ -28,7 +28,9 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     gap: 6,
-    minWidth: 220,
+
+
+
     flex: 1,
   } as React.CSSProperties,
   limitLabel: {
