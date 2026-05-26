@@ -39,6 +39,7 @@ export function useWells({filters, offset, enabled = true}: useWellsParams) {
         const fetchWells = async () => {
             setLoading(true);
             setError(null);
+            setData(null);
 
             try {
                 // Construir query params incluyendo filtros
