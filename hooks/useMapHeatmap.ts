@@ -1,6 +1,7 @@
 import {useMemo} from "react";
 import {useWellsHeatmap, type HeatmapResource} from "@/hooks/useWellsHeatmap";
 import { WellFilters } from "@/app/types/wellFilters";
+import {CLASSIFICATION_API_PARAM} from "@/utils/wellClassification";
 
 type MapHeatmapMode = "pozos" | "heatmap";
 
@@ -20,10 +21,7 @@ export function useMapHeatmap({mode, resource, filters}: UseMapHeatmapParams) {
     company: filters.company,
     province: filters.province,
     status: filters.status,
-    resource_type:
-      filters.classification === "conv" ? "CONVENCIONAL" :
-      filters.classification === "no_conv" ? "NO CONVENCIONAL" :
-      undefined,
+    resource_type: filters.classification !== "all" ? CLASSIFICATION_API_PARAM[filters.classification] : undefined,
     limit: filters.limit
   });
 

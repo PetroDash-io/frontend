@@ -1,12 +1,7 @@
 import React from "react";
 import {MetricsSummaryItem} from "@/components/wells/map/MetricsSummary";
-import {ClassificationFilter, WellFilters} from "@/app/types/wellFilters";
-
-const CLASSIFICATION_LABEL: Record<ClassificationFilter, string> = {
-  all: "Todos",
-  conv: "Convencional",
-  no_conv: "No convencional",
-};
+import {WellFilters} from "@/app/types/wellFilters";
+import {CLASSIFICATION_DISPLAY_LABEL} from "@/utils/wellClassification";
 
 interface WellMetricsProps {
   items: MetricsSummaryItem[];
@@ -35,7 +30,7 @@ export function WellMetrics({items, loading = false, error, filters, filteredCou
     `Provincia ${readableFilterValue(filters.province, "Todas")}`,
     `Estado ${readableFilterValue(filters.status, "Todos")}`,
     `Empresa ${readableFilterValue(filters.company, "Todas")}`,
-    `Tipo ${CLASSIFICATION_LABEL[filters.classification]}`,
+    `Tipo ${CLASSIFICATION_DISPLAY_LABEL[filters.classification]}`,
   ].join(" · ");
 
   return (

@@ -125,11 +125,12 @@ export const LEGEND_ITEMS = [
 ];
 
 export const CLASSIFICATION_LEGEND_ITEMS: Array<{
-  shape: "circle" | "triangle";
+  shape: "circle" | "triangle" | "x";
   label: string;
 }> = [
   { shape: "circle",   label: "Convencional" },
   { shape: "triangle", label: "No convencional" },
+  { shape: "x",        label: "Sin información" },
 ];
 
 export const YEARS = Array.from(

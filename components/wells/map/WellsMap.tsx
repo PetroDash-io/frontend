@@ -1,7 +1,8 @@
 import {colors, LEGEND_ITEMS, CLASSIFICATION_LEGEND_ITEMS} from "@/utils/constants";
 import {ActiveWell, WellDetail} from "@/app/types";
 import {LegendItem} from "@/components/wells/map/LegendItem";
-import {getWellColor} from "@/utils/helpers";
+import {classifyWell, CLASSIFICATION_ARIA_LABEL} from "@/utils/wellClassification";
+import {WellMarker} from "@/components/wells/map/WellMarker";
 
 import Map, {Marker, Popup, Source, Layer} from "react-map-gl/mapbox";
 import type {MapRef} from "react-map-gl/mapbox";
@@ -20,8 +21,6 @@ interface WellsMapProps {
   overlayControlsBottomCenter?: React.ReactNode;
 }
 
-const isUnconventional = (well: WellDetail) =>
-    well.resource_type?.toUpperCase().trim() === "NO CONVENCIONAL";
 
 export function WellsMap({
     wells,
@@ -158,7 +157,7 @@ export function WellsMap({
                             <div
                                 role="button"
                                 tabIndex={0}
-                                aria-label={`${item.status || "Well"} ${wellId} ${isUnconventional(item) ? "no convencional" : item.resource_type ? "convencional" : "sin clasificar"}`}
+                                aria-label={`${item.status || "Well"} ${wellId} ${CLASSIFICATION_ARIA_LABEL[classifyWell(item)]}`}
                                 onMouseEnter={() => setActivePozo({id: wellId, lon, lat, company: item.company, resource_type: item.resource_type})}
                                 onMouseLeave={() => setActivePozo(null)}
                                 onClick={(e) => {
@@ -175,11 +174,12 @@ export function WellsMap({
                                     }
                                 }}
                                 style={styles.markerWrap}>
-                                {isUnconventional(item) ? (
-                                    <span style={styles.markerTriangle({selected: isSelected, status: item.status, focused: focusedPozoId === wellId})} />
-                                ) : (
-                                    <span style={styles.markerDot({selected: isSelected, status: item.status, focused: focusedPozoId === wellId})} />
-                                )}
+                                <WellMarker
+                                    classification={classifyWell(item)}
+                                    selected={isSelected}
+                                    focused={focusedPozoId === wellId}
+                                    status={item.status}
+                                />
                             </div>
                         </Marker>
                     );
@@ -265,40 +265,6 @@ const styles = {
         cursor: "pointer",
         outline: "none",
     } as React.CSSProperties,
-    markerDot: (opts: { selected: boolean; status: string; focused: boolean }) => ({
-        width: opts.selected ? 16 : 10,
-        height: opts.selected ? 16 : 10,
-        backgroundColor: getWellColor(opts.status),
-        borderRadius: "50%",
-        border: "1px solid rgba(0,0,0,0.4)",
-        transition: "all 0.15s ease",
-        boxShadow: opts.selected
-            ? "0 0 0 4px rgba(45, 74, 45, 0.25), 0 1px 2px rgba(0,0,0,0.4)"
-            : opts.focused
-            ? `0 0 0 2px ${colors.accent}`
-            : "0 1px 2px rgba(0,0,0,0.3)",
-    }) as React.CSSProperties,
-    markerTriangle: (opts: { selected: boolean; status: string; focused: boolean }) => {
-        const color = getWellColor(opts.status);
-        const halfBase = opts.selected ? 9 : 6;
-        const height = opts.selected ? 16 : 11;
-        const baseOutline = "drop-shadow(0 0 0.6px rgba(0,0,0,0.7))";
-        const halo = opts.selected
-            ? "drop-shadow(0 0 5px rgba(45, 74, 45, 0.55))"
-            : opts.focused
-            ? `drop-shadow(0 0 3px ${colors.accent})`
-            : "drop-shadow(0 1px 1px rgba(0,0,0,0.3))";
-        return {
-            width: 0,
-            height: 0,
-            backgroundColor: "transparent",
-            borderLeft: `${halfBase}px solid transparent`,
-            borderRight: `${halfBase}px solid transparent`,
-            borderBottom: `${height}px solid ${color}`,
-            transition: "all 0.15s ease",
-            filter: `${baseOutline} ${halo}`,
-        } as React.CSSProperties;
-    },
     popupBox: {
         backgroundColor: colors.panel,
         color: colors.textLight,

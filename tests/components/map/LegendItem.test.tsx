@@ -20,4 +20,10 @@ describe("LegendItem", () => {
 
     expect(screen.getByText("No convencional")).toBeInTheDocument();
   });
+
+  it("renderiza el label con shape x", () => {
+    render(<LegendItem shape="x" label="Sin información" />);
+
+    expect(screen.getByText("Sin información")).toBeInTheDocument();
+  });
 });

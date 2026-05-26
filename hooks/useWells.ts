@@ -1,6 +1,7 @@
 import {useEffect, useState} from "react";
 import {WellDetail} from "@/app/types";
 import {WellFilters} from "@/app/types/wellFilters";
+import {buildWellFilterParams} from "@/utils/wellParams";
 
 interface useWellsParams {
     filters: WellFilters;
@@ -43,29 +44,9 @@ export function useWells({filters, offset, enabled = true}: useWellsParams) {
             setData(null);
 
             try {
-                // Construir query params incluyendo filtros
-                const params = new URLSearchParams();
-                params.append('limit', filters.limit.toString());
-                if (offset !== undefined) {
-                    params.append('offset', offset.toString());
-                }
-                params.append('watershed', filters.watershed);
-
-                if (filters.company) {
-                    params.append('company', filters.company);
-                }
-                if (filters.province) {
-                    params.append('province', filters.province);
-                }
-                if (filters.status) {
-                    params.append('status', filters.status);
-                }
-                if (filters.classification === "conv") {
-                    params.append("resource_type", "CONVENCIONAL");
-                }
-                if (filters.classification === "no_conv") {
-                    params.append("resource_type", "NO CONVENCIONAL");
-                }
+                const params = buildWellFilterParams(filters);
+                params.append("limit", filters.limit.toString());
+                if (offset !== undefined) params.append("offset", offset.toString());
 
                 const url = `${process.env.NEXT_PUBLIC_API_URL}/pozos?${params.toString()}`;
 
