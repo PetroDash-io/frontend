@@ -1,11 +1,10 @@
 import React, {useState, useMemo, useEffect} from "react";
 import {MapView} from "@/components/wells/MapView";
 import {TableView} from "@/components/wells/TableView";
-import {LimitFilter} from "@/components/wells/common/LimitFilter";
-import {ClassificationFilter} from "@/components/wells/common/ClassificationFilter";
+import {WellsFilterPanel} from "@/components/wells/WellsFilterPanel";
 import {WellFilters} from "@/app/types/wellFilters";
-import {SELECT_DEFAULT_VALUE, SelectFilter} from "@/components/common/SelectFilter";
-import {colors, CONTENT_MAX_WIDTH, WATERSHED_OPTIONS} from "@/utils/constants";
+import {SELECT_DEFAULT_VALUE} from "@/components/common/SelectFilter";
+import {colors, CONTENT_MAX_WIDTH} from "@/utils/constants";
 import {useWells} from "@/hooks/useWells";
 
 const DEFAULT_FILTERS = {
@@ -72,46 +71,13 @@ export function WellsView() {
                     </button>
                 </div>
             </div>
-            <div style={styles.filterPanel}>
-                <SelectFilter
-                    filterName="watershed"
-                    value={filters.watershed}
-                    onSelect={updateFilters}
-                    options={WATERSHED_OPTIONS}/>
-                <SelectFilter
-                    filterName="province"
-                    value={filters.province}
-                    onSelect={updateFilters}
-                    options={provinceFilterOptions}
-                    defaultOptionLabel="Todas las provincias"
-                />
-
-                <SelectFilter
-                    filterName="status"
-                    value={filters.status}
-                    onSelect={updateFilters}
-                    options={statusFilterOptions}
-                    defaultOptionLabel="Todos los estados"
-                />
-
-                <SelectFilter
-                    filterName="company"
-                    value={filters.company}
-                    onSelect={updateFilters}
-                    options={companyFilterOptions}
-                    defaultOptionLabel="Todas las empresas"
-                />
-
-                <ClassificationFilter
-                    value={filters.classification}
-                    onChange={(v) => updateFilters("classification", v)}
-                />
-
-                <LimitFilter
-                    filterName="limit"
-                    limit={filters.limit}
-                    onDefineLimit={updateFilters}/>
-            </div>
+            <WellsFilterPanel
+                filters={filters}
+                onUpdate={updateFilters}
+                provinceOptions={provinceFilterOptions}
+                statusOptions={statusFilterOptions}
+                companyOptions={companyFilterOptions}
+            />
 
             {view === "map" && (
                 <>
@@ -147,19 +113,6 @@ const styles = {
         fontWeight: 600,
         color: colors.primary,
         margin: 0,
-    } as React.CSSProperties,
-    filterPanel: {
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
-        alignItems: "end",
-        gap: 16,
-        padding: "16px",
-        marginBottom: 18,
-        borderRadius: "var(--radius-2xl)",
-        border: "1px solid var(--color-brand-subtle)",
-        backgroundColor: "var(--color-surface-glass)",
-        boxShadow: "0 10px 22px rgba(0,0,0,0.05)",
-        overflow: "hidden",
     } as React.CSSProperties,
     viewShell: {
         width: "100%",

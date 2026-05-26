@@ -49,7 +49,7 @@ const styles = {
   } as React.CSSProperties,
   pill: {
     display: "flex",
-    flexWrap: "wrap",
+    flexWrap: "nowrap",
     alignItems: "center",
     padding: 4,
     borderRadius: 999,
