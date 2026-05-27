@@ -4,9 +4,10 @@ import {LegendItem} from "@/components/wells/map/LegendItem";
 import {getWellColor} from "@/utils/helpers";
 
 import Map, {Marker, Popup, Source, Layer} from "react-map-gl/mapbox";
+import type {MapRef} from "react-map-gl/mapbox";
 import type { HeatmapLayer } from "mapbox-gl";
 import type { GeoJSON } from "geojson";
-import React, {useState} from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 
 interface WellsMapProps {
   wells: WellDetail[];
@@ -31,7 +32,49 @@ export function WellsMap({
 }: WellsMapProps) {
     const [focusedPozoId, setFocusedPozoId] = useState<number | null>(null);
     const [activePozo, setActivePozo] = useState<ActiveWell | null>(null);
+    const mapRef = useRef<MapRef | null>(null);
     const safeHeatmapMaxValue = Number.isFinite(heatmapMaxValue) && heatmapMaxValue > 0 ? heatmapMaxValue : 1;
+
+    const wellsCoordinates = useMemo(() => {
+        return wells
+            .map((item) => {
+                if (!item.geojson) return null;
+
+                try {
+                    const geo = typeof item.geojson === "string" ? JSON.parse(item.geojson) : item.geojson;
+                    if (!geo?.coordinates || !Array.isArray(geo.coordinates) || geo.coordinates.length < 2) {
+                        return null;
+                    }
+
+                    const [lon, lat] = geo.coordinates;
+                    if (!Number.isFinite(lon) || !Number.isFinite(lat)) return null;
+
+                    return {
+                        wellId: item.well_id,
+                        lon,
+                        lat,
+                        item,
+                    };
+                } catch {
+                    return null;
+                }
+            })
+            .filter((value): value is {wellId: number; lon: number; lat: number; item: WellDetail} => Boolean(value));
+    }, [wells]);
+
+    useEffect(() => {
+        if (!mapRef.current || wellsCoordinates.length === 0) return;
+
+        const randomIndex = Math.floor(Math.random() * wellsCoordinates.length);
+        const randomWell = wellsCoordinates[randomIndex];
+
+        mapRef.current.flyTo({
+            center: [randomWell.lon, randomWell.lat],
+            zoom: 6.2,
+            duration: 800,
+            essential: true,
+        });
+    }, [wellsCoordinates]);
 
     return (
         <div style={styles.mapContainer}>
@@ -43,6 +86,7 @@ export function WellsMap({
             {overlayControlsTopRight ? <div style={styles.overlayControlsTopRight}>{overlayControlsTopRight}</div> : null}
             {overlayControlsBottomCenter ? <div style={styles.overlayControlsBottomCenter}>{overlayControlsBottomCenter}</div> : null}
             <Map
+                ref={mapRef}
                 initialViewState={{
                     longitude: -68.059167,
                     latitude: -38.951944,
@@ -94,21 +138,7 @@ export function WellsMap({
                 )}
 
                 {/* Markers layer */}
-                {mapMode === "markers" && wells.map((item) => {
-                    if (!item.geojson) return null;
-
-                    let lon: number, lat: number;
-                    try {
-                        const geo = typeof item.geojson === "string" ? JSON.parse(item.geojson) : item.geojson;
-                        if (!geo?.coordinates || !Array.isArray(geo.coordinates) || geo.coordinates.length < 2) {
-                            return null;
-                        }
-                        [lon, lat] = geo.coordinates;
-                    } catch {
-                        return null;
-                    }
-
-                    const wellId = item.well_id;
+                {mapMode === "markers" && wellsCoordinates.map(({wellId, lon, lat, item}) => {
 
                     const isSelected = selectedWellId === wellId;
 

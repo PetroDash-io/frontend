@@ -37,6 +37,9 @@ export function useWellsHeatmap(filters: HeatmapFilters) {
       return;
     }
 
+    const controller = new AbortController();
+    let isCancelled = false;
+
     const fetchHeatmap = async () => {
       setLoading(true);
       setError(null);
@@ -57,6 +60,7 @@ export function useWellsHeatmap(filters: HeatmapFilters) {
 
         const url = `${process.env.NEXT_PUBLIC_API_URL}/pozos/heatmap?${params.toString()}`;
         const response = await fetch(url, {
+          signal: controller.signal,
           headers: { "X-API-Key": process.env.NEXT_PUBLIC_API_KEY || "" },
         });
 
@@ -67,17 +71,30 @@ export function useWellsHeatmap(filters: HeatmapFilters) {
         const json = await response.json();
         setRawData(json.data);
       } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") {
+          return;
+        }
         setError(err instanceof Error ? err.message : "Unexpected error");
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
     };
 
     fetchHeatmap();
+
+    return () => {
+      isCancelled = true;
+      controller.abort();
+    };
   }, [
     filters.enabled,
     filters.resource,
     filters.watershed,
+    filters.company,
+    filters.province,
+    filters.status,
     filters.limit,
     filters.offset,
     filters.start_year,

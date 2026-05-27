@@ -18,8 +18,13 @@ export function useProductionAggregates(filters: Partial<ProductionAggregatesFil
     const date_selected = filters.inicio_anio || filters.fin_anio
     if (!company_selected || !date_selected) {
       setData(null);
+      setLoading(false);
+      setError(null);
       return;
     }
+
+    const controller = new AbortController();
+    let isCancelled = false;
 
     const fetchProduction = async () => {
       setLoading(true);
@@ -50,6 +55,7 @@ export function useProductionAggregates(filters: Partial<ProductionAggregatesFil
         const url = `${process.env.NEXT_PUBLIC_API_URL}/empresas/${filters.empresa}/produccion?${params.toString()}`;
         
         const response = await fetch(url, {
+          signal: controller.signal,
           headers: {
             "X-API-Key": process.env.NEXT_PUBLIC_API_KEY || "",
           },
@@ -62,13 +68,23 @@ export function useProductionAggregates(filters: Partial<ProductionAggregatesFil
         const json = await response.json();
         setData(json.data);
       } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") {
+          return;
+        }
         setError(err instanceof Error ? err.message : "Unexpected error");
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
     };
 
     fetchProduction();
+
+    return () => {
+      isCancelled = true;
+      controller.abort();
+    };
   }, [filters.empresa, filters.watershed, filters.inicio_anio, filters.inicio_mes, filters.fin_anio, filters.fin_mes]);
 
   return { data, loading, error };
