@@ -149,7 +149,7 @@ export function WellsMap({
 
                 {/* Markers layer */}
                 {mapMode === "markers" && wellsCoordinates.map(({wellId, lon, lat, item}) => {
-
+                    const classification = classifyWell(item);
                     const isSelected = selectedWellId === wellId;
 
                     return (
@@ -157,7 +157,7 @@ export function WellsMap({
                             <div
                                 role="button"
                                 tabIndex={0}
-                                aria-label={`${item.status || "Well"} ${wellId} ${CLASSIFICATION_ARIA_LABEL[classifyWell(item)]}`}
+                                aria-label={`${item.status || "Pozo"} ${wellId} ${CLASSIFICATION_ARIA_LABEL[classification]}`}
                                 onMouseEnter={() => setActivePozo({id: wellId, lon, lat, company: item.company, resource_type: item.resource_type})}
                                 onMouseLeave={() => setActivePozo(null)}
                                 onClick={(e) => {
@@ -175,7 +175,7 @@ export function WellsMap({
                                 }}
                                 style={styles.markerWrap}>
                                 <WellMarker
-                                    classification={classifyWell(item)}
+                                    classification={classification}
                                     selected={isSelected}
                                     focused={focusedPozoId === wellId}
                                     status={item.status}
