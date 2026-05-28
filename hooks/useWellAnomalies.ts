@@ -22,6 +22,9 @@ export function useWellAnomalies({wellId, resource, dateRange}: UseWellAnomalies
       return;
     }
 
+    const controller = new AbortController();
+    let isCancelled = false;
+
     const fetchAnomalies = async () => {
       const hasWellChanged = previousWellId.current !== wellId;
       previousWellId.current = wellId;
@@ -49,6 +52,7 @@ export function useWellAnomalies({wellId, resource, dateRange}: UseWellAnomalies
 
         const url = `${process.env.NEXT_PUBLIC_API_URL}/pozos/${wellId}/anomalias-produccion?${params.toString()}`;
         const response = await fetch(url, {
+          signal: controller.signal,
           headers: {
             "X-API-Key": process.env.NEXT_PUBLIC_API_KEY || "",
           },
@@ -61,15 +65,25 @@ export function useWellAnomalies({wellId, resource, dateRange}: UseWellAnomalies
         const json = await response.json();
         setData(Array.isArray(json.data) ? json.data : []);
       } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") {
+          return;
+        }
         setError(err instanceof Error ? err.message : "Unexpected error");
         setData([]);
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
     };
 
     fetchAnomalies();
-  }, [wellId, resource, dateRange]);
+
+    return () => {
+      isCancelled = true;
+      controller.abort();
+    };
+  }, [wellId, resource, dateRange.startYear, dateRange.startMonth, dateRange.endYear, dateRange.endMonth]);
 
   return {data, loading, error};
 }

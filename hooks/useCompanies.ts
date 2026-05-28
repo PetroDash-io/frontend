@@ -23,6 +23,9 @@ export function useCompanies(searchQuery?: string, watershed = "NEUQUINA"): UseC
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const controller = new AbortController();
+    let isCancelled = false;
+
     const fetchCompanies = async () => {
       setLoading(true);
       setError(null);
@@ -37,6 +40,7 @@ export function useCompanies(searchQuery?: string, watershed = "NEUQUINA"): UseC
         const url = `${process.env.NEXT_PUBLIC_API_URL}/empresas${params.toString() ? `?${params.toString()}` : ""}`;
         
         const response = await fetch(url, {
+          signal: controller.signal,
           headers: {
             "X-API-Key": process.env.NEXT_PUBLIC_API_KEY || "",
           },
@@ -72,13 +76,23 @@ export function useCompanies(searchQuery?: string, watershed = "NEUQUINA"): UseC
 
         setCompanies(normalized);
       } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") {
+          return;
+        }
         setError(err instanceof Error ? err.message : "Unexpected error");
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
     };
 
     fetchCompanies();
+
+    return () => {
+      isCancelled = true;
+      controller.abort();
+    };
   }, [searchQuery, watershed]);
 
   return { companies, loading, error };

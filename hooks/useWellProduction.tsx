@@ -22,6 +22,9 @@ export function useWellsProduction({wellId, dateRange}: useWellProductionParams)
             return;
         }
 
+        const controller = new AbortController();
+        let isCancelled = false;
+
         const fetchWellProduction = async () => {
             const hasWellChanged = previousWellId.current !== wellId;
             previousWellId.current = wellId;
@@ -51,6 +54,7 @@ export function useWellsProduction({wellId, dateRange}: useWellProductionParams)
 
                 const response = await fetch(url,
                     {
+                        signal: controller.signal,
                         headers: {
                             "X-API-Key": process.env.NEXT_PUBLIC_API_KEY || "",
                         },
@@ -64,14 +68,24 @@ export function useWellsProduction({wellId, dateRange}: useWellProductionParams)
                 const json: ProductionMonthlyResponse = await response.json();
                 setData(json.data);
             } catch (err) {
+                if (err instanceof DOMException && err.name === "AbortError") {
+                    return;
+                }
                 setError(err instanceof Error ? err.message : "Unexpected error");
                 setData(null);
             } finally {
-                setLoading(false);
+                if (!isCancelled) {
+                    setLoading(false);
+                }
             }
         };
 
         fetchWellProduction();
+
+        return () => {
+            isCancelled = true;
+            controller.abort();
+        };
     }, [wellId, dateRange?.startYear, dateRange?.startMonth, dateRange?.endYear, dateRange?.endMonth]);
     return {data, loading, error};
 }

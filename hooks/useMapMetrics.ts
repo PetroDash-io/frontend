@@ -1,6 +1,7 @@
 import {useEffect, useState} from "react";
 import {MapMetricsResponse} from "@/app/types";
 import {WellFilters} from "@/app/types/wellFilters";
+import {buildWellFilterParams} from "@/utils/wellParams";
 
 interface UseMapMetricsResult {
   data: MapMetricsResponse | null;
@@ -21,28 +22,19 @@ export function useMapMetrics(filters: WellFilters): UseMapMetricsResult {
       return;
     }
 
+    const controller = new AbortController();
+    let isCancelled = false;
+
     const fetchMetrics = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        const params = new URLSearchParams();
-        params.append("watershed", filters.watershed);
-
-        if (filters.company) {
-          params.append("company", filters.company);
-        }
-
-        if (filters.province) {
-          params.append("province", filters.province);
-        }
-
-        if (filters.status) {
-          params.append("status", filters.status);
-        }
+        const params = buildWellFilterParams(filters);
 
         const url = `${process.env.NEXT_PUBLIC_API_URL}/pozos/resumen-mapa?${params.toString()}`;
         const response = await fetch(url, {
+          signal: controller.signal,
           headers: {
             "X-API-Key": process.env.NEXT_PUBLIC_API_KEY || "",
           },
@@ -55,15 +47,25 @@ export function useMapMetrics(filters: WellFilters): UseMapMetricsResult {
         const json = await response.json();
         setData(json as MapMetricsResponse);
       } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") {
+          return;
+        }
         setError(err instanceof Error ? err.message : "Unexpected error");
         setData(null);
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
     };
 
     fetchMetrics();
-  }, [filters.watershed, filters.company, filters.province, filters.status]);
+
+    return () => {
+      isCancelled = true;
+      controller.abort();
+    };
+  }, [filters.watershed, filters.company, filters.province, filters.status, filters.classification]);
 
   return {data, loading, error};
 }

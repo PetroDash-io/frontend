@@ -1,5 +1,6 @@
 import React from "react";
 import {colors, PRODUCTION_TYPES} from "@/utils/constants";
+import {formatTooltip, formatYAxis} from "@/utils/formatters";
 import {
     ResponsiveContainer,
     BarChart,
@@ -29,21 +30,6 @@ interface ProductionBarChartProps {
     watershed?: string;
 }
 
-const formatYAxis = (value: number) => {
-  if (value >= 1000000) {
-    return `${(value / 1000000).toFixed(1)}M`;
-  } else if (value >= 1000) {
-    return `${(value / 1000).toFixed(1)}K`;
-  }
-  return value.toFixed(0);
-};
-
-const formatTooltip = (value: number | string | undefined) => {
-  if (typeof value === 'number') {
-    return value.toLocaleString('es-AR', { maximumFractionDigits: 2 });
-  }
-  return value;
-};
 
 export function ProductionBarChart({
   data,

@@ -10,10 +10,17 @@ export function useWell({wellId}: useWellParams) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/pozos/${wellId}`;
     useEffect(() => {
-        console.log("Fetching well details for ID:", wellId);
-        if (!wellId) return;
+        if (!wellId) {
+            setData(null);
+            setLoading(false);
+            setError(null);
+            return;
+        }
+
+        const controller = new AbortController();
+        let isCancelled = false;
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/pozos/${wellId}`;
 
         const fetchWell = async () => {
             setLoading(true);
@@ -22,6 +29,7 @@ export function useWell({wellId}: useWellParams) {
             try {
                 const response = await fetch(url,
                     {
+                        signal: controller.signal,
                         headers: {
                             "X-API-Key": process.env.NEXT_PUBLIC_API_KEY || "",
                         },
@@ -34,20 +42,29 @@ export function useWell({wellId}: useWellParams) {
 
                 const json = await response.json();
                 const data = json.data;
-                console.log("Received well details response:", data);
                 if (Array.isArray(data)) {
                     setData(data.length > 0 ? data[0] : null);
                 } else {
                     setData(data ?? null);
                 }
             } catch (err) {
+                if (err instanceof DOMException && err.name === "AbortError") {
+                    return;
+                }
                 setError(err instanceof Error ? err.message : "Unexpected error");
             } finally {
-                setLoading(false);
+                if (!isCancelled) {
+                    setLoading(false);
+                }
             }
         };
 
         fetchWell();
-    }, [wellId, url]);
+
+        return () => {
+            isCancelled = true;
+            controller.abort();
+        };
+    }, [wellId]);
     return {data, loading, error};
 }
