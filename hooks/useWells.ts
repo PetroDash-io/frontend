@@ -1,8 +1,10 @@
 import {useEffect, useState} from "react";
 import {WellDetail} from "@/app/types";
+import {WellFilters} from "@/app/types/wellFilters";
+import {buildWellFilterParams} from "@/utils/wellParams";
 
 interface useWellsParams {
-    filters: {watershed: string; province: string; status: string; company: string; limit: number};
+    filters: WellFilters;
     offset?: number;
     enabled?: boolean;
 }
@@ -42,23 +44,9 @@ export function useWells({filters, offset, enabled = true}: useWellsParams) {
             setData(null);
 
             try {
-                // Construir query params incluyendo filtros
-                const params = new URLSearchParams();
-                params.append('limit', filters.limit.toString());
-                if (offset !== undefined) {
-                    params.append('offset', offset.toString());
-                }
-                params.append('watershed', filters.watershed);
-
-                if (filters.company) {
-                    params.append('company', filters.company);
-                }
-                if (filters.province) {
-                    params.append('province', filters.province);
-                }
-                if (filters.status) {
-                    params.append('status', filters.status);
-                }
+                const params = buildWellFilterParams(filters);
+                params.append("limit", filters.limit.toString());
+                if (offset !== undefined) params.append("offset", offset.toString());
 
                 const url = `${process.env.NEXT_PUBLIC_API_URL}/pozos?${params.toString()}`;
 
@@ -104,7 +92,7 @@ export function useWells({filters, offset, enabled = true}: useWellsParams) {
             isCancelled = true;
             controller.abort();
         };
-    }, [enabled, filters.limit, filters.watershed, filters.company, filters.province, filters.status, offset]);
+    }, [enabled, filters.limit, filters.watershed, filters.company, filters.province, filters.status, filters.classification, offset]);
 
     return {data, loading, error, pagination};
 }

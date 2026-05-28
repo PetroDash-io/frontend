@@ -1,6 +1,7 @@
 import {useEffect, useState} from "react";
 import {MapMetricsResponse} from "@/app/types";
 import {WellFilters} from "@/app/types/wellFilters";
+import {buildWellFilterParams} from "@/utils/wellParams";
 
 interface UseMapMetricsResult {
   data: MapMetricsResponse | null;
@@ -29,20 +30,7 @@ export function useMapMetrics(filters: WellFilters): UseMapMetricsResult {
       setError(null);
 
       try {
-        const params = new URLSearchParams();
-        params.append("watershed", filters.watershed);
-
-        if (filters.company) {
-          params.append("company", filters.company);
-        }
-
-        if (filters.province) {
-          params.append("province", filters.province);
-        }
-
-        if (filters.status) {
-          params.append("status", filters.status);
-        }
+        const params = buildWellFilterParams(filters);
 
         const url = `${process.env.NEXT_PUBLIC_API_URL}/pozos/resumen-mapa?${params.toString()}`;
         const response = await fetch(url, {
@@ -77,7 +65,7 @@ export function useMapMetrics(filters: WellFilters): UseMapMetricsResult {
       isCancelled = true;
       controller.abort();
     };
-  }, [filters.watershed, filters.company, filters.province, filters.status]);
+  }, [filters.watershed, filters.company, filters.province, filters.status, filters.classification]);
 
   return {data, loading, error};
 }

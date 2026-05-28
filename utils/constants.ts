@@ -124,6 +124,15 @@ export const LEGEND_ITEMS = [
   { color: colors.notInformedWell, label: "No informado" },
 ];
 
+export const CLASSIFICATION_LEGEND_ITEMS: Array<{
+  shape: "circle" | "triangle" | "x";
+  label: string;
+}> = [
+  { shape: "circle",   label: "Convencional" },
+  { shape: "triangle", label: "No convencional" },
+  { shape: "x",        label: "Sin información" },
+];
+
 export const YEARS = Array.from(
     { length: new Date().getFullYear() - 2013 + 1 },
     (_, i) => 2013 + i

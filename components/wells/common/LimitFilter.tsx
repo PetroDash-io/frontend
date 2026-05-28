@@ -28,13 +28,17 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     gap: 6,
-    minWidth: 220,
+
+
+
     flex: 1,
   } as React.CSSProperties,
   limitLabel: {
-    fontSize: 14,
-    fontWeight: 500,
-    color: colors.text,
+    fontSize: "11px",
+    fontWeight: 700,
+    letterSpacing: "0.04em",
+    color: "var(--color-text-secondary)",
+    textTransform: "uppercase",
   } as React.CSSProperties,
   limitInput: {
     width: "100%",

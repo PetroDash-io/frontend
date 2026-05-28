@@ -1,6 +1,7 @@
 import type { WellDetail } from "@/app/types";
 import type { WellFilters } from "@/app/types/wellFilters";
 import { toSlug } from "@/utils/helpers";
+import { CLASSIFICATION_DISPLAY_LABEL } from "@/utils/wellClassification";
 
 type WellsExportParams = {
   data: WellDetail[];
@@ -37,6 +38,7 @@ export const buildWellsExcelExport = ({
     { Filtro: "Provincia", Valor: filters.province || "Todas" },
     { Filtro: "Estado", Valor: filters.status || "Todos" },
     { Filtro: "Empresa", Valor: filters.company || "Todas" },
+    { Filtro: "Tipo de recurso", Valor: CLASSIFICATION_DISPLAY_LABEL[filters.classification] },
     { Filtro: "Limite", Valor: String(pageSize) },
     { Filtro: "Pagina", Valor: String(currentPage + 1) },
     { Filtro: "Total", Valor: String(totalItems) },

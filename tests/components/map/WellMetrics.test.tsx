@@ -9,6 +9,7 @@ describe("WellMetrics", () => {
     status: "",
     company: "",
     limit: 100,
+    classification: "all" as const,
   };
 
   it("muestra tarjetas de métricas", () => {
@@ -27,7 +28,7 @@ describe("WellMetrics", () => {
     );
 
     expect(screen.getByText("Resumen de pozos filtrados")).toBeInTheDocument();
-    expect(screen.getByText("Cuenca Noroeste · Provincia Todas · Estado Todos · Empresa Todas")).toBeInTheDocument();
+    expect(screen.getByText("Cuenca Noroeste · Provincia Todas · Estado Todos · Empresa Todas · Tipo Todos")).toBeInTheDocument();
     expect(screen.getByText("100 pozos en mapa")).toBeInTheDocument();
     expect(screen.getByText("Pozos activos")).toBeInTheDocument();
     expect(screen.getByText("1.2K")).toBeInTheDocument();
@@ -43,6 +44,30 @@ describe("WellMetrics", () => {
     render(<WellMetrics items={[]} error="Error" filters={filters} filteredCount={0} />);
 
     expect(screen.getByText("No se pudieron cargar las métricas.")).toBeInTheDocument();
+  });
+
+  it("muestra 'Tipo Convencional' en el contextLine cuando el filtro es conv", () => {
+    render(
+      <WellMetrics
+        items={[]}
+        filters={{ ...filters, classification: "conv" }}
+        filteredCount={0}
+      />
+    );
+
+    expect(screen.getByText(/Tipo Convencional/)).toBeInTheDocument();
+  });
+
+  it("muestra 'Tipo No convencional' en el contextLine cuando el filtro es nc", () => {
+    render(
+      <WellMetrics
+        items={[]}
+        filters={{ ...filters, classification: "no_conv" }}
+        filteredCount={0}
+      />
+    );
+
+    expect(screen.getByText(/Tipo No convencional/)).toBeInTheDocument();
   });
 
   it("muestra estado vacío sin datos", () => {

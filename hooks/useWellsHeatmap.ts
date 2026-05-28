@@ -8,6 +8,7 @@ interface HeatmapFilters {
   company?: string;
   province?: string;
   status?: string;
+  resource_type?: string;
   enabled?: boolean;
   start_year?: number;
   start_month?: number;
@@ -51,6 +52,7 @@ export function useWellsHeatmap(filters: HeatmapFilters) {
         if (filters.company) params.append("company", filters.company);
         if (filters.province) params.append("province", filters.province);
         if (filters.status) params.append("status", filters.status);
+        if (filters.resource_type) params.append("resource_type", filters.resource_type);
         if (filters.limit) params.append("limit", filters.limit.toString());
         if (filters.offset) params.append("offset", filters.offset.toString());
         if (filters.start_year) params.append("start_year", filters.start_year.toString());
@@ -95,6 +97,7 @@ export function useWellsHeatmap(filters: HeatmapFilters) {
     filters.company,
     filters.province,
     filters.status,
+    filters.resource_type,
     filters.limit,
     filters.offset,
     filters.start_year,
