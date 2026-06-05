@@ -2,6 +2,8 @@ import React, {useState, useMemo, useEffect} from "react";
 import {MapView} from "@/components/wells/MapView";
 import {TableView} from "@/components/wells/TableView";
 import {WellsFilterPanel} from "@/components/wells/WellsFilterPanel";
+import {LimitFilter} from "@/components/wells/common/LimitFilter";
+import {InlineMessage} from "@/components/common/InlineMessage";
 import {WellFilters} from "@/app/types/wellFilters";
 import {SELECT_DEFAULT_VALUE} from "@/components/common/SelectFilter";
 import {colors, CONTENT_MAX_WIDTH} from "@/utils/constants";
@@ -80,6 +82,14 @@ export function WellsView() {
             />
 
             {view === "map" && (
+                <div style={styles.mapFilterNote}>
+                    <InlineMessage
+                        message={`Se eligen los primeros ${filters.limit} resultados según los filtros aplicados y el número definido en el filtro de arriba.`}
+                    />
+                </div>
+            )}
+
+            {view === "map" && (
                 <>
                     <MapView
                         filters={filters}
@@ -113,6 +123,21 @@ const styles = {
         fontWeight: 600,
         color: colors.primary,
         margin: 0,
+    } as React.CSSProperties,
+    filterPanel: {
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+        alignItems: "end",
+        gap: 16,
+        padding: "16px",
+        marginBottom: 18,
+        borderRadius: "var(--radius-2xl)",
+        border: "1px solid var(--color-brand-subtle)",
+        backgroundColor: "var(--color-surface-glass)",
+        boxShadow: "0 10px 22px rgba(0,0,0,0.05)",
+    } as React.CSSProperties,
+    mapFilterNote: {
+        marginBottom: 16,
     } as React.CSSProperties,
     viewShell: {
         width: "100%",
