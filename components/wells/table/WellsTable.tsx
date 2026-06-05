@@ -19,6 +19,7 @@ const EMPTY_FILTERS: WellFilters = {
   status: "",
   company: "",
   limit: 0,
+  classification: "all",
 };
 
 export function WellsTable({

@@ -8,6 +8,7 @@ interface HeatmapFilters {
   company?: string;
   province?: string;
   status?: string;
+  resource_type?: string;
   enabled?: boolean;
   start_year?: number;
   start_month?: number;
@@ -37,6 +38,9 @@ export function useWellsHeatmap(filters: HeatmapFilters) {
       return;
     }
 
+    const controller = new AbortController();
+    let isCancelled = false;
+
     const fetchHeatmap = async () => {
       setLoading(true);
       setError(null);
@@ -48,6 +52,7 @@ export function useWellsHeatmap(filters: HeatmapFilters) {
         if (filters.company) params.append("company", filters.company);
         if (filters.province) params.append("province", filters.province);
         if (filters.status) params.append("status", filters.status);
+        if (filters.resource_type) params.append("resource_type", filters.resource_type);
         if (filters.limit) params.append("limit", filters.limit.toString());
         if (filters.offset) params.append("offset", filters.offset.toString());
         if (filters.start_year) params.append("start_year", filters.start_year.toString());
@@ -57,6 +62,7 @@ export function useWellsHeatmap(filters: HeatmapFilters) {
 
         const url = `${process.env.NEXT_PUBLIC_API_URL}/pozos/heatmap?${params.toString()}`;
         const response = await fetch(url, {
+          signal: controller.signal,
           headers: { "X-API-Key": process.env.NEXT_PUBLIC_API_KEY || "" },
         });
 
@@ -67,17 +73,31 @@ export function useWellsHeatmap(filters: HeatmapFilters) {
         const json = await response.json();
         setRawData(json.data);
       } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") {
+          return;
+        }
         setError(err instanceof Error ? err.message : "Unexpected error");
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
     };
 
     fetchHeatmap();
+
+    return () => {
+      isCancelled = true;
+      controller.abort();
+    };
   }, [
     filters.enabled,
     filters.resource,
     filters.watershed,
+    filters.company,
+    filters.province,
+    filters.status,
+    filters.resource_type,
     filters.limit,
     filters.offset,
     filters.start_year,

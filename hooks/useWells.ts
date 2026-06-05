@@ -1,9 +1,12 @@
 import {useEffect, useState} from "react";
 import {WellDetail} from "@/app/types";
+import {WellFilters} from "@/app/types/wellFilters";
+import {buildWellFilterParams} from "@/utils/wellParams";
 
 interface useWellsParams {
-    filters: {watershed: string; province: string; status: string; company: string; limit: number};
+    filters: WellFilters;
     offset?: number;
+    enabled?: boolean;
 }
 
 type WellsResponse = {
@@ -19,39 +22,36 @@ type WellsPagination = {
     offset: number;
 };
 
-export function useWells({filters, offset}: useWellsParams) {
+export function useWells({filters, offset, enabled = true}: useWellsParams) {
     const [data, setData] = useState<WellDetail[] | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [pagination, setPagination] = useState<WellsPagination | null>(null);
 
     useEffect(() => {
+        if (!enabled) {
+            setLoading(false);
+            setError(null);
+            return;
+        }
+
+        const controller = new AbortController();
+        let isCancelled = false;
+
         const fetchWells = async () => {
             setLoading(true);
             setError(null);
+            setData(null);
 
             try {
-                // Construir query params incluyendo filtros
-                const params = new URLSearchParams();
-                params.append('limit', filters.limit.toString());
-                if (offset !== undefined) {
-                    params.append('offset', offset.toString());
-                }
-                params.append('watershed', filters.watershed);
-
-                if (filters.company) {
-                    params.append('company', filters.company);
-                }
-                if (filters.province) {
-                    params.append('province', filters.province);
-                }
-                if (filters.status) {
-                    params.append('status', filters.status);
-                }
+                const params = buildWellFilterParams(filters);
+                params.append("limit", filters.limit.toString());
+                if (offset !== undefined) params.append("offset", offset.toString());
 
                 const url = `${process.env.NEXT_PUBLIC_API_URL}/pozos?${params.toString()}`;
 
                 const response = await fetch(url, {
+                    signal: controller.signal,
                     headers: {
                         "X-API-Key": process.env.NEXT_PUBLIC_API_KEY || "",
                     },
@@ -74,15 +74,25 @@ export function useWells({filters, offset}: useWellsParams) {
                     offset: responseOffset,
                 });
             } catch (err) {
+                if (err instanceof DOMException && err.name === "AbortError") {
+                    return;
+                }
                 setError(err instanceof Error ? err.message : "Unexpected error");
                 setPagination(null);
             } finally {
-                setLoading(false);
+                if (!isCancelled) {
+                    setLoading(false);
+                }
             }
         };
 
         fetchWells();
-    }, [filters.limit, filters.watershed, filters.company, filters.province, filters.status, offset]);
+
+        return () => {
+            isCancelled = true;
+            controller.abort();
+        };
+    }, [enabled, filters.limit, filters.watershed, filters.company, filters.province, filters.status, filters.classification, offset]);
 
     return {data, loading, error, pagination};
 }

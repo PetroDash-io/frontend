@@ -26,6 +26,9 @@ export function useWellProductionComparison(
       return;
     }
 
+    const controller = new AbortController();
+    let isCancelled = false;
+
     const fetchData = async () => {
       setLoading(true);
       setError(null);
@@ -54,6 +57,7 @@ export function useWellProductionComparison(
         const url = `${process.env.NEXT_PUBLIC_API_URL}/pozos/${wellId}/comparacion-produccion?${params.toString()}`;
 
         const response = await fetch(url, {
+          signal: controller.signal,
           headers: {
             "X-API-Key": process.env.NEXT_PUBLIC_API_KEY || "",
           },
@@ -66,13 +70,23 @@ export function useWellProductionComparison(
         const result: WellProductionComparisonResponse = await response.json();
         setData(result);
       } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") {
+          return;
+        }
         setError(err instanceof Error ? err.message : "Unexpected error");
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
     };
 
     fetchData();
+
+    return () => {
+      isCancelled = true;
+      controller.abort();
+    };
   }, [wellId, dateRange, filters]);
 
   return { data, loading, error };
