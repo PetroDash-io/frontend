@@ -170,18 +170,13 @@ http://localhost:3000
 
 ### Data Exploration
 
--
 ### Individual Analysis
 
--
 ### Anomaly Detection
--
+
 ### Companies Comparison
 
--
-
 ### Production Ranking
--
 
 ---
 
