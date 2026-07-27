@@ -170,13 +170,23 @@ http://localhost:3000
 
 ### Data Exploration
 
+![Data Exploration](images/data-exploration.png)
+
 ### Individual Analysis
+
+![Individual Analysis](images/individual-analysis.png)
 
 ### Anomaly Detection
 
+![Anomaly Detection](images/anomalies.png)
+
 ### Companies Comparison
 
+![Companies Comparison](images/company-comparison.png)
+
 ### Production Ranking
+
+![Production Ranking](images/ranking.png)
 
 ---
 
